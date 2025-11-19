@@ -2,25 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Students;
 
 class StudentController extends Controller
 {
     //
 
-    public function index() {
+    public function index()
+    {
         return view('student.dashboard');
     }
 
-    public function getStudent($id = null) {
-        if(!$id) {
-            $record = Students::all();
+    public function getStudent($id = null)
+    {
+        if ($id) {
+            $student = Students::with('parent')
+                ->find($id);
+
+            if (! $student) {
+                abort(404, 'Student not found');
+            }
+
+            $data = [[
+                'sfname' => $student->first_name,
+                'slname' => $student->last_name,
+                'pfname' => $student->parent->first_name ?? '',
+                'plname' => $student->parent->last_name ?? '',
+            ]];
         } else {
-            $record = Students::find($id);
+            $students = Students::with('parent')->get();
+
+            $data = $students->map(function ($student) {
+                return [
+                    'sfname' => $student->first_name,
+                    'slname' => $student->last_name,
+                    'pfname' => $student->parent->first_name ?? '',
+                    'plname' => $student->parent->last_name ?? '',
+                ];
+            })->toArray();
         }
-        $data = $record->toArray();
-        // var_dump($record->toArray());exit;
+
         return view('student.list')->with('data', $data);
     }
 }

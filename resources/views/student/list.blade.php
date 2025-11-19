@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('content')
-<div class="table-container">
+{{-- <div class="table-container">
     <table id="studentList">
     <thead>
         <tr>
@@ -29,108 +29,43 @@
         @endforeach
     </tbody>
 </table>
+</div> --}}
+
+
+<div class="row">
+    @foreach ($data as $item)
+        <div class="col-sm-3">
+             <div class="card card-primary card-outline">
+        <div class="card-header">
+            <h3 class="card-title">{{$item['sfname']." ".$item['slname'] }}</h3>
+            <div class="card-tools">
+            <!-- Buttons, labels, and many other things can be placed here! -->
+            <!-- Here is a label for example -->
+            <span class="badge badge-primary">Active</span>
+            <span class="badge badge-danger">Delete</span>
+            </div>
+            <!-- /.card-tools -->
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            Parent/Guardian: {{ $item['pfname']." ".$item['plname'] }}
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer">
+            <button type="button" class="btn btn-block btn-outline-primary">View Student</button>
+        </div>
+        <!-- /.card-footer -->
+        </div>
+    <!-- /.card -->
+        </div>
+    @endforeach
 </div>
-
 @stop
-@section('css')
 
-<style>
-    /* Table container for responsiveness */
-.table-container {
-    width: 100%;
-    overflow-x: auto;
-    margin: 20px 0;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-/* Base table styling */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #fff;
-}
-
-/* Table headers */
-thead {
-    background-color: #4779b9;
-    color: white;
-}
-
-thead th {
-    padding: 12px 15px;
-    text-align: left;
-    font-weight: 600;
-}
-
-/* Table body */
-tbody td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #e0e0e0;
-    color: #333;
-}
-
-/* Row hover effect */
-tbody tr:hover {
-    background-color: #f1f1f1;
-    transition: background-color 0.2s ease-in-out;
-}
-
-/* Alternate row coloring */
-tbody tr:nth-child(even) {
-    background-color: #fafafa;
-}
-
-/* Table footer (if used) */
-tfoot {
-    background-color: #f9f9f9;
-    font-weight: bold;
-}
-
-/* Responsive for small screens */
-@media (max-width: 768px) {
-    thead {
-        display: none;
-    }
-
-    tbody td {
-        display: block;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    tbody tr {
-        margin-bottom: 15px;
-        display: block;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 10px;
-    }
-
-    tbody td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        display: inline-block;
-        width: 120px;
-    }
-}
-
-</style>
-
-@stop
 @section('js')
     <script>
 
-        $("#studentList").DataTable({
-            "paging": true,
-            "lengthChange": false,
-            "searching": false,
-            "ordering": true,
-            "info": true,
-            "autoWidth": false,
-            "className": "cell-border compact stripe"
-        });
+
 
     </script>
 @stop

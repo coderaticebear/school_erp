@@ -7,6 +7,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ParentController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\SubjectController;
 
 Auth::routes();
 
@@ -56,3 +57,6 @@ Route::group(['middleware' => ['auth', 'role:4']], function () {
 Route::get('/logout', [LoginController::class, 'logout']);
 
 Route::get('/students', [StudentController::class, 'getStudent']);
+Route::get('/teachers', [TeacherController::class, 'getTeacher']);
+Route::get('/subjects', [SubjectController::class, 'getSubject']);
+Route::get('/teachers/{id}', [TeacherController::class, 'viewTeacher']);
