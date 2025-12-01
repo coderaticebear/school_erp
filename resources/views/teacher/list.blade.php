@@ -3,7 +3,26 @@
 @section('content')
 
 
-
+{{-- <div class="row">
+    <table id="teacherList" class="dataTable">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Name</th>
+                <th>Subject</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($data as $item )
+                <tr>
+                    <td>1.</td>
+                    <td>{{$item['fname']." ".$item['lname'] }}</td>
+                    <td>Sub</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div> --}}
 <div class="row">
     @foreach ($data as $item)
         <div class="col-sm-3">
@@ -85,6 +104,28 @@
 
 
             })
+
+
+
+
+
         })
+
+  $(function () {
+    $("#teacherList").DataTable({
+      "responsive": true, "lengthChange": false, "autoWidth": false,
+      "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+
     </script>
 @stop
