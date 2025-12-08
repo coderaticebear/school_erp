@@ -1,71 +1,53 @@
 @extends('adminlte::page')
 
 @section('content')
-{{-- <div class="table-container">
-    <table id="studentList">
-    <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Students</h1>
+                    <a href="{{ url('admin/addStudent') }}" class="badge badge-primary">Add Student</a>
+                    <a class="badge badge-primary">Bulk Add Student</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="studentList" class="table table-bordered table-hover dataTable dtr-inline">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Parent</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($data as $item)
+                                    <tr>
+                                        <td>{{ $item['sfname'] }}</td>
+                                        <td>{{ $item['slname'] }}</td>
+                                        <td>{{ $item['pfname'] . ' ' . $item['plname'] }}</td>
+                                        <td>
+                                            <button class="badge badge-success">Active</button>
+                                            <button class="badge badge-primary">View/Edit</button>
 
-            <th>City</th>
-            <th>Province</th>
-
-            <th>Postal</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($data as $item)
-            <tr>
-                <td>{{ $item['first_name'] }}</td>
-                <td>{{ $item['last_name'] }}</td>
-
-                <td>{{ $item['city'] }}</td>
-                <td>{{ $item['province'] }}</td>
-
-                <td>{{ $item['postal'] }}</td>
-
-            </tr>
-        @endforeach
-    </tbody>
-</table>
-</div> --}}
-
-
-<div class="row">
-    @foreach ($data as $item)
-        <div class="col-sm-3">
-             <div class="card card-primary card-outline">
-        <div class="card-header">
-            <h3 class="card-title">{{$item['sfname']." ".$item['slname'] }}</h3>
-            <div class="card-tools">
-            <!-- Buttons, labels, and many other things can be placed here! -->
-            <!-- Here is a label for example -->
-            <span class="badge badge-primary">Active</span>
-            <span class="badge badge-danger">Delete</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <!-- /.card-tools -->
         </div>
-        <!-- /.card-header -->
-        <div class="card-body">
-            Parent/Guardian: {{ $item['pfname']." ".$item['plname'] }}
-        </div>
-        <!-- /.card-body -->
-        <div class="card-footer">
-            <button type="button" class="btn btn-block btn-outline-primary">View Student</button>
-        </div>
-        <!-- /.card-footer -->
-        </div>
-    <!-- /.card -->
-        </div>
-    @endforeach
-</div>
+    </div>
 @stop
 
 @section('js')
     <script>
-
-
-
+        $(document).ready(function() {
+            $('#studentList').DataTable({
+                responsive: true,
+            });
+        })
     </script>
 @stop

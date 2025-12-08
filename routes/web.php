@@ -38,6 +38,7 @@ Route::get('/dashboard', function () {
 // Admin routes
 Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/addStudent', [AdminController::class, 'addStudent'])->name('admin.addStudent');
 });
 
 // Teacher routes
@@ -48,6 +49,7 @@ Route::group(['middleware' => ['auth', 'role:2']], function () {
 // Student routes
 Route::group(['middleware' => ['auth', 'role:3']], function () {
     Route::get('/student/dashboard', [StudentController::class, 'index'])->name('student.dashboard');
+    Route::post('/student/addStudent', [StudentController::class, 'addStudent'])->name('student.addStudent');
 });
 
 // Parent routes
@@ -60,3 +62,5 @@ Route::get('/students', [StudentController::class, 'getStudent']);
 Route::get('/teachers', [TeacherController::class, 'getTeacher']);
 Route::get('/subjects', [SubjectController::class, 'getSubject']);
 Route::get('/teachers/{id}', [TeacherController::class, 'viewTeacher']);
+
+

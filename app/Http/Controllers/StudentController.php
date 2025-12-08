@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Students;
+use App\Models\Login;
+use App\Models\StudentClass;
+ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -16,11 +19,12 @@ class StudentController extends Controller
 
     public function addStudent(Request $request)
     {
+
         // --- 1. VALIDATION ---
         $validated = $request->validate([
             'first_name' => 'required|max:255|string',
             'last_name' => 'required|max:255|string',
-            'parent_id' => 'nullable|integer',
+            'parent_id' => 'required|integer',
 
             'address_line_1' => 'required|max:255|string',
             'address_line_2' => 'nullable|max:255|string',
@@ -29,9 +33,8 @@ class StudentController extends Controller
             'country' => 'required|max:255|string',
             'postal' => 'required|max:255|string',
 
-            'email' => 'required|email|max:255|unique:logins,email',
+            'email' => 'required|email|max:255|unique:login,email',
             'password' => 'required|max:255',
-            'role' => 'required|integer',
         ]);
 
         DB::beginTransaction();
@@ -42,13 +45,14 @@ class StudentController extends Controller
             $login = Login::create([
                 'email' => $validated['email'],
                 'password' => bcrypt($validated['password']),
-                'role' => $validated['role'], // student = 3
+                'role' => 3, // student = 3
+                'is_active' => true
             ]);
 
             // --- 3. CREATE STUDENT RECORD ---
             $student = Students::create([
                 'login_id' => $login->id,
-                'parent_id' => $validated['parent_id'] ?? null,
+                'parent_id' => $validated['parent_id'],
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
 
@@ -73,6 +77,15 @@ class StudentController extends Controller
     }
 
     public function assignClass($student_id, $division_id) {
+        if($student_id != NUll && $division_id != NULL) {
+            $current_class = StudentClass::create([
+                'student_id' => $student_id,
+                'class_division_id' => $division_id,
+                'is_active' => true,
+            ]);
+            return $current_class->id;
+        }
+        return false;
 
     }
 
