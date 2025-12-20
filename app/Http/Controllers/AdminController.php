@@ -24,6 +24,10 @@ class AdminController extends Controller
 
         return view('admin.dashboard')->with('data', $data);
     }
+    public function viewStudent($id)
+    {
+        return view('student.profile');
+    }
 
     public function addStudent()
     {

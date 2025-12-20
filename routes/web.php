@@ -63,5 +63,5 @@ Route::get('/students', [StudentController::class, 'getStudent']);
 Route::get('/teachers', [TeacherController::class, 'getTeacher']);
 Route::get('/subjects', [SubjectController::class, 'getSubject']);
 Route::get('/teachers/{id}', [TeacherController::class, 'viewTeacher']);
-
+Route::get('/admin/view/student/{id}', [AdminController::class, 'viewStudent']);
 
