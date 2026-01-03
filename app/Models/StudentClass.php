@@ -23,7 +23,7 @@ class StudentClass extends Model
 
     public function division()
     {
-        return $this->belongsTo(Division::class, 'class_division_id');
+        return $this->belongsTo(Divisions::class, 'class_division_id');
     }
     public function academicYear()
     {

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Parents;
 use App\Models\Students;
 use App\Models\Teachers;
+use App\Models\AcademicYear;
+use App\Models\StudentClass;
 use App\Pipelines\SanitizeInput;
 use Illuminate\Http\Request;
 
@@ -26,15 +28,26 @@ class AdminController extends Controller
         return view('admin.dashboard')->with('data', $data);
     }
 
+    public function getCurrentAcademicYear() {
+        $academicYear = AcademicYear::where('is_active', true)->first();
+        return $academicYear;
+    }
+
     public function viewStudent($id)
     {
+
+
         $id = SanitizeInput::run([$id])[0];
         if (! ctype_digit((string) $id)) {
             abort(404, 'Invalid student ID');
         }
-
+        $academicYear = $this->getCurrentAcademicYear();
         $student = Students::with(['parent.login'])->findOrFail($id);
         $parent = $student->parent;
+        $classDetails = StudentClass::query()
+        ->where('student_id', $student->id)
+        ->where('academic_year_id', $academicYear->id)
+        ->with(['division.class'])->firstOrFail();
         $data = [
             'student_id' => $student->id,
             'roll_number' => $student->roll_number ?? 'N/A',
@@ -53,6 +66,9 @@ class AdminController extends Controller
             'date_of_birth' => date('j F Y', strtotime($student->date_of_birth)) ?? 'N/A',
             'gender' => $student->gender ?? 'N/A',
             'blood_group' => $student->blood_group ?? 'N/A',
+            'division_name' => $classDetails->division->division_name,
+            'class_name' => $classDetails->division->class->class_name,
+            'academic_year' => $academicYear->year,
         ];
         return view('student.profile', compact('data'));
     }
