@@ -35,13 +35,13 @@
                     {{-- TABS --}}
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" data-toggle="tab" href="#student_tab">Student Info</a>
+                            <a class="nav-link active" data-identify="1" data-toggle="tab" href="#student_tab">Student Info</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#parent_tab">Parent Info</a>
+                            <a class="nav-link" data-identify="2" data-toggle="tab" href="#parent_tab">Parent Info</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#address_tab">Address & Login</a>
+                            <a class="nav-link" data-identify="3" data-toggle="tab" href="#address_tab">Address & Login</a>
                         </li>
                     </ul>
 
@@ -74,6 +74,7 @@
                             </div>
 
                             <div class="form-group">
+                                
                                 <label>Blood Group</label>
                                 <select name="blood_group" class="form-control">
                                     <option value="">Select</option>
@@ -179,7 +180,10 @@
                 </div>
 
                 <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    
+                    <button id="prev" type="button" class="btn btn-primary">Previous</button>
+                    <button id="next" type="button" class="btn btn-primary">Next</button>
+                    <button id="submit" type="submit" class="btn btn-primary">Submit</button>
                 </div>
 
             </form>
@@ -191,6 +195,55 @@
 @section('js')
 <script>
 $(document).ready(function () {
+
+    $('#prev').hide();
+    $('#next').show();
+    $('#submit').hide();
+
+    $('#next').on('click', function () {
+    let $activeTab = $('.nav-tabs .nav-link.active');
+
+    if ($activeTab.attr('href') === '#student_tab') {
+        // Student → Parent
+        $('a[href="#parent_tab"]').tab('show');
+    } else if ($activeTab.attr('href') === '#parent_tab') {
+        // Parent → Address
+        $('a[href="#address_tab"]').tab('show');
+    }
+});
+
+// PREV button
+$('#prev').on('click', function () {
+    let $activeTab = $('.nav-tabs .nav-link.active');
+
+    if ($activeTab.attr('href') === '#address_tab') {
+        // Address → Parent
+        $('a[href="#parent_tab"]').tab('show');
+    } else if ($activeTab.attr('href') === '#parent_tab') {
+        // Parent → Student
+        $('a[href="#student_tab"]').tab('show');
+    }
+});
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    let tab_value = $(e.target).data('identify');
+        
+        if (tab_value == 1) {
+            $('#prev').hide();
+            $('#next').show();
+            $('#submit').hide();
+        } else if(tab_value == 2) {
+            $('#submit').hide();
+            $('#prev').show();
+            $('#next').show();
+        } else if(tab_value == 3) {
+            $('#submit').show();
+            $('#prev').show();
+            $('#next').hide();
+        }
+    })
+    
+    
     $('#check_p_email').click(function (e) {
         e.preventDefault();
 
@@ -218,6 +271,9 @@ $(document).ready(function () {
             }
         });
     });
+
+    
+
 });
 </script>
 @stop
