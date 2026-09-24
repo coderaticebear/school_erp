@@ -82,6 +82,12 @@ Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, 
 - The report card view (`exams/report-card.blade.php`) is shared by the admin, student and parent pages.
 - `AcademicYearFactory` makes **inactive** years with unique names. Use `->active()` when a test needs the current year.
 
+### Student and parent portals (Phase 5)
+- `Portal\StudentPortalController` (`/student/*`) and `Portal\ParentPortalController` (`/parent/*`, with child pages at `/parent/children/{student}/*`) share the `StudentRecords` trait and the `resources/views/portal/*` views. The trait's `portalRoutes()` supplies `$routePrefix`/`$routeParams`, so links stay in the current portal.
+- The `view-student` Gate allows admins, the student themselves, or the student's parent. Every parent child route must authorize it.
+- Portals show a timetable only once `timetable_published_at` is set, and only exams with `results_published_at`. An unpublished report card returns 404.
+- `App\Services\StudentOverview` supplies enrolment, the attendance summary and records, published results, and today's lessons.
+
 ### Input sanitization and validation
 `App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).
 

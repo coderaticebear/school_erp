@@ -17,11 +17,6 @@ use Illuminate\View\View;
 
 class StudentController extends Controller
 {
-    public function index(): View
-    {
-        return view('student.dashboard');
-    }
-
     /**
      * Create the student's login and profile, attach (or create) the parent,
      * and enrol the student in a division for the active academic year.

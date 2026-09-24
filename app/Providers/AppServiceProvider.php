@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Divisions;
 use App\Models\Login;
+use App\Models\Students;
 use App\Models\Subjects;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -32,6 +33,16 @@ class AppServiceProvider extends ServiceProvider
             return $user->role === Login::ROLE_TEACHER
                 && $user->teacher !== null
                 && $user->teacher->divisions()->whereKey($division->id)->exists();
+        });
+
+        // A student's own records: the student, their parent, or an admin.
+        Gate::define('view-student', function (Login $user, Students $student): bool {
+            return match ($user->role) {
+                Login::ROLE_ADMIN => true,
+                Login::ROLE_STUDENT => $user->student?->id === $student->id,
+                Login::ROLE_PARENT => $user->parent !== null && $user->parent->id === $student->parent_id,
+                default => false,
+            };
         });
 
         // Marks for a subject in a division: admins, or a teacher assigned to the division who teaches the subject.

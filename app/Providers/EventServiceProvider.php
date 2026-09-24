@@ -44,9 +44,12 @@ class EventServiceProvider extends ServiceProvider
             ],
             Login::ROLE_STUDENT => [
                 ['text' => 'Dashboard', 'url' => 'student/dashboard', 'icon' => 'fas fa-tachometer-alt'],
+                ['text' => 'My Timetable', 'url' => 'student/timetable', 'icon' => 'fas fa-calendar-alt'],
+                ['text' => 'My Attendance', 'url' => 'student/attendance', 'icon' => 'fas fa-clipboard-check'],
+                ['text' => 'My Results', 'url' => 'student/results', 'icon' => 'fas fa-poll'],
             ],
             Login::ROLE_PARENT => [
-                ['text' => 'Dashboard', 'url' => 'parent/dashboard', 'icon' => 'fas fa-tachometer-alt'],
+                ['text' => 'My Children', 'url' => 'parent/dashboard', 'icon' => 'fas fa-users'],
             ],
             default => [],
         };

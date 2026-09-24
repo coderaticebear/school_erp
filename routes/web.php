@@ -8,7 +8,8 @@ use App\Http\Controllers\Admin\PeriodController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\MarksController;
-use App\Http\Controllers\ParentController;
+use App\Http\Controllers\Portal\ParentPortalController;
+use App\Http\Controllers\Portal\StudentPortalController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\Teacher\AttendanceController as TeacherAttendanceController;
@@ -131,12 +132,22 @@ Route::middleware(['auth', 'role:'.Login::ROLE_TEACHER])->prefix('teacher')->nam
 });
 
 // Student routes
-Route::group(['middleware' => ['auth', 'role:3']], function () {
-    Route::get('/student/dashboard', [StudentController::class, 'index'])->name('student.dashboard');
+Route::middleware(['auth', 'role:'.Login::ROLE_STUDENT])->prefix('student')->name('student.')->group(function () {
+    Route::get('/dashboard', [StudentPortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/timetable', [StudentPortalController::class, 'timetable'])->name('timetable');
+    Route::get('/attendance', [StudentPortalController::class, 'attendance'])->name('attendance');
+    Route::get('/results', [StudentPortalController::class, 'results'])->name('results');
+    Route::get('/results/{exam}', [StudentPortalController::class, 'reportCard'])->name('report-card');
 });
 
 // Parent routes
-Route::group(['middleware' => ['auth', 'role:4']], function () {
-    Route::get('/parent/dashboard', [ParentController::class, 'index'])->name('parent.dashboard');
+Route::middleware(['auth', 'role:'.Login::ROLE_PARENT])->prefix('parent')->name('parent.')->group(function () {
+    Route::get('/dashboard', [ParentPortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/children/{student}', [ParentPortalController::class, 'child'])->name('children.dashboard');
+    Route::get('/children/{student}/timetable', [ParentPortalController::class, 'timetable'])->name('children.timetable');
+    Route::get('/children/{student}/attendance', [ParentPortalController::class, 'attendance'])->name('children.attendance');
+    Route::get('/children/{student}/results', [ParentPortalController::class, 'results'])->name('children.results');
+    Route::get('/children/{student}/results/{exam}', [ParentPortalController::class, 'reportCard'])->name('children.report-card');
 });
+
 Route::get('/logout', [LoginController::class, 'logout']);

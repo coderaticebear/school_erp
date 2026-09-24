@@ -46,6 +46,16 @@ class Login extends Authenticable
         return $this->teacher ?? abort(403, 'Your account has no teacher profile. Please contact the office.');
     }
 
+    public function studentProfile(): Students
+    {
+        return $this->student ?? abort(403, 'Your account has no student profile. Please contact the office.');
+    }
+
+    public function parentProfile(): Parents
+    {
+        return $this->parent ?? abort(403, 'Your account has no parent profile. Please contact the office.');
+    }
+
     public function student()
     {
         return $this->hasOne(Students::class, 'login_id');
