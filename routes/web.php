@@ -3,9 +3,11 @@
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\DivisionTeacherController;
+use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\PeriodController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\MarksController;
 use App\Http\Controllers\ParentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
@@ -94,11 +96,28 @@ Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {
     Route::post('/admin/timetable/publish', [TimeTableController::class, 'publish'])->name('admin.timetable.publish');
     Route::get('/admin/timetable/export', [TimeTableController::class, 'export'])->name('admin.timetable.export');
 
+    // Exams and results
+    Route::get('/admin/exams', [ExamController::class, 'index'])->name('admin.exams.index');
+    Route::post('/admin/exams', [ExamController::class, 'store'])->name('admin.exams.store');
+    Route::get('/admin/exams/{exam}', [ExamController::class, 'show'])->name('admin.exams.show');
+    Route::put('/admin/exams/{exam}', [ExamController::class, 'update'])->name('admin.exams.update');
+    Route::delete('/admin/exams/{exam}', [ExamController::class, 'destroy'])->name('admin.exams.destroy');
+    Route::post('/admin/exams/{exam}/publish', [ExamController::class, 'togglePublish'])->name('admin.exams.publish');
+    Route::get('/admin/exams/{exam}/divisions/{division}', [ExamController::class, 'results'])->name('admin.exams.results');
+    Route::get('/admin/exams/{exam}/students/{student}', [ExamController::class, 'reportCard'])->name('admin.exams.report-card');
+
     // Bell schedule
     Route::get('/admin/periods', [PeriodController::class, 'index'])->name('admin.periods.index');
     Route::post('/admin/periods', [PeriodController::class, 'store'])->name('admin.periods.store');
     Route::put('/admin/periods/{period}', [PeriodController::class, 'update'])->name('admin.periods.update');
     Route::delete('/admin/periods/{period}', [PeriodController::class, 'destroy'])->name('admin.periods.destroy');
+});
+
+// Marks entry (admins: any division and subject; teachers: their own, checked by the enter-marks gate)
+Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN.','.Login::ROLE_TEACHER])->name('marks.')->group(function () {
+    Route::get('/marks', [MarksController::class, 'index'])->name('index');
+    Route::get('/marks/{exam}/{division}/{subject}', [MarksController::class, 'sheet'])->name('sheet');
+    Route::post('/marks/{exam}/{division}/{subject}', [MarksController::class, 'save'])->name('save');
 });
 
 // Teacher routes

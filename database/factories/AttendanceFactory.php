@@ -17,7 +17,7 @@ class AttendanceFactory extends Factory
     public function definition(): array
     {
         return [
-            'academic_year_id' => fn () => AcademicYear::current()?->id ?? AcademicYear::factory()->create()->id,
+            'academic_year_id' => fn () => AcademicYear::current()?->id ?? AcademicYear::factory()->active()->create()->id,
             'division_id' => fn (array $attributes) => StudentClass::where('student_id', $attributes['student_id'])->value('class_division_id'),
             'student_id' => fn () => StudentClass::factory()->create()->student_id,
             'date' => now()->toDateString(),

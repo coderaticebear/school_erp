@@ -18,7 +18,7 @@ class StudentClassFactory extends Factory
             'student_id' => Students::factory(),
             'class_division_id' => Divisions::factory(),
             'is_active' => true,
-            'academic_year_id' => fn () => AcademicYear::current()?->id ?? AcademicYear::factory()->create()->id,
+            'academic_year_id' => fn () => AcademicYear::current()?->id ?? AcademicYear::factory()->active()->create()->id,
         ];
     }
 }

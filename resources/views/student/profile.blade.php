@@ -44,6 +44,23 @@
             </div>
         </div>
 
+        <!-- REPORT CARDS -->
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Report Cards</h3></div>
+            <ul class="list-group list-group-flush">
+                @forelse ($exams as $exam)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{{ route('admin.exams.report-card', [$exam, $student]) }}">{{ $exam->name }}</a>
+                        @if ($exam->isPublished())
+                            <span class="badge badge-success">Published</span>
+                        @endif
+                    </li>
+                @empty
+                    <li class="list-group-item text-muted">No exams yet.</li>
+                @endforelse
+            </ul>
+        </div>
+
         <!-- PARENT DETAILS -->
         <div class="card">
             <div class="card-header">

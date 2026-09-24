@@ -25,4 +25,23 @@ return [
         // Randomised attempts the generator makes; the best result is kept.
         'attempts' => (int) env('TIMETABLE_ATTEMPTS', 40),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Grade scale
+    |--------------------------------------------------------------------------
+    |
+    | Minimum percentage for each grade, highest first. Anything below the
+    | exam's pass mark is always an F.
+    |
+    */
+
+    'grades' => [
+        'A+' => 90,
+        'A' => 80,
+        'B' => 70,
+        'C' => 60,
+        'D' => 50,
+        'E' => 0,
+    ],
 ];

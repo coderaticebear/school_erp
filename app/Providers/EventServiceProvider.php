@@ -32,12 +32,15 @@ class EventServiceProvider extends ServiceProvider
                 ['text' => 'Academic Years', 'url' => 'admin/academic-years', 'icon' => 'fas fa-calendar'],
                 ['text' => 'Timetable Manager', 'url' => 'admin/timetable', 'icon' => 'fas fa-calendar-alt'],
                 ['text' => 'Bell Schedule', 'url' => 'admin/periods', 'icon' => 'fas fa-bell'],
+                ['text' => 'Exams & Results', 'url' => 'admin/exams', 'icon' => 'fas fa-poll'],
+                ['text' => 'Marks Entry', 'url' => 'marks', 'icon' => 'fas fa-pen'],
             ],
             Login::ROLE_TEACHER => [
                 ['text' => 'Dashboard', 'url' => 'teacher/dashboard', 'icon' => 'fas fa-tachometer-alt'],
                 ['text' => 'My Timetable', 'url' => 'teacher/timetable', 'icon' => 'fas fa-calendar-alt'],
                 ['text' => 'My Classes', 'url' => 'teacher/classes', 'icon' => 'fas fa-chalkboard'],
                 ['text' => 'Attendance', 'url' => 'teacher/attendance', 'icon' => 'fas fa-clipboard-check'],
+                ['text' => 'Marks Entry', 'url' => 'marks', 'icon' => 'fas fa-pen'],
             ],
             Login::ROLE_STUDENT => [
                 ['text' => 'Dashboard', 'url' => 'student/dashboard', 'icon' => 'fas fa-tachometer-alt'],

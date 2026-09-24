@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AcademicYear;
 use App\Models\Divisions;
+use App\Models\Exam;
 use App\Models\Login;
 use App\Models\Parents;
 use App\Models\StudentClass;
@@ -72,7 +73,11 @@ class AdminController extends Controller
             'academic_year' => $academicYear?->year ?? 'N/A',
         ];
 
-        return view('student.profile', compact('data'));
+        $exams = $academicYear
+            ? Exam::query()->where('academic_year_id', $academicYear->id)->orderByDesc('starts_on')->get()
+            : collect();
+
+        return view('student.profile', compact('data', 'exams', 'student'));
     }
 
     public function addStudent()

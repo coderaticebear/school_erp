@@ -72,6 +72,16 @@ Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, 
 - The `attendance` table holds one row per student per date (unique), and a CHECK constraint limits `status` to `Attendance::STATUSES`. `Attendance::ATTENDED` (present and late) counts toward attendance percentages. `marked_by` points at the login that saved it.
 - `DemoActivitySeeder` generates and publishes the timetable and adds two weeks of attendance, so every portal has demo data.
 
+### Exams and results (Phase 4)
+- `exams` belong to an academic year and have `max_marks`, `pass_marks` and `results_published_at`. `marks` has one row per (exam, student, subject) with either `marks` or `is_absent` (a CHECK enforces this). The upper bound comes from the exam and is validated in `SaveMarksRequest`.
+- Marks entry (`MarksController`, `/marks/*`) is shared by admins and teachers. The `enter-marks` Gate allows admins, or a teacher assigned to the division who teaches the subject. Marks are locked while results are published. A blank row deletes a student's mark.
+- `App\Services\ExamResults` calculates results:
+  - An absent subject counts as 0 and fails the student. A missing subject makes the result `Incomplete`, which isn't ranked.
+  - Ranks are competition ranks (1, 2, 2, 4).
+  - Grades come from `config('school.grades')` via `Exam::gradeFor()`, and anything below the pass mark is F.
+- The report card view (`exams/report-card.blade.php`) is shared by the admin, student and parent pages.
+- `AcademicYearFactory` makes **inactive** years with unique names. Use `->active()` when a test needs the current year.
+
 ### Input sanitization and validation
 `App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).
 

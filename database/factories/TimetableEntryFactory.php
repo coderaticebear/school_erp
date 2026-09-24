@@ -20,7 +20,7 @@ class TimetableEntryFactory extends Factory
     public function definition(): array
     {
         return [
-            'academic_year_id' => fn () => AcademicYear::current()?->id ?? AcademicYear::factory()->create()->id,
+            'academic_year_id' => fn () => AcademicYear::current()?->id ?? AcademicYear::factory()->active()->create()->id,
             'division_id' => Divisions::factory(),
             'day' => 1,
             'period_id' => fn () => Period::query()->teaching()->ordered()->value('id') ?? Period::factory()->create()->id,
