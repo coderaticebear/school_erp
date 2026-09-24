@@ -19,6 +19,11 @@ class AcademicYear extends Model
         'is_active',
     ];
 
+    protected function casts(): array
+    {
+        return ['is_active' => 'boolean'];
+    }
+
     /**
      * The academic year currently marked as active, if any.
      */

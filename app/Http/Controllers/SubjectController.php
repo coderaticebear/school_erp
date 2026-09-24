@@ -2,33 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\SubjectRequest;
 use App\Models\Subjects;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class SubjectController extends Controller
 {
-    //
+    public function index(): View
+    {
+        $subjects = Subjects::query()
+            ->with('teachers')
+            ->orderBy('subject_name')
+            ->get();
 
-    public function getSubject($id = null) {
-        if($id) {
-            $subject = Subjects::find($id);
-            if(!$subject) {
-                abort(404,'No subject found');
-            }
+        return view('subject.list', compact('subjects'));
+    }
 
-            $data = [[
-                'subject_name' => $subject->subject_name,
-            ]];
-        } else {
-            $subject = Subjects::all();
+    public function store(SubjectRequest $request): RedirectResponse
+    {
+        Subjects::create($request->validated());
 
-            $data = $subject->map(function ($item){
-                return [
-                    'subject_name' =>$item->subject_name,
-                ];
-            } )->toArray();
+        return back()->with('success', 'Subject added.');
+    }
+
+    public function update(SubjectRequest $request, Subjects $subject): RedirectResponse
+    {
+        $subject->update($request->validated());
+
+        return back()->with('success', 'Subject updated.');
+    }
+
+    public function destroy(Subjects $subject): RedirectResponse
+    {
+        if ($subject->teachers()->exists()) {
+            return back()->with('error', "{$subject->subject_name} is still taught by teachers. Remove it from those teachers first.");
         }
 
-        return view('subject.list')->with('data', $data);
+        $subject->delete();
+
+        return back()->with('success', 'Subject deleted.');
     }
 }

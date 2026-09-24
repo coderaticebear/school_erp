@@ -29,12 +29,13 @@ class LoginSeeder extends Seeder
         );
 
         if (! Login::where('email', 'teacher@example.com')->exists()) {
-            Teachers::factory()->create([
+            $teacher = Teachers::factory()->create([
                 'login_id' => Login::factory()->teacher()->create(['email' => 'teacher@example.com', 'password' => $password])->id,
-                'subject_id' => Subjects::query()->inRandomOrder()->value('id') ?? Subjects::factory(),
                 'first_name' => 'Demo',
                 'last_name' => 'Teacher',
             ]);
+
+            $teacher->subjects()->attach(Subjects::query()->orderBy('id')->limit(2)->pluck('id'));
         }
 
         if (! Login::where('email', 'parent@example.com')->exists()) {

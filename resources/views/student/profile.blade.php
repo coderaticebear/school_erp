@@ -3,6 +3,7 @@
 @section('title', 'Student Profile')
 
 @section('content')
+@include('partials.alerts')
 <div class="row">
     <!-- LEFT COLUMN -->
     <div class="col-md-4">
@@ -16,7 +17,7 @@
                 >
 
                 <h3 class="profile-username">{{ $data['student_name'] }}</h3>
-                <p class="text-muted">N/A</p>
+                <p class="text-muted">{{ $data['class_name'] }} - {{ $data['division_name'] }}</p>
 
                 <ul class="list-group list-group-unbordered mb-3 text-left">
                     <li class="list-group-item">
@@ -29,11 +30,15 @@
                     </li>
                     <li class="list-group-item">
                         <b>Status</b>
-                        <span class="float-right text-success">Active</span>
+                        @if ($data['is_active'])
+                            <span class="float-right text-success">Active</span>
+                        @else
+                            <span class="float-right text-secondary">Inactive</span>
+                        @endif
                     </li>
                 </ul>
 
-                <a href="#" class="btn btn-primary btn-block">
+                <a href="{{ route('admin.students.edit', $data['student_id']) }}" class="btn btn-primary btn-block">
                     Edit Student
                 </a>
             </div>

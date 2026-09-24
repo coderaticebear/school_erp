@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreStudentRequest;
+use App\Http\Requests\UpdateStudentRequest;
 use App\Models\AcademicYear;
+use App\Models\Divisions;
 use App\Models\Login;
 use App\Models\Parents;
 use App\Models\StudentClass;
@@ -101,14 +103,95 @@ class StudentController extends Controller
 
     public function getStudent(): View
     {
-        $data = Students::with('parent')->get()->map(fn (Students $student) => [
-            'sid' => $student->id,
-            'sfname' => $student->first_name,
-            'slname' => $student->last_name,
-            'pfname' => $student->parent->first_name ?? '',
-            'plname' => $student->parent->last_name ?? '',
-        ])->toArray();
+        $academicYear = AcademicYear::current();
 
-        return view('student.list')->with('data', $data);
+        $students = Students::query()
+            ->with([
+                'parent',
+                'login',
+                'StudentClasses' => fn ($query) => $query
+                    ->where('academic_year_id', $academicYear?->id)
+                    ->with('division.class'),
+            ])
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get();
+
+        return view('student.list', compact('students'));
+    }
+
+    public function edit(Students $student): View
+    {
+        $academicYear = AcademicYear::current();
+        $student->load('login');
+
+        $currentDivisionId = $academicYear
+            ? StudentClass::query()
+                ->where('student_id', $student->id)
+                ->where('academic_year_id', $academicYear->id)
+                ->value('class_division_id')
+            : null;
+
+        $divisions = Divisions::with('class')->get()
+            ->sortBy(fn (Divisions $division) => [$division->class->class_name ?? '', $division->division_name])
+            ->values();
+
+        return view('student.edit', compact('student', 'divisions', 'currentDivisionId', 'academicYear'));
+    }
+
+    /**
+     * Update the student's profile and login, and move them to a division for the active year.
+     */
+    public function update(UpdateStudentRequest $request, Students $student): RedirectResponse
+    {
+        $validated = $request->validated();
+        $academicYear = AcademicYear::current();
+
+        if (! $academicYear) {
+            return back()->withInput()->with('error', 'There is no active academic year. Activate one before changing classes.');
+        }
+
+        DB::transaction(function () use ($validated, $student, $academicYear) {
+            $student->update([
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'date_of_birth' => $validated['dob'],
+                'gender' => $validated['gender'],
+                'blood_group' => $validated['blood_group'],
+                'address_line_1' => $validated['address_line_1'],
+                'address_line_2' => $validated['address_line_2'] ?? null,
+                'city' => $validated['city'],
+                'province' => $validated['province'],
+                'country' => $validated['country'],
+                'postal' => $validated['postal'],
+            ]);
+
+            $student->login->email = $validated['email'];
+
+            if (filled($validated['password'] ?? null)) {
+                $student->login->password = bcrypt($validated['password']);
+            }
+
+            $student->login->save();
+
+            StudentClass::updateOrCreate(
+                ['student_id' => $student->id, 'academic_year_id' => $academicYear->id],
+                ['class_division_id' => $validated['class_division_id'], 'is_active' => true],
+            );
+        });
+
+        return redirect()->route('admin.students.show', $student)->with('success', 'Student updated.');
+    }
+
+    /**
+     * Activate or deactivate the student's login.
+     */
+    public function toggleActive(Students $student): RedirectResponse
+    {
+        $student->login->update(['is_active' => ! $student->login->is_active]);
+
+        $state = $student->login->is_active ? 'activated' : 'deactivated';
+
+        return back()->with('success', "{$student->first_name} {$student->last_name} {$state}.");
     }
 }

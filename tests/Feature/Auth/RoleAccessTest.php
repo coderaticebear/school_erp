@@ -43,6 +43,16 @@ test('non-admins cannot reach admin pages or actions', function (int $role) {
     $this->post('/admin/students', [])->assertForbidden();
     $this->post('/admin/getParentByEmail', ['email' => 'a@b.com'])->assertForbidden();
     $this->post('/admin/generateTimeTable')->assertForbidden();
+
+    $this->get('/admin/academic-years')->assertForbidden();
+    $this->post('/admin/academic-years', ['year' => '2030-2031'])->assertForbidden();
+    $this->get('/admin/classes')->assertForbidden();
+    $this->post('/admin/classes', ['class_name' => 'X'])->assertForbidden();
+    $this->post('/admin/divisions', [])->assertForbidden();
+    $this->post('/admin/subjects', ['subject_name' => 'X'])->assertForbidden();
+    $this->get('/admin/teachers/create')->assertForbidden();
+    $this->post('/admin/teachers', [])->assertForbidden();
+    $this->get('/teachers/1')->assertForbidden();
 })->with([
     'teacher' => Login::ROLE_TEACHER,
     'student' => Login::ROLE_STUDENT,

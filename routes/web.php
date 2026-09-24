@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AcademicYearController;
+use App\Http\Controllers\Admin\ClassController;
+use App\Http\Controllers\Admin\DivisionTeacherController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ParentController;
@@ -34,17 +37,54 @@ Route::get('/dashboard', function () {
 })->middleware('auth')->name('dashboard');
 
 // Admin routes
-Route::group(['middleware' => ['auth', 'role:1']], function () {
+Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+    // Students
+    Route::get('/students', [StudentController::class, 'getStudent'])->name('admin.students.index');
     Route::get('/admin/addStudent', [AdminController::class, 'addStudent'])->name('admin.addStudent');
     Route::post('/admin/students', [StudentController::class, 'store'])->name('admin.students.store');
+    Route::get('/admin/view/student/{id}', [AdminController::class, 'viewStudent'])->name('admin.students.show');
+    Route::get('/admin/students/{student}/edit', [StudentController::class, 'edit'])->name('admin.students.edit');
+    Route::put('/admin/students/{student}', [StudentController::class, 'update'])->name('admin.students.update');
+    Route::post('/admin/students/{student}/toggle-active', [StudentController::class, 'toggleActive'])->name('admin.students.toggle-active');
     Route::post('/admin/getParentByEmail', [AdminController::class, 'getParentByEmail']);
-    Route::get('/students', [StudentController::class, 'getStudent']);
-    Route::get('/teachers', [TeacherController::class, 'getTeacher']);
-    Route::get('/subjects', [SubjectController::class, 'getSubject']);
-    Route::get('/teachers/{id}', [TeacherController::class, 'viewTeacher']);
-    Route::get('/admin/view/student/{id}', [AdminController::class, 'viewStudent']);
-    Route::get('/admin/timetable', [AdminController::class, 'timeTableManager']);
+
+    // Teachers
+    Route::get('/teachers', [TeacherController::class, 'getTeacher'])->name('admin.teachers.index');
+    Route::get('/teachers/{teacher}', [TeacherController::class, 'viewTeacher'])->whereNumber('teacher')->name('admin.teachers.show');
+    Route::get('/admin/teachers/create', [TeacherController::class, 'create'])->name('admin.teachers.create');
+    Route::post('/admin/teachers', [TeacherController::class, 'store'])->name('admin.teachers.store');
+    Route::get('/admin/teachers/{teacher}/edit', [TeacherController::class, 'edit'])->name('admin.teachers.edit');
+    Route::put('/admin/teachers/{teacher}', [TeacherController::class, 'update'])->name('admin.teachers.update');
+    Route::post('/admin/teachers/{teacher}/toggle-active', [TeacherController::class, 'toggleActive'])->name('admin.teachers.toggle-active');
+
+    // Subjects
+    Route::get('/subjects', [SubjectController::class, 'index'])->name('admin.subjects.index');
+    Route::post('/admin/subjects', [SubjectController::class, 'store'])->name('admin.subjects.store');
+    Route::put('/admin/subjects/{subject}', [SubjectController::class, 'update'])->name('admin.subjects.update');
+    Route::delete('/admin/subjects/{subject}', [SubjectController::class, 'destroy'])->name('admin.subjects.destroy');
+
+    // Academic years
+    Route::get('/admin/academic-years', [AcademicYearController::class, 'index'])->name('admin.academic-years.index');
+    Route::post('/admin/academic-years', [AcademicYearController::class, 'store'])->name('admin.academic-years.store');
+    Route::put('/admin/academic-years/{academicYear}', [AcademicYearController::class, 'update'])->name('admin.academic-years.update');
+    Route::post('/admin/academic-years/{academicYear}/activate', [AcademicYearController::class, 'activate'])->name('admin.academic-years.activate');
+    Route::delete('/admin/academic-years/{academicYear}', [AcademicYearController::class, 'destroy'])->name('admin.academic-years.destroy');
+
+    // Classes, divisions and division teachers
+    Route::get('/admin/classes', [ClassController::class, 'index'])->name('admin.classes.index');
+    Route::post('/admin/classes', [ClassController::class, 'store'])->name('admin.classes.store');
+    Route::put('/admin/classes/{class}', [ClassController::class, 'update'])->name('admin.classes.update');
+    Route::delete('/admin/classes/{class}', [ClassController::class, 'destroy'])->name('admin.classes.destroy');
+    Route::post('/admin/divisions', [ClassController::class, 'storeDivision'])->name('admin.divisions.store');
+    Route::put('/admin/divisions/{division}', [ClassController::class, 'updateDivision'])->name('admin.divisions.update');
+    Route::delete('/admin/divisions/{division}', [ClassController::class, 'destroyDivision'])->name('admin.divisions.destroy');
+    Route::get('/admin/divisions/{division}/teachers', [DivisionTeacherController::class, 'edit'])->name('admin.divisions.teachers.edit');
+    Route::put('/admin/divisions/{division}/teachers', [DivisionTeacherController::class, 'update'])->name('admin.divisions.teachers.update');
+
+    // Timetable
+    Route::get('/admin/timetable', [AdminController::class, 'timeTableManager'])->name('admin.timetable');
     Route::post('/admin/generateTimeTable', [TimeTableController::class, 'generateTimeTable']);
 });
 

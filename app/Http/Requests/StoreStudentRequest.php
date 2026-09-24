@@ -2,27 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Login;
-use App\Pipelines\SanitizeInput;
-use Illuminate\Foundation\Http\FormRequest;
-
-class StoreStudentRequest extends FormRequest
+class StoreStudentRequest extends AdminFormRequest
 {
-    /**
-     * Fields that must reach validation untouched (sanitizing would alter them).
-     *
-     * @var list<string>
-     */
-    protected array $unsanitized = ['password', 'parent_password'];
-
-    public function authorize(): bool
-    {
-        return $this->user()?->role === Login::ROLE_ADMIN;
-    }
-
     protected function prepareForValidation(): void
     {
-        $this->merge(SanitizeInput::run($this->except($this->unsanitized)));
+        parent::prepareForValidation();
 
         // The form always posts the hidden parent_id; an empty one means "create a new parent".
         if (blank($this->input('parent_id'))) {

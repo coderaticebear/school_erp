@@ -46,7 +46,13 @@ Model classes use **plural names** (`Students`, `Teachers`, `Parents`, `Subjects
 - `Classes` (grade) → has many `Divisions` (sections, FK `class_id`).
 - `StudentClass` (`student_classes`) assigns a student to a division for an academic year (`student_id`, `class_division_id`, `academic_year_id`).
 - `AcademicYear` uses `is_active`. Code gets the current year with `AcademicYear::where('is_active', true)->first()` (see `AdminController::getCurrentAcademicYear`).
-- `Students` belongs to `Parents` (`parent_id`). `Teachers` belongs to a single `Subjects` (`subject_id`). There is also a `teacher_division` table.
+- `Students` belongs to `Parents` (`parent_id`).
+- `Teachers` ↔ `Subjects` is many-to-many through `subject_teacher`.
+- `Teachers` ↔ `Divisions` is many-to-many through `teacher_division`. Its `class_teacher` pivot flag is limited to one per division by a partial unique index. Clear the flag before re-syncing (see `DivisionTeacherController`).
+- The database enforces uniqueness: case-insensitive `lower()` indexes on subject, class and division names (validate with `App\Rules\UniqueCaseInsensitive`), one active academic year, and one enrolment per student per year.
+
+### Admin screens (Phase 1)
+Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, classes/divisions, division teachers). Students, teachers and subjects keep their controllers at the top level. All admin routes are named `admin.*`. Admin Form Requests extend `AdminFormRequest`, which handles admin authorization and sanitization. Flash messages and validation errors render through `@include('partials.alerts')`.
 
 ### Input sanitization and validation
 `App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).

@@ -181,3 +181,108 @@ test('an empty parent_id with no new-parent details is a validation error, not a
     $this->post('/admin/students', studentPayload(['parent_id' => '', 'p_email' => '', 'parent_first_name' => '']))
         ->assertSessionHasErrors(['p_email', 'parent_first_name']);
 });
+
+test('the student list shows class and status', function () {
+    $enrolment = StudentClass::factory()->create(['class_division_id' => $this->division->id]);
+
+    $this->get('/students')
+        ->assertSuccessful()
+        ->assertSee($enrolment->student->first_name)
+        ->assertSee($this->division->division_name)
+        ->assertSee('Active');
+});
+
+test('the edit student form is prefilled with the current class', function () {
+    $enrolment = StudentClass::factory()->create(['class_division_id' => $this->division->id]);
+
+    $this->get("/admin/students/{$enrolment->student_id}/edit")
+        ->assertSuccessful()
+        ->assertSee('value="'.$enrolment->student->first_name.'"', false)
+        ->assertSee('value="'.$this->division->id.'" selected', false);
+});
+
+function studentUpdatePayload(Students $student, array $overrides = []): array
+{
+    return [
+        'first_name' => 'Renamed',
+        'last_name' => $student->last_name,
+        'dob' => '2013-01-02',
+        'gender' => 'other',
+        'blood_group' => 'AB-',
+        'class_division_id' => test()->division->id,
+        'address_line_1' => 'New Street 5',
+        'address_line_2' => '',
+        'city' => 'Ottawa',
+        'province' => 'ON',
+        'country' => 'Canada',
+        'postal' => 'K1K1K1',
+        'email' => $student->login->email,
+        'password' => '',
+        ...$overrides,
+    ];
+}
+
+test('admin can edit a student and move them to another division', function () {
+    $enrolment = StudentClass::factory()->create(['class_division_id' => $this->division->id]);
+    $student = $enrolment->student;
+    $newDivision = Divisions::factory()->create();
+    $oldHash = $student->login->password;
+
+    $this->put("/admin/students/{$student->id}", studentUpdatePayload($student, ['class_division_id' => $newDivision->id]))
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('admin.students.show', $student));
+
+    $student->refresh();
+    expect($student->first_name)->toBe('Renamed')
+        ->and($student->gender)->toBe('other')
+        ->and($student->login->password)->toBe($oldHash)
+        ->and(StudentClass::where('student_id', $student->id)->count())->toBe(1)
+        ->and(StudentClass::where('student_id', $student->id)->value('class_division_id'))->toBe($newDivision->id);
+});
+
+test('editing a student without a class enrols them for the active year', function () {
+    $student = Students::factory()->create();
+
+    $this->put("/admin/students/{$student->id}", studentUpdatePayload($student))->assertSessionHasNoErrors();
+
+    $this->assertDatabaseHas('student_classes', [
+        'student_id' => $student->id,
+        'class_division_id' => $this->division->id,
+        'academic_year_id' => $this->academicYear->id,
+    ]);
+});
+
+test('editing a student can change login email and password', function () {
+    $student = Students::factory()->create();
+
+    $this->put("/admin/students/{$student->id}", studentUpdatePayload($student, ['email' => 'new@example.test', 'password' => 'new-password']))
+        ->assertSessionHasNoErrors();
+
+    $login = $student->fresh()->login;
+    expect($login->email)->toBe('new@example.test')
+        ->and(Hash::check('new-password', $login->password))->toBeTrue();
+});
+
+test('student edit validation', function (array $overrides, string $field) {
+    $student = Students::factory()->create();
+    $taken = Login::factory()->create(['email' => 'taken@example.test']);
+
+    $this->put("/admin/students/{$student->id}", studentUpdatePayload($student, $overrides))->assertSessionHasErrors($field);
+})->with([
+    'email of another account' => [['email' => 'taken@example.test'], 'email'],
+    'short new password' => [['password' => 'short'], 'password'],
+    'missing division' => [['class_division_id' => ''], 'class_division_id'],
+    'bad gender' => [['gender' => 'robot'], 'gender'],
+]);
+
+test('a student can be deactivated and reactivated', function () {
+    $student = Students::factory()->create();
+
+    $this->post("/admin/students/{$student->id}/toggle-active")->assertSessionHas('success');
+    expect($student->login->fresh()->is_active)->toBeFalse();
+
+    $this->get("/admin/view/student/{$student->id}")->assertSee('Inactive');
+
+    $this->post("/admin/students/{$student->id}/toggle-active");
+    expect($student->login->fresh()->is_active)->toBeTrue();
+});

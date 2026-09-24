@@ -28,6 +28,8 @@ class EventServiceProvider extends ServiceProvider
                 ['text' => 'Manage Students', 'url' => 'students', 'icon' => 'fas fa-user-graduate'],
                 ['text' => 'Manage Teachers', 'url' => 'teachers', 'icon' => 'fas fa-chalkboard-teacher'],
                 ['text' => 'Manage Subjects', 'url' => 'subjects', 'icon' => 'fas fa-book'],
+                ['text' => 'Classes & Divisions', 'url' => 'admin/classes', 'icon' => 'fas fa-school'],
+                ['text' => 'Academic Years', 'url' => 'admin/academic-years', 'icon' => 'fas fa-calendar'],
                 ['text' => 'Timetable Manager', 'url' => 'admin/timetable', 'icon' => 'fas fa-calendar-alt'],
             ],
             Login::ROLE_TEACHER => [

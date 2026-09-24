@@ -1,10 +1,9 @@
 <?php
 
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\RoleMiddleware;
-
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,6 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
         ]);
+
+        // Check the role before route-model binding, so other roles get 403 (not 404) on admin URLs.
+        $middleware->prependToPriorityList(
+            before: \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            prepend: RoleMiddleware::class,
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

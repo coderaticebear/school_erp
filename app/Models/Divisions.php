@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Divisions extends Model
 {
@@ -18,13 +21,28 @@ class Divisions extends Model
         'class_id',
     ];
 
-    public function class()
+    public function class(): BelongsTo
     {
         return $this->belongsTo(Classes::class, 'class_id');
     }
 
-    public function studentClasses()
+    public function studentClasses(): HasMany
     {
         return $this->hasMany(StudentClass::class, 'class_division_id');
+    }
+
+    public function teachers(): BelongsToMany
+    {
+        return $this->belongsToMany(Teachers::class, 'teacher_division', 'division_id', 'teacher_id')
+            ->withPivot('class_teacher')
+            ->withTimestamps();
+    }
+
+    /**
+     * "Grade 5 - A" style label.
+     */
+    public function getLabelAttribute(): string
+    {
+        return trim(($this->class->class_name ?? '').' - '.$this->division_name, ' -');
     }
 }

@@ -39,7 +39,7 @@ class AdminController extends Controller
         }
 
         $academicYear = AcademicYear::current();
-        $student = Students::with(['parent.login'])->findOrFail($id);
+        $student = Students::with(['parent.login', 'login'])->findOrFail($id);
         $parent = $student->parent;
         $classDetails = $academicYear
             ? StudentClass::query()
@@ -52,7 +52,7 @@ class AdminController extends Controller
         $data = [
             'student_id' => $student->id,
             'roll_number' => $student->roll_number ?? 'N/A',
-            'status' => $student->status,
+            'is_active' => (bool) $student->login?->is_active,
             'student_name' => "{$student->first_name} {$student->last_name}",
             'parent_name' => $parent
                 ? "{$parent->first_name} {$parent->last_name}"

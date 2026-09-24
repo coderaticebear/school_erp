@@ -24,7 +24,7 @@ class TimeTableController extends Controller
 
         $divisions = Divisions::with('class')->get();
         $subjects = Subjects::all();
-        $teachers = Teachers::with('subject')->get();
+        $teachers = Teachers::with('subjects')->get();
 
         if ($divisions->isEmpty()) {
             $divisions = collect([
@@ -64,8 +64,8 @@ class TimeTableController extends Controller
                     $subject = $subjects[$subject_index % $subjects->count()];
                     $teacher = $teachers[$teacher_index % $teachers->count()];
 
-                    if (! empty($teacher->subject) && $teacher->subject->id !== $subject->id) {
-                        $teacher = $teachers->firstWhere('subject_id', $subject->id) ?? $teacher;
+                    if (isset($teacher->subjects) && ! $teacher->subjects->contains('id', $subject->id)) {
+                        $teacher = $teachers->first(fn ($candidate) => isset($candidate->subjects) && $candidate->subjects->contains('id', $subject->id)) ?? $teacher;
                     }
 
                     $final_timetable[$division_key][$day][$slot] = [
