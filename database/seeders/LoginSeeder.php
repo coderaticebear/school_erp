@@ -36,6 +36,15 @@ class LoginSeeder extends Seeder
             ]);
 
             $teacher->subjects()->attach(Subjects::query()->orderBy('id')->limit(2)->pluck('id'));
+
+            // Teach in the first two divisions; class teacher of the first.
+            foreach (Divisions::query()->orderBy('id')->limit(2)->get() as $index => $division) {
+                if ($index === 0) {
+                    $division->teachers()->newPivotStatement()->where('division_id', $division->id)->update(['class_teacher' => false]);
+                }
+
+                $division->teachers()->syncWithoutDetaching([$teacher->id => ['class_teacher' => $index === 0]]);
+            }
         }
 
         if (! Login::where('email', 'parent@example.com')->exists()) {

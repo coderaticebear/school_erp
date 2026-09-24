@@ -13,11 +13,6 @@ use Illuminate\View\View;
 
 class TeacherController extends Controller
 {
-    public function index(): View
-    {
-        return view('teacher.dashboard');
-    }
-
     public function getTeacher(): View
     {
         $teachers = Teachers::query()

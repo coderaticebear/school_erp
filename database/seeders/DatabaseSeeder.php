@@ -87,5 +87,8 @@ class DatabaseSeeder extends Seeder
 
         // Demo accounts with known passwords
         $this->call(LoginSeeder::class);
+
+        // A published timetable and two weeks of attendance, so every portal has data.
+        $this->call(DemoActivitySeeder::class);
     }
 }

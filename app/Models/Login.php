@@ -38,6 +38,14 @@ class Login extends Authenticable
         ];
     }
 
+    /**
+     * The teacher profile of a teacher login, or 403 when the account has none.
+     */
+    public function teacherProfile(): Teachers
+    {
+        return $this->teacher ?? abort(403, 'Your account has no teacher profile. Please contact the office.');
+    }
+
     public function student()
     {
         return $this->hasOne(Students::class, 'login_id');

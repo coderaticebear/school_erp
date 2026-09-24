@@ -9,6 +9,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ParentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\Teacher\AttendanceController as TeacherAttendanceController;
+use App\Http\Controllers\Teacher\PortalController as TeacherPortalController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TimeTableController;
 use App\Models\Login;
@@ -100,8 +102,13 @@ Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {
 });
 
 // Teacher routes
-Route::group(['middleware' => ['auth', 'role:2']], function () {
-    Route::get('/teacher/dashboard', [TeacherController::class, 'index'])->name('teacher.dashboard');
+Route::middleware(['auth', 'role:'.Login::ROLE_TEACHER])->prefix('teacher')->name('teacher.')->group(function () {
+    Route::get('/dashboard', [TeacherPortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/timetable', [TeacherPortalController::class, 'timetable'])->name('timetable');
+    Route::get('/classes', [TeacherPortalController::class, 'classes'])->name('classes');
+    Route::get('/classes/{division}', [TeacherPortalController::class, 'roster'])->name('classes.show');
+    Route::get('/attendance', [TeacherAttendanceController::class, 'index'])->name('attendance');
+    Route::post('/attendance', [TeacherAttendanceController::class, 'store'])->name('attendance.store');
 });
 
 // Student routes

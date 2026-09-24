@@ -66,6 +66,12 @@ Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, 
 - Manual slot edits go through `TimetableEntryRequest`. The teacher must be active, assigned to the division, teach the subject, and be free in that slot.
 - `academic_year.timetable_published_at` controls whether teachers, students and parents can see the timetable.
 
+### Teacher portal and attendance (Phase 3)
+- Teacher pages are in `app/Http/Controllers/Teacher` under `/teacher/*` (routes named `teacher.*`). Get the profile with `$request->user()->teacherProfile()`, which returns 403 when a teacher login has no `teachers` row.
+- The `teach-division` Gate (in `AppServiceProvider`) allows admins, or teachers assigned to that division. Use it for any division-scoped teacher action.
+- The `attendance` table holds one row per student per date (unique), and a CHECK constraint limits `status` to `Attendance::STATUSES`. `Attendance::ATTENDED` (present and late) counts toward attendance percentages. `marked_by` points at the login that saved it.
+- `DemoActivitySeeder` generates and publishes the timetable and adds two weeks of attendance, so every portal has demo data.
+
 ### Input sanitization and validation
 `App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).
 
@@ -73,7 +79,7 @@ Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, 
 `DatabaseSeeder` uses model factories in `database/factories` (for example `Login::factory()->admin()`). It creates a single active `2025-2026` academic year, then classes and divisions, teachers, parents and students. It then calls `LoginSeeder`, which creates demo accounts with full profiles. Their password is `password`: `admin@example.com`, `teacher@example.com`, `student@example.com` (enrolled), and `parent@example.com` (the demo student's parent).
 
 ### Tests
-Pest feature tests use `RefreshDatabase` against the `testing` Postgres database. `actingAsRole(Login::ROLE_X)` in `tests/Pest.php` creates and logs in a user with that role.
+Pest feature tests use `RefreshDatabase` against the `testing` Postgres database. `actingAsRole(Login::ROLE_X)` in `tests/Pest.php` creates and logs in a user with that role, including their teacher, student or parent profile. Tests that depend on "today" pin the clock with `Carbon::setTestNow()`.
 
 ## PostgreSQL notes
 Differences from MySQL that cause real bugs here:
