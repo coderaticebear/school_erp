@@ -38,6 +38,11 @@ class Divisions extends Model
             ->withTimestamps();
     }
 
+    public function timetableEntries(): HasMany
+    {
+        return $this->hasMany(TimetableEntry::class, 'division_id');
+    }
+
     /**
      * "Grade 5 - A" style label.
      */

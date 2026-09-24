@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Teachers extends Model
 {
@@ -46,6 +47,11 @@ class Teachers extends Model
         return $this->belongsToMany(Divisions::class, 'teacher_division', 'teacher_id', 'division_id')
             ->withPivot('class_teacher')
             ->withTimestamps();
+    }
+
+    public function timetableEntries(): HasMany
+    {
+        return $this->hasMany(TimetableEntry::class, 'teacher_id');
     }
 
     public function getFullNameAttribute(): string

@@ -31,6 +31,7 @@ class EventServiceProvider extends ServiceProvider
                 ['text' => 'Classes & Divisions', 'url' => 'admin/classes', 'icon' => 'fas fa-school'],
                 ['text' => 'Academic Years', 'url' => 'admin/academic-years', 'icon' => 'fas fa-calendar'],
                 ['text' => 'Timetable Manager', 'url' => 'admin/timetable', 'icon' => 'fas fa-calendar-alt'],
+                ['text' => 'Bell Schedule', 'url' => 'admin/periods', 'icon' => 'fas fa-bell'],
             ],
             Login::ROLE_TEACHER => [
                 ['text' => 'Dashboard', 'url' => 'teacher/dashboard', 'icon' => 'fas fa-tachometer-alt'],

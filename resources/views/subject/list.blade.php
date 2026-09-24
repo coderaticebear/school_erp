@@ -18,6 +18,9 @@
                     <div class="card-body">
                         <label for="subject_name">Subject name</label>
                         <input type="text" id="subject_name" name="subject_name" class="form-control" value="{{ old('subject_name') }}" placeholder="Mathematics">
+                        <label for="periods_per_week" class="mt-3">Periods per week <small class="text-muted">(optional)</small></label>
+                        <input type="number" id="periods_per_week" name="periods_per_week" class="form-control" min="1" max="60" value="{{ old('periods_per_week') }}">
+                        <small class="form-text text-muted">Leave empty to share the week evenly with other subjects.</small>
                     </div>
                     <div class="card-footer"><button type="submit" class="btn btn-primary">Add</button></div>
                 </form>
@@ -31,6 +34,7 @@
                         <thead>
                             <tr>
                                 <th>Subject</th>
+                                <th>Periods / week</th>
                                 <th>Teachers</th>
                                 <th class="text-right">Actions</th>
                             </tr>
@@ -39,9 +43,10 @@
                             @forelse ($subjects as $subject)
                                 <tr>
                                     <td>{{ $subject->subject_name }}</td>
+                                    <td>{{ $subject->periods_per_week ?? 'Auto' }}</td>
                                     <td>{{ $subject->teachers->map->full_name->join(', ') ?: '—' }}</td>
                                     <td class="text-right text-nowrap">
-                                        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editSubject{{ $subject->id }}">Rename</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editSubject{{ $subject->id }}">Edit</button>
                                         <form action="{{ route('admin.subjects.destroy', $subject) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $subject->subject_name }}?')">
                                             @csrf
                                             @method('DELETE')
@@ -50,7 +55,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="3" class="text-center text-muted">No subjects yet.</td></tr>
+                                <tr><td colspan="4" class="text-center text-muted">No subjects yet.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -66,11 +71,14 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-header">
-                        <h5 class="modal-title">Rename {{ $subject->subject_name }}</h5>
+                        <h5 class="modal-title">Edit {{ $subject->subject_name }}</h5>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body">
+                        <label>Name</label>
                         <input type="text" name="subject_name" class="form-control" value="{{ $subject->subject_name }}">
+                        <label class="mt-3">Periods per week <small class="text-muted">(empty = auto)</small></label>
+                        <input type="number" name="periods_per_week" class="form-control" min="1" max="60" value="{{ $subject->periods_per_week }}">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>

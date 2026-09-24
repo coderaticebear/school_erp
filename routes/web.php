@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\DivisionTeacherController;
+use App\Http\Controllers\Admin\PeriodController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ParentController;
@@ -84,8 +85,18 @@ Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {
     Route::put('/admin/divisions/{division}/teachers', [DivisionTeacherController::class, 'update'])->name('admin.divisions.teachers.update');
 
     // Timetable
-    Route::get('/admin/timetable', [AdminController::class, 'timeTableManager'])->name('admin.timetable');
-    Route::post('/admin/generateTimeTable', [TimeTableController::class, 'generateTimeTable']);
+    Route::get('/admin/timetable', [TimeTableController::class, 'index'])->name('admin.timetable');
+    Route::post('/admin/timetable/generate', [TimeTableController::class, 'generate'])->name('admin.timetable.generate');
+    Route::put('/admin/timetable/entries', [TimeTableController::class, 'saveEntry'])->name('admin.timetable.entries.save');
+    Route::delete('/admin/timetable/entries', [TimeTableController::class, 'clearEntry'])->name('admin.timetable.entries.clear');
+    Route::post('/admin/timetable/publish', [TimeTableController::class, 'publish'])->name('admin.timetable.publish');
+    Route::get('/admin/timetable/export', [TimeTableController::class, 'export'])->name('admin.timetable.export');
+
+    // Bell schedule
+    Route::get('/admin/periods', [PeriodController::class, 'index'])->name('admin.periods.index');
+    Route::post('/admin/periods', [PeriodController::class, 'store'])->name('admin.periods.store');
+    Route::put('/admin/periods/{period}', [PeriodController::class, 'update'])->name('admin.periods.update');
+    Route::delete('/admin/periods/{period}', [PeriodController::class, 'destroy'])->name('admin.periods.destroy');
 });
 
 // Teacher routes

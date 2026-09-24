@@ -54,6 +54,18 @@ Model classes use **plural names** (`Students`, `Teachers`, `Parents`, `Subjects
 ### Admin screens (Phase 1)
 Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, classes/divisions, division teachers). Students, teachers and subjects keep their controllers at the top level. All admin routes are named `admin.*`. Admin Form Requests extend `AdminFormRequest`, which handles admin authorization and sanitization. Flash messages and validation errors render through `@include('partials.alerts')`.
 
+### Timetable (Phase 2)
+- `periods` is the bell schedule. `is_break` rows (Lunch) show in grids but never get lessons. `config/school.php` holds the school days (`SCHOOL_DAYS`, ISO 1–7) and generator settings.
+- `timetable_entries` has one row per (academic year, division, day, period). Two unique indexes forbid a double-booked division **and** a double-booked teacher.
+- `App\Services\TimetableGenerator` builds timetables:
+  - Only uses active teachers assigned to the division, and keeps one teacher per subject per division.
+  - Caps a subject per day, and fills weekly targets from `subjects.periods_per_week`. Subjects with no value share the week evenly.
+  - Fills slots across all divisions together, then repairs gaps by swapping lessons.
+  - Runs `generate()` with a seed (deterministic in tests). `save()` replaces only the targeted divisions.
+- `App\Services\TimetableGrid` builds day×period grids for a division or teacher. They render through `resources/views/timetable/grid.blade.php` (+ `timetable/styles.blade.php`, which includes the print CSS). The portals reuse the same partial.
+- Manual slot edits go through `TimetableEntryRequest`. The teacher must be active, assigned to the division, teach the subject, and be free in that slot.
+- `academic_year.timetable_published_at` controls whether teachers, students and parents can see the timetable.
+
 ### Input sanitization and validation
 `App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).
 

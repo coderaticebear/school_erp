@@ -109,29 +109,4 @@ class AdminController extends Controller
             'parent_id' => $parent,
         ]);
     }
-
-    public function assignClassTeacher($id, $classDivisionId) {}
-
-    public function timeTableManager()
-    {
-        /**
-         * Lets for a moment design a cell in timetable. what data is it associated with.
-         * It should have a class/division id to identify which room it belongs to
-         * A cell must have a subject
-         * A cell must have a teacher
-         * A cell must have a time
-         * A cell must have a day.
-         *
-         * All this constitutes a cell in time table.
-         *
-         * The next question is onwership of these data for each cell.
-         * What conditions does it needs to meet to be assigned with the data.
-         */
-        return view('admin.timetable');
-    }
 }
-/**
- * To assign a class teacher, we need two tables.
- * Teacher-division - to track each teachers teaching on each division with a flg to mark if its class teacher or not
- * Also table to track which subjects each teacher teaches!
- */

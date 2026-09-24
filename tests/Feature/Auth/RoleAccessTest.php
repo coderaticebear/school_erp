@@ -42,7 +42,12 @@ test('non-admins cannot reach admin pages or actions', function (int $role) {
     $this->get('/admin/timetable')->assertForbidden();
     $this->post('/admin/students', [])->assertForbidden();
     $this->post('/admin/getParentByEmail', ['email' => 'a@b.com'])->assertForbidden();
-    $this->post('/admin/generateTimeTable')->assertForbidden();
+    $this->post('/admin/timetable/generate')->assertForbidden();
+    $this->put('/admin/timetable/entries', [])->assertForbidden();
+    $this->delete('/admin/timetable/entries', [])->assertForbidden();
+    $this->post('/admin/timetable/publish')->assertForbidden();
+    $this->get('/admin/timetable/export?division=1')->assertForbidden();
+    $this->get('/admin/periods')->assertForbidden();
 
     $this->get('/admin/academic-years')->assertForbidden();
     $this->post('/admin/academic-years', ['year' => '2030-2031'])->assertForbidden();

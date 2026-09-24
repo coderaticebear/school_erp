@@ -16,6 +16,7 @@ class SubjectRequest extends AdminFormRequest
                 'required', 'string', 'max:255',
                 new UniqueCaseInsensitive('subjects', 'subject_name', $this->route('subject')?->id),
             ],
+            'periods_per_week' => ['nullable', 'integer', 'min:1', 'max:60'],
         ];
     }
 }

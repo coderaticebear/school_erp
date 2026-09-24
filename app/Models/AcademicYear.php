@@ -17,11 +17,12 @@ class AcademicYear extends Model
     protected $fillable = [
         'year',
         'is_active',
+        'timetable_published_at',
     ];
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean'];
+        return ['is_active' => 'boolean', 'timetable_published_at' => 'datetime'];
     }
 
     /**
