@@ -51,6 +51,12 @@ class EventServiceProvider extends ServiceProvider
                 ]);
 
                 $event->menu->add([
+                    'text' => 'Timetable Manager',
+                    'url'  => 'admin/timetable',
+                    'icon' => 'fas fa-chalkboard-teacher',
+                ]);
+
+                $event->menu->add([
                     'text' => 'Manage Subjects',
                     'url'  => 'subjects',
                     'icon' => 'fas fa-book',
