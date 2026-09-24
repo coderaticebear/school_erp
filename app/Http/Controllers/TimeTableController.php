@@ -214,6 +214,7 @@ class TimeTableController extends Controller
             ->groupBy('division_id');
 
         $subjectNames = Subjects::query()->pluck('subject_name', 'id');
+        $divisions->loadMissing(['teachers.subjects', 'teachers.login']);
         $unscheduled = [];
 
         foreach ($divisions as $division) {

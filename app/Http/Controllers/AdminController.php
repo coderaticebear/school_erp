@@ -11,24 +11,35 @@ use App\Models\StudentClass;
 use App\Models\Students;
 use App\Models\Teachers;
 use App\Pipelines\SanitizeInput;
+use App\Services\SchoolReports;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminController extends Controller
 {
     //
 
-    public function index()
+    public function index(SchoolReports $reports): View
     {
+        $academicYear = AcademicYear::current();
 
-        $studentCount = Students::count();
-        $teacherCount = Teachers::count();
+        $latestExam = $academicYear
+            ? Exam::query()->where('academic_year_id', $academicYear->id)->whereNotNull('results_published_at')->latest('results_published_at')->first()
+            : null;
 
-        $data = [
-            'studentCount' => $studentCount,
-            'teacherCount' => $teacherCount,
-        ];
+        $examSummary = $latestExam ? $reports->examByDivision($latestExam) : collect();
+        $complete = $examSummary->sum('complete');
 
-        return view('admin.dashboard')->with('data', $data);
+        return view('admin.dashboard', [
+            'academicYear' => $academicYear,
+            'studentCount' => Students::whereHas('login', fn ($query) => $query->where('is_active', true))->count(),
+            'teacherCount' => Teachers::whereHas('login', fn ($query) => $query->where('is_active', true))->count(),
+            'today' => $academicYear ? $reports->attendanceToday($academicYear) : null,
+            'lowAttendance' => $academicYear ? $reports->attendanceByStudent($academicYear, now()->startOfMonth(), now()->startOfDay())->take(5) : collect(),
+            'latestExam' => $latestExam,
+            'passRate' => $complete > 0 ? round(100 * $examSummary->sum('passed') / $complete, 1) : null,
+            'timetablePublished' => (bool) $academicYear?->timetable_published_at,
+        ]);
     }
 
     public function viewStudent($id)

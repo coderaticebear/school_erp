@@ -6,6 +6,7 @@ use App\Models\Divisions;
 use App\Models\Login;
 use App\Models\Students;
 use App\Models\Subjects;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Surface N+1 queries during development and tests.
+        Model::preventLazyLoading(! $this->app->isProduction());
+
         // Admins can manage any division; teachers only the divisions they are assigned to.
         Gate::define('teach-division', function (Login $user, Divisions $division): bool {
             if ($user->role === Login::ROLE_ADMIN) {

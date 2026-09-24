@@ -305,12 +305,6 @@ return [
         //     'text' => 'search',
         //     'topnav_right' => true,
         // ],
-        [
-            'text' => 'Logout',
-            'url' => '/logout',
-            'topnav_right' => true,
-            'icon' => 'fas fa-sign-out-alt',
-        ],
 
         // Sidebar items:
         // [

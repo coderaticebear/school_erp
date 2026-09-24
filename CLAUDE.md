@@ -88,6 +88,12 @@ Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, 
 - Portals show a timetable only once `timetable_published_at` is set, and only exams with `results_published_at`. An unpublished report card returns 404.
 - `App\Services\StudentOverview` supplies enrolment, the attendance summary and records, published results, and today's lessons.
 
+### Reports and hardening (Phase 6)
+- `App\Services\SchoolReports` powers the admin dashboard and `Admin\ReportController` (attendance by division or student with a `school.low_attendance_percent` flag, exam results by division or subject, CSV export).
+- `Model::preventLazyLoading()` is on outside production, so an N+1 query throws in dev and tests. Eager-load relations (including `class` whenever you use `Divisions::$label`).
+- Logout is POST only (AdminLTE's user menu). `Login` uses `Notifiable` so password-reset emails send. `Login::$name` feeds the navbar.
+- `tests/Feature/Auth/RouteProtectionTest.php` fails if a new route lacks `auth` plus a `role:` middleware. Add public routes to its list on purpose, never by accident.
+
 ### Input sanitization and validation
 `App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).
 
@@ -106,7 +112,7 @@ Differences from MySQL that cause real bugs here:
 - Use Boost `database-schema` / `database-query` to check real columns and foreign keys before writing queries or migrations.
 
 ## Docker file sync
-On this machine (Docker Desktop for Linux), the container sometimes sees a stale copy of a file that was just replaced, as an editor's atomic save does. Before trusting a test run right after edits, confirm the container matches the host (e.g. `diff <(cat FILE) <(vendor/bin/sail exec -T laravel.test cat FILE)`).
+This machine uses the Docker Desktop for Linux context (`desktop-linux`). Laravel's Sail docs recommend `docker context use default` there. With the Desktop context, the container sometimes sees a stale copy of a file that was just replaced, as an editor's atomic save does. Before trusting a test run right after edits, confirm the container matches the host (e.g. `diff <(cat FILE) <(vendor/bin/sail exec -T laravel.test cat FILE)`).
 
 ## Environment
 `.env` must set `PG_ADMIN_USERNAME` / `PG_ADMIN_PASSWORD` for the pgAdmin container, as well as the `DB_*` values (`DB_HOST=pgsql` under Sail).

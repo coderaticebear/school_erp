@@ -44,12 +44,22 @@ test('remember me works on the login table', function () {
     expect($login->fresh()->remember_token)->not->toBeNull();
 });
 
-test('a user can log out', function () {
+test('a user can log out with a POST, and GET logout is not allowed', function () {
     actingAsRole(Login::ROLE_ADMIN);
 
-    $this->get('/logout')->assertRedirect('/');
+    $this->get('/logout')->assertMethodNotAllowed();
+    $this->assertAuthenticated();
 
+    $this->post('/logout')->assertRedirect('/');
     $this->assertGuest();
+});
+
+test('the navbar shows the user\'s name with a POST logout form', function () {
+    $login = actingAsRole(Login::ROLE_TEACHER);
+
+    $this->get('/teacher/dashboard')
+        ->assertSee($login->teacher->full_name)
+        ->assertSee('id="logout-form"', false);
 });
 
 test('public registration is disabled', function () {

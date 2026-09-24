@@ -5,8 +5,8 @@ use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\DivisionTeacherController;
 use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\PeriodController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\MarksController;
 use App\Http\Controllers\Portal\ParentPortalController;
 use App\Http\Controllers\Portal\StudentPortalController;
@@ -107,6 +107,10 @@ Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {
     Route::get('/admin/exams/{exam}/divisions/{division}', [ExamController::class, 'results'])->name('admin.exams.results');
     Route::get('/admin/exams/{exam}/students/{student}', [ExamController::class, 'reportCard'])->name('admin.exams.report-card');
 
+    // Reports
+    Route::get('/admin/reports/attendance', [ReportController::class, 'attendance'])->name('admin.reports.attendance');
+    Route::get('/admin/reports/exams', [ReportController::class, 'exams'])->name('admin.reports.exams');
+
     // Bell schedule
     Route::get('/admin/periods', [PeriodController::class, 'index'])->name('admin.periods.index');
     Route::post('/admin/periods', [PeriodController::class, 'store'])->name('admin.periods.store');
@@ -149,5 +153,3 @@ Route::middleware(['auth', 'role:'.Login::ROLE_PARENT])->prefix('parent')->name(
     Route::get('/children/{student}/results', [ParentPortalController::class, 'results'])->name('children.results');
     Route::get('/children/{student}/results/{exam}', [ParentPortalController::class, 'reportCard'])->name('children.report-card');
 });
-
-Route::get('/logout', [LoginController::class, 'logout']);

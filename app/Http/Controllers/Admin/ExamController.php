@@ -75,7 +75,7 @@ class ExamController extends Controller
      */
     public function show(Exam $exam): View
     {
-        $divisions = Divisions::with('class')->get()->sortBy('label')->values();
+        $divisions = Divisions::with(['class', 'teachers.subjects', 'teachers.login'])->get()->sortBy('label')->values();
 
         $studentCounts = StudentClass::query()
             ->where('academic_year_id', $exam->academic_year_id)

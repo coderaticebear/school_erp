@@ -34,6 +34,8 @@ class EventServiceProvider extends ServiceProvider
                 ['text' => 'Bell Schedule', 'url' => 'admin/periods', 'icon' => 'fas fa-bell'],
                 ['text' => 'Exams & Results', 'url' => 'admin/exams', 'icon' => 'fas fa-poll'],
                 ['text' => 'Marks Entry', 'url' => 'marks', 'icon' => 'fas fa-pen'],
+                ['text' => 'Attendance Report', 'url' => 'admin/reports/attendance', 'icon' => 'fas fa-chart-bar'],
+                ['text' => 'Exam Report', 'url' => 'admin/reports/exams', 'icon' => 'fas fa-chart-line'],
             ],
             Login::ROLE_TEACHER => [
                 ['text' => 'Dashboard', 'url' => 'teacher/dashboard', 'icon' => 'fas fa-tachometer-alt'],

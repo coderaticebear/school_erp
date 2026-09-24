@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticable;
+use Illuminate\Notifications\Notifiable;
 
 class Login extends Authenticable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     public const ROLE_ADMIN = 1;
 
@@ -36,6 +37,21 @@ class Login extends Authenticable
             'role' => 'integer',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Display name for the navbar user menu: the person's name, or the email for admins.
+     */
+    public function getNameAttribute(): string
+    {
+        $profile = match ($this->role) {
+            self::ROLE_TEACHER => $this->teacher,
+            self::ROLE_STUDENT => $this->student,
+            self::ROLE_PARENT => $this->parent,
+            default => null,
+        };
+
+        return $profile ? trim("{$profile->first_name} {$profile->last_name}") : (string) $this->email;
     }
 
     /**

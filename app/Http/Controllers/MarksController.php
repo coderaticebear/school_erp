@@ -106,9 +106,10 @@ class MarksController extends Controller
      */
     protected function sheetsFor(Login $user, Exam $exam): Collection
     {
+        $relations = ['class', 'teachers.subjects', 'teachers.login'];
         $divisions = $user->role === Login::ROLE_ADMIN
-            ? Divisions::with('class')->get()
-            : $user->teacherProfile()->divisions()->with('class')->get();
+            ? Divisions::with($relations)->get()
+            : $user->teacherProfile()->divisions()->with($relations)->get();
 
         $mySubjectIds = $user->role === Login::ROLE_ADMIN ? null : $user->teacher->subjects()->pluck('subjects.id');
 
