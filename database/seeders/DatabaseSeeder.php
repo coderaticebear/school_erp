@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\AcademicYear;
@@ -43,21 +44,21 @@ class DatabaseSeeder extends Seeder
         $parents = Parents::factory()->count(5)->create();
 
         // Students
-        $students = Students::factory()->count(20)->create([
-            'parent_id' => $parents->random()->id,
-        ]);
+        $students = Students::factory()->count(20)->recycle($parents)->create();
 
         // Student Classes (THIS WAS MISSING)
         $divisions = Divisions::all();
 
         foreach ($students as $student) {
             StudentClass::create([
-                'student_id'        => $student->id,
+                'student_id' => $student->id,
                 'class_division_id' => $divisions->random()->id,
-                'academic_year_id'  => $academicYear->id,
-                'is_active'         => true,
+                'academic_year_id' => $academicYear->id,
+                'is_active' => true,
             ]);
         }
-    }
 
+        // Demo accounts with known passwords
+        $this->call(LoginSeeder::class);
+    }
 }

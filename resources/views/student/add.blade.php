@@ -8,7 +8,7 @@
                 <h3 class="card-title">Add Student</h3>
             </div>
 
-            <form action="{{ url('student/addStudent') }}" method="post">
+            <form action="{{ route('admin.students.store') }}" method="post">
                 @csrf
 
                 <div class="card-body">
@@ -51,25 +51,26 @@
                         <div class="tab-pane fade show active" id="student_tab">
                             <div class="form-group">
                                 <label>First Name</label>
-                                <input type="text" name="first_name" class="form-control">
+                                <input type="text" name="first_name" value="{{ old('first_name') }}" class="form-control">
                             </div>
 
                             <div class="form-group">
                                 <label>Last Name</label>
-                                <input type="text" name="last_name" class="form-control">
+                                <input type="text" name="last_name" value="{{ old('last_name') }}" class="form-control">
                             </div>
 
                             <div class="form-group">
                                 <label>Date of Birth</label>
-                                <input type="date" name="dob" class="form-control">
+                                <input type="date" name="dob" value="{{ old('dob') }}" class="form-control">
                             </div>
 
                             <div class="form-group">
                                 <label>Gender</label>
                                 <select name="gender" class="form-control">
                                     <option value="">Select</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
+                                    <option value="male" @selected(old('gender') === 'male')>Male</option>
+                                    <option value="female" @selected(old('gender') === 'female')>Female</option>
+                                    <option value="other" @selected(old('gender') === 'other')>Other</option>
                                 </select>
                             </div>
 
@@ -78,10 +79,22 @@
                                 <label>Blood Group</label>
                                 <select name="blood_group" class="form-control">
                                     <option value="">Select</option>
-                                    <option value="A+">A+</option><option value="A-">A-</option>
-                                    <option value="B+">B+</option><option value="B-">B-</option>
-                                    <option value="AB+">AB+</option><option value="AB-">AB-</option>
-                                    <option value="O+">O+</option><option value="O-">O-</option>
+                                    <option value="A+" @selected(old('blood_group') === 'A+')>A+</option><option value="A-" @selected(old('blood_group') === 'A-')>A-</option>
+                                    <option value="B+" @selected(old('blood_group') === 'B+')>B+</option><option value="B-" @selected(old('blood_group') === 'B-')>B-</option>
+                                    <option value="AB+" @selected(old('blood_group') === 'AB+')>AB+</option><option value="AB-" @selected(old('blood_group') === 'AB-')>AB-</option>
+                                    <option value="O+" @selected(old('blood_group') === 'O+')>O+</option><option value="O-" @selected(old('blood_group') === 'O-')>O-</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Class / Division</label>
+                                <select name="class_division_id" class="form-control">
+                                    <option value="">Select</option>
+                                    @foreach ($divisions as $division)
+                                        <option value="{{ $division->id }}" @selected((string) old('class_division_id') === (string) $division->id)>
+                                            {{ $division->class->class_name ?? 'Class' }} - {{ $division->division_name }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -91,33 +104,33 @@
 
                             <div class="form-group">
                                 <label>Parent Email</label>
-                                <input type="email" id="p_email" name="p_email" class="form-control">
+                                <input type="email" id="p_email" name="p_email" value="{{ old('p_email') }}" class="form-control">
                                 <button id="check_p_email" class="badge badge-info mt-1">Check Availability</button>
                                 <span id="p_found_badge" class="badge badge-success" style="display:none">Parent Found</span>
                                 <span id="p_missing_badge" class="badge badge-danger" style="display:none">Parent Not Found</span>
                             </div>
 
-                            <input type="hidden" name="parent_id" id="parent_id">
+                            <input type="hidden" name="parent_id" id="parent_id" value="{{ old('parent_id') }}">
 
-                            <div id="parent_form" style="display:none">
+                            <div id="parent_form" @style(['display:none' => ! $errors->any() || old('parent_id')])>
                                 <div class="form-group">
                                     <label>Parent First Name</label>
-                                    <input type="text" name="parent_first_name" class="form-control">
+                                    <input type="text" name="parent_first_name" value="{{ old('parent_first_name') }}" class="form-control">
                                 </div>
 
                                 <div class="form-group">
                                     <label>Parent Last Name</label>
-                                    <input type="text" name="parent_last_name" class="form-control">
+                                    <input type="text" name="parent_last_name" value="{{ old('parent_last_name') }}" class="form-control">
                                 </div>
 
                                 <div class="form-row">
                                     <div class="col-4">
                                         <label>Area Code</label>
-                                        <input type="text" name="parent_area_code" class="form-control">
+                                        <input type="text" name="parent_area_code" value="{{ old('parent_area_code') }}" class="form-control">
                                     </div>
                                     <div class="col-8">
                                         <label>Phone Number</label>
-                                        <input type="text" name="parent_phone" class="form-control">
+                                        <input type="text" name="parent_phone" value="{{ old('parent_phone') }}" class="form-control">
                                     </div>
                                 </div>
 
@@ -133,33 +146,33 @@
 
                             <div class="form-group">
                                 <label>Address Line 1</label>
-                                <input type="text" name="address_line_1" class="form-control">
+                                <input type="text" name="address_line_1" value="{{ old('address_line_1') }}" class="form-control">
                             </div>
 
                             <div class="form-group">
                                 <label>Address Line 2</label>
-                                <input type="text" name="address_line_2" class="form-control">
+                                <input type="text" name="address_line_2" value="{{ old('address_line_2') }}" class="form-control">
                             </div>
 
                             <div class="form-row">
                                 <div class="col">
                                     <label>City</label>
-                                    <input type="text" name="city" class="form-control">
+                                    <input type="text" name="city" value="{{ old('city') }}" class="form-control">
                                 </div>
                                 <div class="col">
                                     <label>Province</label>
-                                    <input type="text" name="province" class="form-control">
+                                    <input type="text" name="province" value="{{ old('province') }}" class="form-control">
                                 </div>
                             </div>
 
                             <div class="form-row mt-2">
                                 <div class="col">
                                     <label>Country</label>
-                                    <input type="text" name="country" class="form-control">
+                                    <input type="text" name="country" value="{{ old('country') }}" class="form-control">
                                 </div>
                                 <div class="col">
                                     <label>Postal Code</label>
-                                    <input type="text" name="postal" class="form-control">
+                                    <input type="text" name="postal" value="{{ old('postal') }}" class="form-control">
                                 </div>
                             </div>
 
@@ -167,7 +180,7 @@
 
                             <div class="form-group">
                                 <label>Student Email</label>
-                                <input type="email" name="email" class="form-control">
+                                <input type="email" name="email" value="{{ old('email') }}" class="form-control">
                             </div>
 
                             <div class="form-group">

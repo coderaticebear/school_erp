@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class StudentClass extends Model
 {
-    //
+    use HasFactory;
+
     protected $table = 'student_classes';
 
     protected $fillable = [
@@ -16,8 +18,7 @@ class StudentClass extends Model
         'academic_year_id',
     ];
 
-
-     public function student()
+    public function student()
     {
         return $this->belongsTo(Students::class, 'student_id');
     }
@@ -26,6 +27,7 @@ class StudentClass extends Model
     {
         return $this->belongsTo(Divisions::class, 'class_division_id');
     }
+
     public function academicYear()
     {
         return $this->belongsTo(AcademicYear::class, 'academic_year_id');

@@ -40,6 +40,16 @@ class LoginController extends Controller
         $this->middleware('auth')->only('logout');
     }
 
+    /**
+     * Only active accounts may log in.
+     *
+     * @return array<string, mixed>
+     */
+    protected function credentials(Request $request): array
+    {
+        return [...$request->only($this->username(), 'password'), 'is_active' => true];
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();

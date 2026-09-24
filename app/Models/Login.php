@@ -2,14 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User as Authenticable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticable;
 
 class Login extends Authenticable
 {
     use HasFactory;
+
+    public const ROLE_ADMIN = 1;
+
+    public const ROLE_TEACHER = 2;
+
+    public const ROLE_STUDENT = 3;
+
+    public const ROLE_PARENT = 4;
+
     protected $table = 'login';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -18,7 +27,16 @@ class Login extends Authenticable
         'role',
         'is_active',
     ];
-    protected $hidden = ['password'];
+
+    protected $hidden = ['password', 'remember_token'];
+
+    protected function casts(): array
+    {
+        return [
+            'role' => 'integer',
+            'is_active' => 'boolean',
+        ];
+    }
 
     public function student()
     {
@@ -35,4 +53,3 @@ class Login extends Authenticable
         return $this->hasOne(Parents::class, 'login_id');
     }
 }
-

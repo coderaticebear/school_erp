@@ -7,10 +7,11 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TimeTableController;
+use App\Models\Login;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Auth::routes();
+Auth::routes(['register' => false]);
 
 // Redirect root '/' based on login
 Route::get('/', function () {
@@ -22,24 +23,21 @@ Route::get('/', function () {
 // Fallback dashboard route that redirects based on role
 Route::get('/dashboard', function () {
     $user = auth()->user();
-    switch ($user->role) {
-        case 1:
-            return redirect()->route('admin.dashboard');
-        case 2:
-            return redirect()->route('teacher.dashboard');
-        case 3:
-            return redirect()->route('student.dashboard');
-        case 4:
-            return redirect()->route('parent.dashboard');
-        default:
-            return redirect('/login');
-    }
+
+    return match ((int) $user->role) {
+        Login::ROLE_ADMIN => redirect()->route('admin.dashboard'),
+        Login::ROLE_TEACHER => redirect()->route('teacher.dashboard'),
+        Login::ROLE_STUDENT => redirect()->route('student.dashboard'),
+        Login::ROLE_PARENT => redirect()->route('parent.dashboard'),
+        default => abort(403),
+    };
 })->middleware('auth')->name('dashboard');
 
 // Admin routes
 Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/addStudent', [AdminController::class, 'addStudent'])->name('admin.addStudent');
+    Route::post('/admin/students', [StudentController::class, 'store'])->name('admin.students.store');
     Route::post('/admin/getParentByEmail', [AdminController::class, 'getParentByEmail']);
     Route::get('/students', [StudentController::class, 'getStudent']);
     Route::get('/teachers', [TeacherController::class, 'getTeacher']);
@@ -58,7 +56,6 @@ Route::group(['middleware' => ['auth', 'role:2']], function () {
 // Student routes
 Route::group(['middleware' => ['auth', 'role:3']], function () {
     Route::get('/student/dashboard', [StudentController::class, 'index'])->name('student.dashboard');
-    Route::post('/student/addStudent', [StudentController::class, 'addStudent'])->name('student.addStudent');
 });
 
 // Parent routes

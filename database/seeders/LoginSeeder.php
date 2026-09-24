@@ -2,47 +2,66 @@
 
 namespace Database\Seeders;
 
+use App\Models\AcademicYear;
+use App\Models\Divisions;
+use App\Models\Login;
+use App\Models\Parents;
+use App\Models\StudentClass;
+use App\Models\Students;
+use App\Models\Subjects;
+use App\Models\Teachers;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Login;
 
+/**
+ * Demo accounts with known credentials (password: "password") for local testing.
+ * Each non-admin account has a matching profile so its portal pages work.
+ */
 class LoginSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Admin user
-        Login::create([
-            'email' => 'admin@example.com',
-            'password' => Hash::make('admin123'), // must be hashed
-            'role' => 1, // 1 = Admin
-            'is_active' => true,
-        ]);
+        $password = Hash::make('password');
 
-        // Teacher user
-        Login::create([
-            'email' => 'teacher@example.com',
-            'password' => Hash::make('teacher123'),
-            'role' => 2, // 2 = Teacher
-            'is_active' => true,
-        ]);
+        Login::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            ['password' => $password, 'role' => Login::ROLE_ADMIN, 'is_active' => true],
+        );
 
-        // Student user
-        Login::create([
-            'email' => 'student@example.com',
-            'password' => Hash::make('student123'),
-            'role' => 3, // 3 = Student
-            'is_active' => true,
-        ]);
+        if (! Login::where('email', 'teacher@example.com')->exists()) {
+            Teachers::factory()->create([
+                'login_id' => Login::factory()->teacher()->create(['email' => 'teacher@example.com', 'password' => $password])->id,
+                'subject_id' => Subjects::query()->inRandomOrder()->value('id') ?? Subjects::factory(),
+                'first_name' => 'Demo',
+                'last_name' => 'Teacher',
+            ]);
+        }
 
-        // Parent user
-        Login::create([
-            'email' => 'parent@example.com',
-            'password' => Hash::make('parent123'),
-            'role' => 4, // 4 = Parent
-            'is_active' => true,
-        ]);
+        if (! Login::where('email', 'parent@example.com')->exists()) {
+            $parent = Parents::factory()->create([
+                'login_id' => Login::factory()->parent()->create(['email' => 'parent@example.com', 'password' => $password])->id,
+                'first_name' => 'Demo',
+                'last_name' => 'Parent',
+            ]);
+
+            $student = Students::factory()->create([
+                'login_id' => Login::factory()->student()->create(['email' => 'student@example.com', 'password' => $password])->id,
+                'parent_id' => $parent->id,
+                'first_name' => 'Demo',
+                'last_name' => 'Student',
+            ]);
+
+            $academicYear = AcademicYear::current();
+            $division = Divisions::query()->orderBy('id')->first();
+
+            if ($academicYear && $division) {
+                StudentClass::create([
+                    'student_id' => $student->id,
+                    'class_division_id' => $division->id,
+                    'academic_year_id' => $academicYear->id,
+                    'is_active' => true,
+                ]);
+            }
+        }
     }
 }

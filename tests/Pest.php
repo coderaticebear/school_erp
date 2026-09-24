@@ -12,7 +12,7 @@
 */
 
 pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -41,7 +41,14 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Create a login with the given role and authenticate as it.
+ */
+function actingAsRole(int $role): App\Models\Login
 {
-    // ..
+    $login = App\Models\Login::factory()->create(['role' => $role]);
+
+    test()->actingAs($login);
+
+    return $login;
 }

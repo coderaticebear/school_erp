@@ -2,9 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Event;
+use App\Models\Login;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\ServiceProvider;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
 
 class EventServiceProvider extends ServiceProvider
@@ -14,121 +15,48 @@ class EventServiceProvider extends ServiceProvider
         //
     }
 
+    /**
+     * Sidebar items for a role. Only link to pages that exist.
+     *
+     * @return list<array{text: string, url: string, icon: string}>
+     */
+    public static function menuFor(int $role): array
+    {
+        return match ($role) {
+            Login::ROLE_ADMIN => [
+                ['text' => 'Dashboard', 'url' => 'admin/dashboard', 'icon' => 'fas fa-tachometer-alt'],
+                ['text' => 'Manage Students', 'url' => 'students', 'icon' => 'fas fa-user-graduate'],
+                ['text' => 'Manage Teachers', 'url' => 'teachers', 'icon' => 'fas fa-chalkboard-teacher'],
+                ['text' => 'Manage Subjects', 'url' => 'subjects', 'icon' => 'fas fa-book'],
+                ['text' => 'Timetable Manager', 'url' => 'admin/timetable', 'icon' => 'fas fa-calendar-alt'],
+            ],
+            Login::ROLE_TEACHER => [
+                ['text' => 'Dashboard', 'url' => 'teacher/dashboard', 'icon' => 'fas fa-tachometer-alt'],
+            ],
+            Login::ROLE_STUDENT => [
+                ['text' => 'Dashboard', 'url' => 'student/dashboard', 'icon' => 'fas fa-tachometer-alt'],
+            ],
+            Login::ROLE_PARENT => [
+                ['text' => 'Dashboard', 'url' => 'parent/dashboard', 'icon' => 'fas fa-tachometer-alt'],
+            ],
+            default => [],
+        };
+    }
+
     public function boot(): void
     {
         Event::listen(BuildingMenu::class, function (BuildingMenu $event) {
 
             // If user is not logged in, skip menu building
-            if (!Auth::check()) {
+            if (! Auth::check()) {
                 return;
             }
-
-            $role = Auth::user()->role;
 
             // Shared header
             $event->menu->add('MAIN NAVIGATION');
 
-            // -------------------------
-            // ROLE: ADMIN (1)
-            // -------------------------
-            if ($role == 1) {
-                $event->menu->add([
-                    'text' => 'Dashboard',
-                    'url'  => 'admin/dashboard',
-                    'icon' => 'fas fa-tachometer-alt',
-                ]);
-
-                $event->menu->add([
-                    'text' => 'Manage Students',
-                    'url'  => 'students',
-                    'icon' => 'fas fa-user-graduate',
-                ]);
-
-                $event->menu->add([
-                    'text' => 'Manage Teachers',
-                    'url'  => 'teachers',
-                    'icon' => 'fas fa-chalkboard-teacher',
-                ]);
-
-                $event->menu->add([
-                    'text' => 'Timetable Manager',
-                    'url'  => 'admin/timetable',
-                    'icon' => 'fas fa-chalkboard-teacher',
-                ]);
-
-                $event->menu->add([
-                    'text' => 'Manage Subjects',
-                    'url'  => 'subjects',
-                    'icon' => 'fas fa-book',
-                ]);
-
-                $event->menu->add([
-                    'text' => 'Reports',
-                    'url'  => 'reports',
-                    'icon' => 'fas fa-file',
-                ]);
-            }
-
-            // -------------------------
-            // ROLE: TEACHER (2)
-            // -------------------------
-            if ($role == 2) {
-                $event->menu->add([
-                    'text' => 'My Classes',
-                    'url'  => 'teacher/classes',
-                    'icon' => 'fas fa-chalkboard',
-                ]);
-
-                $event->menu->add([
-                    'text' => 'Attendance',
-                    'url'  => 'teacher/attendance',
-                    'icon' => 'fas fa-clipboard-check',
-                ]);
-            }
-
-            // -------------------------
-            // ROLE: STUDENT (3)
-            // -------------------------
-            if ($role == 3) {
-                $event->menu->add([
-                    'text' => 'My Children',
-                    'url'  => 'parent/children',
-                    'icon' => 'fas fa-users',
-                ]);
-
-                $event->menu->add([
-                    'text' => 'Attendance Report',
-                    'url'  => 'parent/attendance',
-                    'icon' => 'fas fa-clipboard-list',
-                ]);
-
-                $event->menu->add([
-                    'text' => 'Grades',
-                    'url'  => 'parent/grades',
-                    'icon' => 'fas fa-graduation-cap',
-                ]);
-            }
-            // -------------------------
-            // ROLE: PARENT (4)
-            // -------------------------
-            if ($role == 4) {
-                $event->menu->add([
-                    'text' => 'My Children',
-                    'url'  => 'parent/children',
-                    'icon' => 'fas fa-users',
-                ]);
-
-                $event->menu->add([
-                    'text' => 'Attendance Report',
-                    'url'  => 'parent/attendance',
-                    'icon' => 'fas fa-clipboard-list',
-                ]);
-
-                $event->menu->add([
-                    'text' => 'Grades',
-                    'url'  => 'parent/grades',
-                    'icon' => 'fas fa-graduation-cap',
-                ]);
+            foreach (self::menuFor((int) Auth::user()->role) as $item) {
+                $event->menu->add($item);
             }
         });
     }

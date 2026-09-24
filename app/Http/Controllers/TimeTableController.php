@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Divisions;
 use App\Models\Subjects;
 use App\Models\Teachers;
@@ -11,7 +10,8 @@ class TimeTableController extends Controller
 {
     //
 
-    public function generateTimeTable() {
+    public function generateTimeTable()
+    {
         $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         $time_slots = [
             '08:30-09:20',
@@ -57,14 +57,14 @@ class TimeTableController extends Controller
 
         foreach ($divisions as $division) {
             $division_key = $division->id;
-            $division_name = ($division->class->class_name ?? 'Class') . ' - ' . $division->division_name;
+            $division_name = ($division->class->class_name ?? 'Class').' - '.$division->division_name;
 
             foreach ($days as $day) {
                 foreach ($time_slots as $slot) {
                     $subject = $subjects[$subject_index % $subjects->count()];
                     $teacher = $teachers[$teacher_index % $teachers->count()];
 
-                    if (!empty($teacher->subject) && $teacher->subject->id !== $subject->id) {
+                    if (! empty($teacher->subject) && $teacher->subject->id !== $subject->id) {
                         $teacher = $teachers->firstWhere('subject_id', $subject->id) ?? $teacher;
                     }
 
@@ -74,7 +74,7 @@ class TimeTableController extends Controller
                         'day' => $day,
                         'time' => $slot,
                         'subject' => $subject->subject_name,
-                        'teacher' => trim($teacher->first_name . ' ' . $teacher->last_name),
+                        'teacher' => trim($teacher->first_name.' '.$teacher->last_name),
                     ];
 
                     $subject_index++;

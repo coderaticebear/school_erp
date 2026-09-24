@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\StudentClass;
 use App\Models\AcademicYear;
+use App\Models\Divisions;
+use App\Models\StudentClass;
+use App\Models\Students;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class StudentClassFactory extends Factory
@@ -13,10 +15,10 @@ class StudentClassFactory extends Factory
     public function definition(): array
     {
         return [
-            'student_id' => 1, // override in seeder if needed
-            'class_division_id' => 1, // override in seeder if needed
+            'student_id' => Students::factory(),
+            'class_division_id' => Divisions::factory(),
             'is_active' => true,
-            'academic_year_id' => AcademicYear::first()->id,
+            'academic_year_id' => fn () => AcademicYear::current()?->id ?? AcademicYear::factory()->create()->id,
         ];
     }
 }

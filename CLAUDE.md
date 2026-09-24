@@ -31,12 +31,12 @@ Tests run against a separate `testing` Postgres database (set in `phpunit.xml`; 
 
 ### Auth and roles
 - The authenticatable model is **`App\Models\Login`** (table `login`), not `User`. `config/auth.php` defaults `AUTH_MODEL` to it. `User`/`users` is leftover Laravel scaffolding.
-- `login.role` is an integer: **1 = admin, 2 = teacher, 3 = student, 4 = parent**. `Login` has `hasOne` relations to `Students`, `Teachers` and `Parents` through `login_id`.
+- `login.role` is an integer: **1 = admin, 2 = teacher, 3 = student, 4 = parent**. Use the `Login::ROLE_*` constants, not bare numbers. `Login` has `hasOne` relations to `Students`, `Teachers` and `Parents` through `login_id`. Only `is_active` accounts can log in, and public registration is disabled (admins create accounts).
 - `routes/web.php` has one route group per role, guarded by `['auth', 'role:N']`. The `role` alias (`App\Http\Middleware\RoleMiddleware`) is registered in `bootstrap/app.php`. `/dashboard` redirects to the right role dashboard.
-- **Known issue:** `RoleMiddleware` calls `redirect('/login')` without `return`, so role checks don't block anything right now. Only `auth` is enforced.
+- `RoleMiddleware` returns 403 for a wrong role. Admin actions must live in the `role:1` group, even when they handle another entity (e.g. `POST /admin/students`).
 
 ### Sidebar navigation
-The AdminLTE sidebar menu for each role is built at runtime in `App\Providers\EventServiceProvider`, which listens for AdminLTE's `BuildingMenu` event. It is not built in `config/adminlte.php`, which only holds the static Logout item. **When you add a page, add its menu entry there.** (`MenuServiceProvider` is an empty stub.)
+The AdminLTE sidebar menu for each role is built at runtime in `App\Providers\EventServiceProvider`, which listens for AdminLTE's `BuildingMenu` event. It is not built in `config/adminlte.php`, which only holds the static Logout item. **When you add a page, add its entry to `EventServiceProvider::menuFor()`.** A test checks that every menu link resolves to a route and opens for its role, so don't link to pages that don't exist yet. (`MenuServiceProvider` is an empty stub.)
 
 ### Views
 Views use `@extends('adminlte::page')` with `title`, `content_header` and `content` sections. They are grouped by role/entity under `resources/views/{admin,teacher,student,parent,subject}`. Overridden AdminLTE vendor views are in `resources/views/vendor/adminlte`.
@@ -48,11 +48,14 @@ Model classes use **plural names** (`Students`, `Teachers`, `Parents`, `Subjects
 - `AcademicYear` uses `is_active`. Code gets the current year with `AcademicYear::where('is_active', true)->first()` (see `AdminController::getCurrentAcademicYear`).
 - `Students` belongs to `Parents` (`parent_id`). `Teachers` belongs to a single `Subjects` (`subject_id`). There is also a `teacher_division` table.
 
-### Input sanitization
-`App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Controllers call it on request data and route params before validating or querying.
+### Input sanitization and validation
+`App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).
 
-### Seeding
-Seeding happens in one place: `DatabaseSeeder`, which uses model factories in `database/factories` (for example `Login::factory()->admin()`). It creates a single active `2025-2026` academic year, then classes and divisions, teachers, parents and students. `LoginSeeder` also exists.
+### Seeding and demo logins
+`DatabaseSeeder` uses model factories in `database/factories` (for example `Login::factory()->admin()`). It creates a single active `2025-2026` academic year, then classes and divisions, teachers, parents and students. It then calls `LoginSeeder`, which creates demo accounts with full profiles. Their password is `password`: `admin@example.com`, `teacher@example.com`, `student@example.com` (enrolled), and `parent@example.com` (the demo student's parent).
+
+### Tests
+Pest feature tests use `RefreshDatabase` against the `testing` Postgres database. `actingAsRole(Login::ROLE_X)` in `tests/Pest.php` creates and logs in a user with that role.
 
 ## PostgreSQL notes
 Differences from MySQL that cause real bugs here:
@@ -61,6 +64,9 @@ Differences from MySQL that cause real bugs here:
 - Inserting explicit `id` values does not advance the sequence, so the next insert fails with a duplicate key. Let IDs auto-generate (don't hard-code `random_int(1, 6)`-style IDs either). Look up real rows instead.
 - DDL is transactional, so a failed migration rolls back completely.
 - Use Boost `database-schema` / `database-query` to check real columns and foreign keys before writing queries or migrations.
+
+## Docker file sync
+On this machine (Docker Desktop for Linux), the container sometimes sees a stale copy of a file that was just replaced, as an editor's atomic save does. Before trusting a test run right after edits, confirm the container matches the host (e.g. `diff <(cat FILE) <(vendor/bin/sail exec -T laravel.test cat FILE)`).
 
 ## Environment
 `.env` must set `PG_ADMIN_USERNAME` / `PG_ADMIN_PASSWORD` for the pgAdmin container, as well as the `DB_*` values (`DB_HOST=pgsql` under Sail).
