@@ -48,7 +48,7 @@
                                         <td>{{ $subject->teachers->map->full_name->join(', ') ?: '—' }}</td>
                                         <td class="text-right text-nowrap">
                                             <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editSubject{{ $subject->id }}">Edit</button>
-                                            <form action="{{ route('admin.subjects.destroy', $subject) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $subject->subject_name }}?')">
+                                            <form action="{{ route('admin.subjects.destroy', $subject) }}" method="post" class="d-inline" data-confirm-title="Delete {{ $subject->subject_name }}?" data-confirm-body="Subjects that are taught, timetabled or have marks can't be deleted; you'll be told if so." data-confirm-button="Delete Subject" data-confirm-tone="danger">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>

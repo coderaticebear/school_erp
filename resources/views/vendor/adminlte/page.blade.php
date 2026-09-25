@@ -44,6 +44,9 @@
             @include('adminlte::partials.footer.footer')
         @endif
 
+        {{-- Shared confirmation dialog (forms with data-confirm-title) --}}
+        @include('partials.confirm-dialog')
+
         {{-- Right Control Sidebar --}}
         @if($layoutHelper->isRightSidebarEnabled())
             @include('adminlte::partials.sidebar.right-sidebar')

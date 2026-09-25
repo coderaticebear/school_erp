@@ -32,7 +32,7 @@ test('the dashboard lists each child with class, attendance and latest result', 
         ->assertSee('Leo')
         ->assertSee($this->division->label)
         ->assertSee('0%')
-        ->assertSee('Unit Test: <strong>A+</strong>', false)
+        ->assertSeeInOrder(['Unit Test', '<p class="stat-value">A+</p>', 'Pass · 95.0%'], false)
         ->assertDontSee($this->stranger->first_name.' '.$this->stranger->last_name);
 });
 

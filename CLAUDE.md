@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Laravel 12 (PHP 8.2+), PostgreSQL, run through Laravel Sail (Docker). The UI is server-rendered Blade built on the **AdminLTE 3** package (`jeroennoten/laravel-adminlte`) with Bootstrap. Auth scaffolding comes from `laravel/ui`. Tests use Pest 4.
 
-**Styling uses Bootstrap / AdminLTE classes, not Tailwind.** Tailwind is listed in `package.json`, but `vite.config.js` only builds `resources/sass/app.scss` (Bootstrap). `resources/css/app.css` (Tailwind) isn't built. Ignore the Tailwind sections of the Boost guidelines below unless a page is explicitly moved to Tailwind.
+**Styling uses Bootstrap / AdminLTE classes plus `public/css/school-theme.css`, not Tailwind.** Tailwind and the Vite/Sass pipeline in `package.json` are unused (no page loads them). Ignore the Tailwind sections of the Boost guidelines below unless a page is explicitly moved to Tailwind.
 
 ## Commands
 
@@ -17,7 +17,7 @@ The app runs inside Sail containers (`compose.yaml`: `laravel.test`, `pgsql` on 
 ./vendor/bin/sail down
 ./vendor/bin/sail artisan migrate --seed
 ./vendor/bin/sail artisan migrate:fresh --seed   # rebuild DB with demo data
-./vendor/bin/sail npm run dev           # Vite (only used by layouts/app.blade.php, the auth pages)
+./vendor/bin/sail npm run dev           # Vite: no page uses it now; styling is AdminLTE + public/css/school-theme.css
 ./vendor/bin/sail psql
 
 ./vendor/bin/sail artisan test                          # full suite (composer test also clears config first)
@@ -94,7 +94,7 @@ Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, 
 - Logout is POST only (AdminLTE's user menu). `Login` uses `Notifiable` so password-reset emails send. `Login::$name` feeds the navbar.
 - `tests/Feature/Auth/RouteProtectionTest.php` fails if a new route lacks `auth` plus a `role:` middleware. Add public routes to its list on purpose, never by accident.
 
-### UI conventions (design review, Steps A–D)
+### UI conventions (design review, Steps A–E)
 The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
 - **Colours:** `public/css/school-theme.css` (loaded in `vendor/adminlte/master.blade.php`) overrides Bootstrap's `#007bff`, `#28a745`, `#17a2b8` and outline-warning colours, which fail contrast. Use Bootstrap classes (`btn-primary`, `badge-success` and so on) and let the theme fix them. Don't hard-code those hex values.
 - **Layout:** the layout provides the skip link, `<main id="main-content">` and the labelled sidebar `<nav>`. Don't add another `<main>`.
@@ -103,7 +103,7 @@ The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
 - **Wording:** Title Case for buttons, headings, card titles, column headers, field labels and status badges. Sentence case for help text, messages and captions. Buttons say what they do ("Add Student", not "Submit").
 - **Dates:** `M j, Y` (Sep 25, 2026); `D, M j` in lists within the current year; `l, M j` for "today" headers.
 - **Page header (Step C):** every page uses `<x-page-header title="…" subtitle="…">actions</x-page-header>` (`resources/views/components/page-header.blade.php`) inside `@section('content_header')`. Page titles match their sidebar label.
-- **Buttons:** one primary action per view (`btn-primary`). Secondary actions (Cancel, Back, Close, Export, Print) use `btn-outline-secondary`. Destructive actions use `btn-outline-danger` with a confirm. Green and yellow are for status, never for actions.
+- **Buttons:** one primary action per view (`btn-primary`). Secondary actions (Cancel, Back, Close, Export, Print) use `btn-outline-secondary`. Destructive actions use `btn-outline-danger` with a confirm (see Confirmations). Green and yellow are for status, never for actions.
 - **Forms:** use the `$field('name')` helper for `@class` so invalid fields get `is-invalid`, put `@include('partials.field-error', ['name' => …])` under each field and `@include('partials.required')` in required labels, and show the "Please fix the N fields marked below" summary instead of listing every error at the top. No tabbed forms, because they hide errors.
 - **Lists:** the record name is the link to open it. Rows have one `btn-sm` Edit action with `sr-only` context ("Edit Jane Doe"). Status badges only mark the exception (e.g. "Inactive"). Activate/deactivate lives on the Edit page (`partials.account-status`).
 - **Sidebar:** grouped with `['header' => '…']` items in `EventServiceProvider::menuFor()`. Tests skip header items when checking links.
@@ -114,6 +114,8 @@ The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
 - **Dashboards** use `.stat-card` (`.stat-label`, `.stat-value`, `.stat-context`), not AdminLTE small-boxes or info-boxes.
 - **Subjects** always appear in their colour: `<x-subject-chip :subject="$s" />` (or `plain` for dot plus name in tables). `TimetableGrid::colorFor()` / `dotFor()` give the classes, keyed by subject id.
 - **Phone layouts:** student, parent and teacher timetables include `timetable.day-list` (day picker, below 768px) plus the grid in `.d-none.d-md-block`. The attendance sheet uses `.attendance-row` (four 44px status buttons on phones, a sticky save bar with live totals).
+- **Confirmations (Step E):** never use inline `onsubmit="return confirm(…)"`; a name with an apostrophe breaks the JS and skips the confirmation. Put `data-confirm-title="Delete {{ $name }}?"` (plus optional `data-confirm-body`, `data-confirm-button="Delete Subject"`, `data-confirm-tone="danger"`) on the `<form>`. `partials/confirm-dialog.blade.php` (included by the page layout) shows the styled modal, focuses Cancel, and submits on confirm. Don't lazy-load relations inside these attributes (e.g. `$division->label`); the lazy-loading guard throws.
+- **Dark mode (Step E):** follows the system setting through the `@media (prefers-color-scheme: dark)` token block in `school-theme.css`. Views never hard-code colours: use tokens (`--erp-ink-text` for ink-coloured text and links, `--erp-ink` for filled backgrounds, `--erp-card`, `--erp-text`, `--erp-text-2`, `--erp-muted`, `--erp-line(-strong)`). When a new AdminLTE component paints its own white background, give it token colours in the theme. Check both schemes with axe (`colorScheme: 'dark'` in Playwright).
 
 ### Input sanitization and validation
 `App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).

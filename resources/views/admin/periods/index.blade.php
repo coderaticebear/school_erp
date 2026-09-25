@@ -69,7 +69,7 @@
                                         <td>{{ $period->entries_count }}</td>
                                         <td class="text-right text-nowrap">
                                             <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editPeriod{{ $period->id }}">Edit</button>
-                                            <form action="{{ route('admin.periods.destroy', $period) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $period->label }}?')">
+                                            <form action="{{ route('admin.periods.destroy', $period) }}" method="post" class="d-inline" data-confirm-title="Delete {{ $period->label }}?" data-confirm-body="It is removed from the bell schedule." data-confirm-button="Delete Period" data-confirm-tone="danger">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>

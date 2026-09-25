@@ -25,7 +25,7 @@
                         <h2 class="card-title">{{ $class->class_name }}</h2>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-toggle="modal" data-target="#editClass{{ $class->id }}" title="Rename class"><i class="fas fa-pen"></i></button>
-                            <form action="{{ route('admin.classes.destroy', $class) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $class->class_name }} and its empty divisions?')">
+                            <form action="{{ route('admin.classes.destroy', $class) }}" method="post" class="d-inline" data-confirm-title="Delete {{ $class->class_name }}?" data-confirm-body="Its divisions and their teacher assignments are deleted too. Classes with students, attendance or marks can't be deleted." data-confirm-button="Delete Class" data-confirm-tone="danger">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-tool text-danger" title="Delete class"><i class="fas fa-trash"></i></button>
@@ -52,7 +52,7 @@
                                             <td class="text-right pr-3 text-nowrap">
                                                 <a href="{{ route('admin.divisions.teachers.edit', $division) }}" class="btn btn-sm btn-outline-primary">Teachers</a>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#editDivision{{ $division->id }}">Rename</button>
-                                                <form action="{{ route('admin.divisions.destroy', $division) }}" method="post" class="d-inline" onsubmit="return confirm('Delete division {{ $division->division_name }}?')">
+                                                <form action="{{ route('admin.divisions.destroy', $division) }}" method="post" class="d-inline" data-confirm-title="Delete {{ $class->class_name }} - {{ $division->division_name }}?" data-confirm-body="Its teacher assignments are removed too." data-confirm-button="Delete Division" data-confirm-tone="danger">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>

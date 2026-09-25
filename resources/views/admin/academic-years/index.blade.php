@@ -61,7 +61,7 @@
                                             @endunless
                                             <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editYear{{ $academicYear->id }}">Edit</button>
                                             @unless ($academicYear->is_active)
-                                                <form action="{{ route('admin.academic-years.destroy', $academicYear) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $academicYear->year }}?')">
+                                                <form action="{{ route('admin.academic-years.destroy', $academicYear) }}" method="post" class="d-inline" data-confirm-title="Delete {{ $academicYear->year }}?" data-confirm-body="This academic year has no enrolments, exams, attendance or timetable, so nothing else is affected." data-confirm-button="Delete Year" data-confirm-tone="danger">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>

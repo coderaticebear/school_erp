@@ -13,7 +13,7 @@
             @endif
         </p>
         <form action="{{ $action }}" method="post" class="m-0"
-              @if ($active) onsubmit="return confirm('Deactivate {{ $name }}? They will be signed out and can\'t sign in until reactivated. Their records are kept.')" @endif>
+              @if ($active) data-confirm-title="Deactivate {{ $name }}?" data-confirm-body="They are signed out and can't sign in until reactivated. Their records are kept." data-confirm-button="Deactivate {{ ucfirst($who) }}" data-confirm-tone="danger" @endif>
             @csrf
             @if ($active)
                 <button type="submit" class="btn btn-outline-danger">Deactivate {{ ucfirst($who) }}</button>
