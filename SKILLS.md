@@ -20,6 +20,7 @@ Restart Claude Code afterwards so it loads the skills.
 | `testing-best-practices` | Laravel Boost | Yes, `.claude/skills/` | Designing and reviewing Pest tests |
 | `infer-conventions` | Laravel Boost | Yes, `.claude/skills/` | Recording this app's own conventions |
 | `playwright-skill` | [`lackeyjb/playwright-skill`](https://github.com/lackeyjb/playwright-skill) via `npx skills` | No, restored by `install-skills.sh` | Browser testing: clicking through pages, JavaScript checks, screenshots, phone layouts |
+| `apple-design` | [`dickwu/apple-design-skill`](https://github.com/dickwu/apple-design-skill) via `npx skills -a claude-code` | No, restored by `install-skills.sh` | Design and UX reviews: layout, hierarchy, accessibility, dark mode, forms, "make this look less generic" |
 
 ### Excluded on purpose
 
@@ -43,12 +44,18 @@ Laravel Boost adds these automatically, but `install-skills.sh --boost` removes 
 - Security review (2026-09-25): `run.js` only runs the scripts it's given, and `lib/helpers.js` launches browsers and probes `localhost` ports. It has no install hooks and makes no outside network calls. skills.sh rates it "Med Risk" (Snyk) because it can run arbitrary JavaScript, which is inherent to browser automation.
 - The app is at `http://localhost` (port 80). The skill's server detection only scans common dev ports and won't find it. AdminLTE shows a loading overlay, so wait for `.preloader` to hide before taking screenshots.
 
+**apple-design**
+- Installed for Claude Code only (`-a claude-code`), as a **copy** in `.claude/skills/apple-design` (gitignored, about 1.5 MB). There's no `.agents/` link. `install-skills.sh` reinstalls it the same way via `SKILL_ADD_OPTIONS`.
+- Built on Apple's Human Interface Guidelines (123 pages bundled in `references/`) for native apps (iOS, macOS, Flutter, React Native, Electron, Tauri). This project is a Bootstrap/AdminLTE web app, so apply its general guidance (hierarchy, spacing, contrast and accessibility, forms, empty states, navigation) and skip platform-specific rules such as Liquid Glass, SF Symbols and iOS navigation bars.
+- No setup step. `scripts/pull-hig.mjs` is only for refreshing the bundled guidelines by hand. Reviews don't need it.
+- Security review (2026-09-25): Markdown plus that one script, which downloads only from `developer.apple.com` and writes only inside the skill's own `references/` folder. skills.sh rates it "Low Risk" (Snyk).
+
 ## Not tracked here
 
 User-level skills and plugins (Figma, docs/pdf/xlsx, `/code-review`, `/simplify` and so on) come with Claude Code or the user's own setup, not with this repo.
 
 ## Adding or removing a skill
 
-- **Add:** `npx skills add <owner/repo> --skill <name> --yes`. This records the skill in `skills-lock.json`, so `install-skills.sh` picks it up automatically. Commit `skills-lock.json`, add a row to the table above, and run `./install-skills.sh` once so it adds the gitignore entry.
+- **Add:** `npx skills add <owner/repo> --skill <name> --yes`. This records the skill in `skills-lock.json`, so `install-skills.sh` picks it up automatically. If you used extra flags such as `-a claude-code`, add them to `SKILL_ADD_OPTIONS` in `install-skills.sh`, because the lock file doesn't record them. Commit `skills-lock.json`, add a row to the table above, and run `./install-skills.sh` once so it adds the gitignore entry.
 - **Remove:** `npx skills remove <name>`, then delete its row here and its line in `.gitignore`.
 - **Boost skill:** change `boost.json`, run `./install-skills.sh --boost`, and commit `.claude/skills/`.

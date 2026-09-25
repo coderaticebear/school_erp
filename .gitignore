@@ -26,3 +26,4 @@ Thumbs.db
 # Agent skills restored by ./install-skills.sh (see SKILLS.md)
 /.claude/skills/playwright-skill
 /.agents/
+/.claude/skills/apple-design
