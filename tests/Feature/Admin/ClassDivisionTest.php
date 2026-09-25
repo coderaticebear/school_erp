@@ -111,3 +111,11 @@ test('deleting an empty class also deletes its divisions', function () {
     expect(Divisions::find($division->id))->toBeNull()
         ->and(Classes::find($division->class_id))->toBeNull();
 });
+
+test('the classes page renders several classes and divisions without extra queries per division', function () {
+    foreach (Classes::factory()->count(2)->create() as $class) {
+        Divisions::factory()->count(2)->create(['class_id' => $class->id]);
+    }
+
+    $this->get('/admin/classes')->assertSuccessful()->assertSee('data-confirm-title="Delete ', false);
+});

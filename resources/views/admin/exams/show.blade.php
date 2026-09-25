@@ -3,13 +3,14 @@
 
 @section('content_header')
     <x-page-header :title="$exam->name" :subtitle="'Out of '.$exam->max_marks.' · pass mark '.$exam->pass_marks.($exam->starts_on ? ' · starts '.$exam->starts_on->format('M j, Y') : '')">
-        <form action="{{ route('admin.exams.publish', $exam) }}" method="post" class="d-flex align-items-center">
+        <form action="{{ route('admin.exams.publish', $exam) }}" method="post" class="d-flex align-items-center"
+              @unless ($exam->isPublished()) data-confirm-title="Publish {{ $exam->name }} results?" data-confirm-body="Students and parents will see their results and report cards, and marks will be locked until you unpublish." data-confirm-button="Publish Results" @endunless>
             @csrf
             @if ($exam->isPublished())
                 <span class="text-muted mr-2">Published {{ $exam->results_published_at->diffForHumans() }}</span>
                 <button type="submit" class="btn btn-outline-warning">Unpublish</button>
             @else
-                <button type="submit" class="btn btn-primary" onclick="return confirm('Publish results? Students and parents will see them, and marks will be locked.')"><i class="fas fa-upload mr-1" aria-hidden="true"></i> Publish Results</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-upload mr-1" aria-hidden="true"></i> Publish Results</button>
             @endif
         </form>
     </x-page-header>

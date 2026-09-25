@@ -55,7 +55,7 @@
                                                 <a href="{{ route('admin.exams.show', $exam) }}" class="btn btn-sm btn-outline-primary">View Progress</a>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#editExam{{ $exam->id }}">Edit</button>
                                                 @if ($exam->marks_count === 0)
-                                                    <form action="{{ route('admin.exams.destroy', $exam) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $exam->name }}?')">
+                                                    <form action="{{ route('admin.exams.destroy', $exam) }}" method="post" class="d-inline" data-confirm-title="Delete {{ $exam->name }}?" data-confirm-body="No marks have been entered for this exam yet." data-confirm-button="Delete Exam" data-confirm-tone="danger">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>

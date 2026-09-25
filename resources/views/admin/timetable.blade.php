@@ -12,13 +12,13 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right">
                     @if ($division)
-                        <form action="{{ route('admin.timetable.generate') }}" method="post" onsubmit="return confirm('Replace the timetable of {{ $division->label }}?')">
+                        <form action="{{ route('admin.timetable.generate') }}" method="post" data-confirm-title="Regenerate {{ $division->label }}?" data-confirm-body="Its current timetable is replaced. Other divisions stay as they are." data-confirm-button="Regenerate">
                             @csrf
                             <input type="hidden" name="division_id" value="{{ $division->id }}">
                             <button type="submit" class="dropdown-item">Only {{ $division->label }}</button>
                         </form>
                     @endif
-                    <form action="{{ route('admin.timetable.generate') }}" method="post" onsubmit="return confirm('Replace the timetables of ALL divisions?')">
+                    <form action="{{ route('admin.timetable.generate') }}" method="post" data-confirm-title="Regenerate every division?" data-confirm-body="All current timetables are replaced, including any lessons you edited by hand." data-confirm-button="Regenerate All">
                         @csrf
                         <button type="submit" class="dropdown-item">All Divisions</button>
                     </form>
@@ -170,7 +170,7 @@
                             @foreach ($legend as $entry)
                                 <div class="legend-item"><x-subject-chip :subject="$entry->subject" plain /></div>
                             @endforeach
-                            <div class="legend-item text-muted"><span class="subject-dot mr-2" style="background: #c3c9d1" aria-hidden="true"></span>Free / Break</div>
+                            <div class="legend-item text-muted"><span class="subject-dot mr-2" style="background: var(--erp-line-strong)" aria-hidden="true"></span>Free / Break</div>
                         </div>
                     </div>
                 @endif

@@ -212,7 +212,7 @@ test('the edit student form is prefilled with the current class', function () {
 
     $this->get("/admin/students/{$enrolment->student_id}/edit")
         ->assertSuccessful()
-        ->assertSee('value="'.$enrolment->student->first_name.'"', false)
+        ->assertSee('value="'.e($enrolment->student->first_name).'"', false)
         ->assertSee('value="'.$this->division->id.'" selected', false);
 });
 
@@ -316,7 +316,7 @@ test('the student profile shows real class, attendance and contact details', fun
 
     $this->get("/admin/view/student/{$student->id}")
         ->assertSuccessful()
-        ->assertSee('<h1 class="mb-0">'.$student->first_name.' '.$student->last_name.'</h1>', false)
+        ->assertSee('<h1 class="mb-0">'.e($student->first_name.' '.$student->last_name).'</h1>', false)
         ->assertSee('Clara Class')
         ->assertSee('50% attended')
         ->assertSee('Dentist')
