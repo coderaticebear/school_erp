@@ -64,7 +64,7 @@ trait StudentRecords
     protected function studentAttendance(Students $student, ?string $month): View
     {
         $academicYear = AcademicYear::current();
-        $month = $month && preg_match('/^\d{4}-\d{2}$/', $month) ? $month : null;
+        $month = $month && preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $month) ? $month : null;
 
         return view('portal.attendance', [
             ...$this->portalRoutes($student),
@@ -75,7 +75,7 @@ trait StudentRecords
             'months' => $this->overview()->attendanceRecords($student, $academicYear)
                 ->map(fn ($record) => $record->date->format('Y-m'))->unique()->values(),
             'month' => $month,
-            'monthLabel' => fn (string $value) => Carbon::createFromFormat('Y-m', $value)->format('F Y'),
+            'monthLabel' => fn (string $value) => Carbon::createFromFormat('!Y-m', $value)->format('F Y'),
         ]);
     }
 

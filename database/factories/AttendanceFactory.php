@@ -18,8 +18,9 @@ class AttendanceFactory extends Factory
     {
         return [
             'academic_year_id' => fn () => AcademicYear::current()?->id ?? AcademicYear::factory()->active()->create()->id,
-            'division_id' => fn (array $attributes) => StudentClass::where('student_id', $attributes['student_id'])->value('class_division_id'),
+            // student_id must come first: division_id is looked up from it.
             'student_id' => fn () => StudentClass::factory()->create()->student_id,
+            'division_id' => fn (array $attributes) => StudentClass::where('student_id', $attributes['student_id'])->value('class_division_id'),
             'date' => now()->toDateString(),
             'status' => Attendance::PRESENT,
         ];

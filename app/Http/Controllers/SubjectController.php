@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SubjectRequest;
+use App\Models\Mark;
 use App\Models\Subjects;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -37,6 +38,10 @@ class SubjectController extends Controller
     {
         if ($subject->teachers()->exists()) {
             return back()->with('error', "{$subject->subject_name} is still taught by teachers. Remove it from those teachers first.");
+        }
+
+        if ($subject->timetableEntries()->exists() || Mark::query()->where('subject_id', $subject->id)->exists()) {
+            return back()->with('error', "{$subject->subject_name} is used in the timetable or has marks and cannot be deleted.");
         }
 
         $subject->delete();

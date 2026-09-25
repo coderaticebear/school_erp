@@ -40,7 +40,7 @@ Route::get('/dashboard', function () {
         Login::ROLE_PARENT => redirect()->route('parent.dashboard'),
         default => abort(403),
     };
-})->middleware('auth')->name('dashboard');
+})->middleware(['auth', 'role'])->name('dashboard');
 
 // Admin routes
 Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {

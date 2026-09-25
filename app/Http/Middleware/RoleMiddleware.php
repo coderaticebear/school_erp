@@ -20,6 +20,15 @@ class RoleMiddleware
             return redirect()->guest(route('login'));
         }
 
+        // Deactivation takes effect immediately, including existing sessions and remember-me cookies.
+        if (! Auth::user()->is_active) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')->withErrors(['email' => 'Your account has been deactivated. Please contact the office.']);
+        }
+
         if ($roles && ! in_array((string) Auth::user()->role, $roles, true)) {
             abort(403);
         }

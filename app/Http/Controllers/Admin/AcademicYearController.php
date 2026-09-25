@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AcademicYearRequest;
 use App\Models\AcademicYear;
+use App\Models\Attendance;
+use App\Models\Exam;
+use App\Models\TimetableEntry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -57,8 +60,13 @@ class AcademicYearController extends Controller
             return back()->with('error', 'The active academic year cannot be deleted.');
         }
 
-        if ($academicYear->studentClass()->exists()) {
-            return back()->with('error', 'This academic year has student enrolments and cannot be deleted.');
+        $inUse = $academicYear->studentClass()->exists()
+            || Exam::query()->where('academic_year_id', $academicYear->id)->exists()
+            || Attendance::query()->where('academic_year_id', $academicYear->id)->exists()
+            || TimetableEntry::query()->where('academic_year_id', $academicYear->id)->exists();
+
+        if ($inUse) {
+            return back()->with('error', 'This academic year has enrolments, exams, attendance or a timetable and cannot be deleted.');
         }
 
         $academicYear->delete();
