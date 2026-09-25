@@ -21,7 +21,7 @@
         <div class="alert alert-info">The timetable for {{ $academicYear->year }} has not been published yet.</div>
     @else
         <div class="card">
-            <div class="card-header"><h3 class="card-title">{{ $enrolment->division->label }} · {{ $academicYear->year }}</h3></div>
+            <div class="card-header"><h2 class="card-title">{{ $enrolment->division->label }} · {{ $academicYear->year }}</h2></div>
             <div class="card-body">
                 @include('timetable.grid', ['grid' => $grid, 'mode' => 'division'])
             </div>

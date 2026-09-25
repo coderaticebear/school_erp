@@ -20,7 +20,8 @@
 
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Tick the teachers who teach this division, and choose one class teacher.</h3>
+                <h2 class="card-title float-none">Assign Teachers</h2>
+                <p class="text-muted small mb-0 mt-1">Tick the teachers who teach this division and choose one class teacher.</p>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -37,10 +38,10 @@
                             @forelse ($teachers as $teacher)
                                 <tr @class(['text-muted' => ! $teacher->login?->is_active])>
                                     <td class="pl-3">
-                                        <input type="checkbox" name="teacher_ids[]" value="{{ $teacher->id }}" class="teacher-toggle" @checked($assignedIds->contains($teacher->id))>
+                                        <input type="checkbox" name="teacher_ids[]" value="{{ $teacher->id }}" class="teacher-toggle" aria-label="{{ $teacher->full_name }} teaches this division" @checked($assignedIds->contains($teacher->id))>
                                     </td>
                                     <td>
-                                        <input type="radio" name="class_teacher_id" value="{{ $teacher->id }}" class="class-teacher" @checked($classTeacherId === $teacher->id)>
+                                        <input type="radio" name="class_teacher_id" value="{{ $teacher->id }}" class="class-teacher" aria-label="{{ $teacher->full_name }} is the class teacher" @checked($classTeacherId === $teacher->id)>
                                     </td>
                                     <td>
                                         {{ $teacher->full_name }}

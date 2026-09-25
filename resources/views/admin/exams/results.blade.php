@@ -26,7 +26,7 @@
                         <th class="text-center">%</th>
                         <th class="text-center">Grade</th>
                         <th>Result</th>
-                        <th class="no-print"></th>
+                        <th class="no-print"><span class="sr-only">Report Card</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,7 +46,7 @@
                             <td>
                                 <span @class(['badge', 'badge-success' => $row['result'] === 'Pass', 'badge-danger' => $row['result'] === 'Fail', 'badge-secondary' => $row['result'] === 'Incomplete'])>{{ $row['result'] }}</span>
                             </td>
-                            <td class="no-print"><a href="{{ route('admin.exams.report-card', [$exam, $row['student']]) }}" class="btn btn-xs btn-outline-primary">Report card</a></td>
+                            <td class="no-print"><a href="{{ route('admin.exams.report-card', [$exam, $row['student']]) }}" class="btn btn-xs btn-outline-primary">Report Card</a></td>
                         </tr>
                     @empty
                         <tr><td colspan="{{ $subjects->count() + 7 }}" class="text-center text-muted">No students are enrolled in {{ $division->label }}.</td></tr>

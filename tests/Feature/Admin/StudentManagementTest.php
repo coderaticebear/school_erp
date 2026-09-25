@@ -286,3 +286,31 @@ test('a student can be deactivated and reactivated', function () {
     $this->post("/admin/students/{$student->id}/toggle-active");
     expect($student->login->fresh()->is_active)->toBeTrue();
 });
+
+test('the student profile shows real class, attendance and contact details', function () {
+    $parent = Parents::factory()->create(['first_name' => 'Rosa', 'area_code' => '416', 'phone_number' => '5551234', 'city' => 'ParentTown']);
+    $student = Students::factory()->create([
+        'parent_id' => $parent->id, 'gender' => 'other', 'city' => 'StudentVille',
+        'address_line_2' => 'Unit 7', 'date_of_birth' => '2014-05-01',
+    ]);
+    StudentClass::factory()->create(['student_id' => $student->id, 'class_division_id' => $this->division->id]);
+    $classTeacher = \App\Models\Teachers::factory()->create(['first_name' => 'Clara', 'last_name' => 'Class']);
+    $this->division->teachers()->attach($classTeacher->id, ['class_teacher' => true]);
+    \App\Models\Attendance::factory()->create(['student_id' => $student->id, 'division_id' => $this->division->id, 'date' => '2026-01-05', 'status' => 'present']);
+    \App\Models\Attendance::factory()->create(['student_id' => $student->id, 'division_id' => $this->division->id, 'date' => '2026-01-06', 'status' => 'absent', 'remark' => 'Dentist']);
+
+    $this->get("/admin/view/student/{$student->id}")
+        ->assertSuccessful()
+        ->assertSee('<h1 class="mb-0">'.$student->first_name.' '.$student->last_name.'</h1>', false)
+        ->assertSee('Clara Class')
+        ->assertSee('50% attended')
+        ->assertSee('Dentist')
+        ->assertSee('(416) 5551234')
+        ->assertSee('Other')
+        ->assertSee('May 1, 2014')
+        ->assertSee('StudentVille')
+        ->assertSee('Unit 7')
+        ->assertDontSee('ParentTown')
+        ->assertDontSee('No teacher has been assigned yet')
+        ->assertDontSee('No data found');
+});

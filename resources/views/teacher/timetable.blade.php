@@ -18,7 +18,7 @@
     @else
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">{{ $teacher->full_name }} · {{ $academicYear->year }}</h3>
+                <h2 class="card-title">{{ $teacher->full_name }} · {{ $academicYear->year }}</h2>
             </div>
             <div class="card-body">
                 @include('timetable.grid', ['grid' => $grid, 'mode' => 'teacher'])

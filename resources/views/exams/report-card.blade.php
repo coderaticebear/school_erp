@@ -18,11 +18,11 @@
         <div class="card-body">
             <div class="d-flex flex-wrap justify-content-between mb-3">
                 <div>
-                    <h3 class="mb-0">{{ $student->first_name }} {{ $student->last_name }}</h3>
+                    <h2 class="h3 mb-0">{{ $student->first_name }} {{ $student->last_name }}</h2>
                     <div class="text-muted">{{ $division?->label ?? 'No class' }} · {{ $exam->academicYear->year ?? '' }}</div>
                 </div>
                 <div class="text-right">
-                    <h4 class="mb-0">{{ $exam->name }}</h4>
+                    <h3 class="h4 mb-0">{{ $exam->name }}</h3>
                     <div class="text-muted">Out of {{ $exam->max_marks }} per subject · pass mark {{ $exam->pass_marks }}</div>
                 </div>
             </div>

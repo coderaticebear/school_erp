@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\AcademicYear;
+use App\Models\Attendance;
 use App\Models\Divisions;
 use App\Models\Exam;
 use App\Models\Login;
 use App\Models\Parents;
-use App\Models\StudentClass;
 use App\Models\Students;
 use App\Models\Teachers;
 use App\Pipelines\SanitizeInput;
 use App\Services\SchoolReports;
+use App\Services\StudentOverview;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -42,7 +43,7 @@ class AdminController extends Controller
         ]);
     }
 
-    public function viewStudent($id)
+    public function viewStudent($id, StudentOverview $overview): View
     {
         $id = SanitizeInput::run([$id])[0];
 
@@ -52,43 +53,22 @@ class AdminController extends Controller
 
         $academicYear = AcademicYear::current();
         $student = Students::with(['parent.login', 'login'])->findOrFail($id);
-        $parent = $student->parent;
-        $classDetails = $academicYear
-            ? StudentClass::query()
-                ->where('student_id', $student->id)
-                ->where('academic_year_id', $academicYear->id)
-                ->with(['division.class'])
-                ->first()
-            : null;
-
-        $data = [
-            'student_id' => $student->id,
-            'roll_number' => $student->roll_number ?? 'N/A',
-            'is_active' => (bool) $student->login?->is_active,
-            'student_name' => "{$student->first_name} {$student->last_name}",
-            'parent_name' => $parent
-                ? "{$parent->first_name} {$parent->last_name}"
-                : 'N/A',
-            'parent_email' => optional($parent?->login)->email ?? 'N/A',
-            'address_line_1' => $parent->address_line_1 ?? 'N/A',
-            'address_line_2' => $parent->address_line_2 ?? 'N/A',
-            'city' => $parent->city ?? 'N/A',
-            'province' => $parent->province ?? 'N/A',
-            'country' => $parent->country ?? 'N/A',
-            'postal' => $parent->postal ?? 'N/A',
-            'date_of_birth' => date('j F Y', strtotime($student->date_of_birth)) ?? 'N/A',
-            'gender' => $student->gender ?? 'N/A',
-            'blood_group' => $student->blood_group ?? 'N/A',
-            'division_name' => $classDetails?->division?->division_name ?? 'Not assigned',
-            'class_name' => $classDetails?->division?->class?->class_name ?? 'Not assigned',
-            'academic_year' => $academicYear?->year ?? 'N/A',
-        ];
 
         $exams = $academicYear
-            ? Exam::query()->where('academic_year_id', $academicYear->id)->orderByDesc('starts_on')->get()
+            ? Exam::query()->where('academic_year_id', $academicYear->id)->orderByDesc('starts_on')->orderByDesc('id')->get()
             : collect();
 
-        return view('student.profile', compact('data', 'exams', 'student'));
+        return view('student.profile', [
+            'student' => $student,
+            'parent' => $student->parent,
+            'academicYear' => $academicYear,
+            'enrolment' => $overview->enrolment($student, $academicYear),
+            'attendance' => $overview->attendanceSummary($student, $academicYear),
+            'recentAbsences' => $overview->attendanceRecords($student, $academicYear)
+                ->whereIn('status', [Attendance::ABSENT, Attendance::LATE])
+                ->take(5),
+            'exams' => $exams,
+        ]);
     }
 
     public function addStudent()

@@ -27,7 +27,7 @@
             <div class="col-md-6 col-xl-4">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">{{ $row['division']->label }} <small class="text-muted">· {{ $row['students'] }} students</small></h3>
+                        <h2 class="card-title">{{ $row['division']->label }} <small class="text-muted">· {{ $row['students'] }} students</small></h2>
                         <div class="card-tools">
                             <a href="{{ route('admin.exams.results', [$exam, $row['division']]) }}" class="btn btn-tool" title="Results"><i class="fas fa-poll"></i> Results</a>
                         </div>

@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="card card-primary">
-                <div class="card-header"><h3 class="card-title">Add Academic Year</h3></div>
+                <div class="card-header"><h2 class="card-title">Add Academic Year</h2></div>
                 <form action="{{ route('admin.academic-years.store') }}" method="post">
                     @csrf
                     <div class="card-body">
@@ -22,7 +22,7 @@
                             <small class="form-text text-muted">The first year you add becomes active automatically.</small>
                         </div>
                     </div>
-                    <div class="card-footer"><button type="submit" class="btn btn-primary">Add</button></div>
+                    <div class="card-footer"><button type="submit" class="btn btn-primary">Add Year</button></div>
                 </form>
             </div>
         </div>
@@ -91,8 +91,8 @@
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <label>Year</label>
-                        <input type="text" name="year" class="form-control" value="{{ $academicYear->year }}">
+                        <label for="year-{{ $academicYear->id }}">Year</label>
+                        <input id="year-{{ $academicYear->id }}" type="text" name="year" class="form-control" value="{{ $academicYear->year }}">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>

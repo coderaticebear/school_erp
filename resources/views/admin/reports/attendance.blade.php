@@ -5,7 +5,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center">
         <h1>Attendance Report</h1>
         <div class="no-print">
-            <a href="{{ request()->fullUrlWithQuery(['format' => 'csv']) }}" class="btn btn-outline-secondary"><i class="fas fa-file-export mr-1"></i> Export students</a>
+            <a href="{{ request()->fullUrlWithQuery(['format' => 'csv']) }}" class="btn btn-outline-secondary"><i class="fas fa-file-export mr-1"></i> Export Students</a>
             <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1"></i> Print</button>
         </div>
     </div>
@@ -17,18 +17,18 @@
     @else
         <form method="get" class="card card-body no-print">
             <div class="form-row align-items-end">
-                <div class="col-md-3"><label>From</label><input type="date" name="from" class="form-control" value="{{ $from->toDateString() }}"></div>
-                <div class="col-md-3"><label>To</label><input type="date" name="to" class="form-control" value="{{ $to->toDateString() }}"></div>
+                <div class="col-md-3"><label for="from">From</label><input id="from" type="date" name="from" class="form-control" value="{{ $from->toDateString() }}"></div>
+                <div class="col-md-3"><label for="to">To</label><input id="to" type="date" name="to" class="form-control" value="{{ $to->toDateString() }}"></div>
                 <div class="col-md-4">
-                    <label>Division</label>
-                    <select name="division" class="custom-select">
+                    <label for="division">Division</label>
+                    <select id="division" name="division" class="custom-select">
                         <option value="">All divisions</option>
                         @foreach ($divisions as $option)
                             <option value="{{ $option->id }}" @selected($division?->id === $option->id)>{{ $option->label }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2"><button type="submit" class="btn btn-primary btn-block">Show</button></div>
+                <div class="col-md-2"><button type="submit" class="btn btn-primary btn-block">Show Report</button></div>
             </div>
         </form>
 
@@ -36,11 +36,11 @@
 
         @unless ($division)
             <div class="card">
-                <div class="card-header"><h3 class="card-title">By division</h3></div>
+                <div class="card-header"><h2 class="card-title">By Division</h2></div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
-                            <thead><tr><th class="pl-3">Division</th><th>Students</th><th>Days marked</th><th>Attendance</th></tr></thead>
+                            <thead><tr><th class="pl-3">Division</th><th>Students</th><th>Days Marked</th><th>Attendance</th></tr></thead>
                             <tbody>
                                 @foreach ($byDivision as $row)
                                     <tr>
@@ -66,7 +66,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">{{ $division ? 'Students in '.$division->label : 'Students below '.config('school.low_attendance_percent').'%' }}</h3>
+                <h2 class="card-title">{{ $division ? 'Students in '.$division->label : 'Students below '.config('school.low_attendance_percent').'%' }}</h2>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">

@@ -34,8 +34,15 @@
                                 <td>{{ $teacher->subjects->pluck('subject_name')->join(', ') ?: '—' }}</td>
                                 <td>
                                     @foreach ($teacher->divisions as $division)
-                                        <span @class(['badge', 'badge-primary' => $division->pivot->class_teacher, 'badge-light' => ! $division->pivot->class_teacher])
-                                              @if ($division->pivot->class_teacher) title="Class teacher" @endif>{{ $division->label }}</span>
+                                        <span @class(['badge', 'badge-primary' => $division->pivot->class_teacher, 'badge-light' => ! $division->pivot->class_teacher])>
+                                            @if ($division->pivot->class_teacher)
+                                                <i class="fas fa-star" aria-hidden="true"></i>
+                                            @endif
+                                            {{ $division->label }}
+                                            @if ($division->pivot->class_teacher)
+                                                <span class="sr-only">(Class Teacher)</span>
+                                            @endif
+                                        </span>
                                     @endforeach
                                 </td>
                                 <td>
@@ -60,6 +67,7 @@
                     </tbody>
                 </table>
             </div>
+            <p class="text-muted small mt-2 mb-0"><i class="fas fa-star" aria-hidden="true"></i> marks the division where the teacher is Class Teacher.</p>
         </div>
     </div>
 
@@ -89,7 +97,7 @@
             $(document).on('click', '.view-button', function () {
                 $.getJSON($(this).data('url'), function (teacher) {
                     const divisions = teacher.divisions.length
-                        ? teacher.divisions.map(d => escape(d.label) + (d.class_teacher ? ' (class teacher)' : '')).join('<br>')
+                        ? teacher.divisions.map(d => escape(d.label) + (d.class_teacher ? ' (Class Teacher)' : '')).join('<br>')
                         : '—';
 
                     $('#viewDataModalLabel').text(teacher.fname + ' ' + teacher.lname);

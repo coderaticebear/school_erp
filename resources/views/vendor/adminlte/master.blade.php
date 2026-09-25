@@ -65,6 +65,9 @@
     {{-- Custom Stylesheets (post AdminLTE) --}}
     @yield('adminlte_css')
 
+    {{-- School ERP theme: accessible colours and shared component styles --}}
+    <link rel="stylesheet" href="{{ asset('css/school-theme.css') }}?v={{ @filemtime(public_path('css/school-theme.css')) }}">
+
     {{-- Favicon --}}
     @if(config('adminlte.use_ico_only'))
         <link rel="shortcut icon" href="{{ asset('favicons/favicon.ico') }}" />
@@ -91,6 +94,9 @@
 </head>
 
 <body class="@yield('classes_body')" @yield('body_data')>
+
+    {{-- Lets keyboard users jump past the navigation --}}
+    <a class="skip-link" href="#main-content">Skip to main content</a>
 
     {{-- Body Content --}}
     @yield('body')

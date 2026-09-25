@@ -34,7 +34,7 @@
                                 <th>Division</th>
                                 <th>Subject</th>
                                 <th>Progress</th>
-                                <th class="text-right">Action</th>
+                                <th class="text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>

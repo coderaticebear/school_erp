@@ -16,7 +16,8 @@ test('the assignment page lists all teachers with current assignments checked', 
     $this->get("/admin/divisions/{$this->division->id}/teachers")
         ->assertSuccessful()
         ->assertSee($this->teachers[0]->full_name)
-        ->assertSee('name="teacher_ids[]" value="'.$this->teachers[1]->id.'" class="teacher-toggle" checked', false);
+        ->assertSee('name="teacher_ids[]" value="'.$this->teachers[1]->id.'" class="teacher-toggle" aria-label="'.$this->teachers[1]->full_name.' teaches this division" checked', false)
+        ->assertDontSee('value="'.$this->teachers[0]->id.'" class="teacher-toggle" aria-label="'.$this->teachers[0]->full_name.' teaches this division" checked', false);
 });
 
 test('admin can assign teachers and a class teacher', function () {

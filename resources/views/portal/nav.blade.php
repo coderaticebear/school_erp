@@ -9,6 +9,6 @@
         @endforeach
     </ul>
     @if ($isParent)
-        <a href="{{ route('parent.dashboard') }}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left mr-1"></i> All children</a>
+        <a href="{{ route('parent.dashboard') }}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left mr-1"></i> All Children</a>
     @endif
 </div>

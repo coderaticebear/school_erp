@@ -1,12 +1,15 @@
 @extends('adminlte::page')
 
+@section('title', 'Add Student')
+
+@section('content_header')
+    <h1>Add Student</h1>
+@stop
+
 @section('content')
 <div class="row">
     <div class="col-12">
-        <div class="card card-primary">
-            <div class="card-header">
-                <h3 class="card-title">Add Student</h3>
-            </div>
+        <div class="card card-primary card-outline">
 
             <form action="{{ route('admin.students.store') }}" method="post">
                 @csrf
@@ -34,14 +37,14 @@
 
                     {{-- TABS --}}
                     <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-identify="1" data-toggle="tab" href="#student_tab">Student Info</a>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" data-identify="1" data-toggle="tab" role="tab" href="#student_tab">Student Info</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-identify="2" data-toggle="tab" href="#parent_tab">Parent Info</a>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-identify="2" data-toggle="tab" role="tab" href="#parent_tab">Parent Info</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-identify="3" data-toggle="tab" href="#address_tab">Address & Login</a>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-identify="3" data-toggle="tab" role="tab" href="#address_tab">Address & Login</a>
                         </li>
                     </ul>
 
@@ -50,23 +53,23 @@
                         {{-- STUDENT TAB --}}
                         <div class="tab-pane fade show active" id="student_tab">
                             <div class="form-group">
-                                <label>First Name</label>
-                                <input type="text" name="first_name" value="{{ old('first_name') }}" class="form-control">
+                                <label for="first-name">First Name</label>
+                                <input id="first-name" type="text" name="first_name" value="{{ old('first_name') }}" class="form-control">
                             </div>
 
                             <div class="form-group">
-                                <label>Last Name</label>
-                                <input type="text" name="last_name" value="{{ old('last_name') }}" class="form-control">
+                                <label for="last-name">Last Name</label>
+                                <input id="last-name" type="text" name="last_name" value="{{ old('last_name') }}" class="form-control">
                             </div>
 
                             <div class="form-group">
-                                <label>Date of Birth</label>
-                                <input type="date" name="dob" value="{{ old('dob') }}" class="form-control">
+                                <label for="dob">Date of Birth</label>
+                                <input id="dob" type="date" name="dob" value="{{ old('dob') }}" class="form-control">
                             </div>
 
                             <div class="form-group">
-                                <label>Gender</label>
-                                <select name="gender" class="form-control">
+                                <label for="gender">Gender</label>
+                                <select id="gender" name="gender" class="form-control">
                                     <option value="">Select</option>
                                     <option value="male" @selected(old('gender') === 'male')>Male</option>
                                     <option value="female" @selected(old('gender') === 'female')>Female</option>
@@ -76,8 +79,8 @@
 
                             <div class="form-group">
                                 
-                                <label>Blood Group</label>
-                                <select name="blood_group" class="form-control">
+                                <label for="blood-group">Blood Group</label>
+                                <select id="blood-group" name="blood_group" class="form-control">
                                     <option value="">Select</option>
                                     <option value="A+" @selected(old('blood_group') === 'A+')>A+</option><option value="A-" @selected(old('blood_group') === 'A-')>A-</option>
                                     <option value="B+" @selected(old('blood_group') === 'B+')>B+</option><option value="B-" @selected(old('blood_group') === 'B-')>B-</option>
@@ -87,8 +90,8 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Class / Division</label>
-                                <select name="class_division_id" class="form-control">
+                                <label for="class-division-id">Class / Division</label>
+                                <select id="class-division-id" name="class_division_id" class="form-control">
                                     <option value="">Select</option>
                                     @foreach ($divisions as $division)
                                         <option value="{{ $division->id }}" @selected((string) old('class_division_id') === (string) $division->id)>
@@ -103,9 +106,9 @@
                         <div class="tab-pane fade" id="parent_tab">
 
                             <div class="form-group">
-                                <label>Parent Email</label>
+                                <label for="p_email">Parent Email</label>
                                 <input type="email" id="p_email" name="p_email" value="{{ old('p_email') }}" class="form-control">
-                                <button id="check_p_email" class="badge badge-info mt-1">Check Availability</button>
+                                <button id="check_p_email" class="badge badge-info mt-1">Find Parent</button>
                                 <span id="p_found_badge" class="badge badge-success" style="display:none">Parent Found</span>
                                 <span id="p_missing_badge" class="badge badge-danger" style="display:none">Parent Not Found</span>
                             </div>
@@ -114,29 +117,29 @@
 
                             <div id="parent_form" @style(['display:none' => ! $errors->any() || old('parent_id')])>
                                 <div class="form-group">
-                                    <label>Parent First Name</label>
-                                    <input type="text" name="parent_first_name" value="{{ old('parent_first_name') }}" class="form-control">
+                                    <label for="parent-first-name">Parent First Name</label>
+                                    <input id="parent-first-name" type="text" name="parent_first_name" value="{{ old('parent_first_name') }}" class="form-control">
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Parent Last Name</label>
-                                    <input type="text" name="parent_last_name" value="{{ old('parent_last_name') }}" class="form-control">
+                                    <label for="parent-last-name">Parent Last Name</label>
+                                    <input id="parent-last-name" type="text" name="parent_last_name" value="{{ old('parent_last_name') }}" class="form-control">
                                 </div>
 
                                 <div class="form-row">
                                     <div class="col-4">
-                                        <label>Area Code</label>
-                                        <input type="text" name="parent_area_code" value="{{ old('parent_area_code') }}" class="form-control">
+                                        <label for="parent-area-code">Area Code</label>
+                                        <input id="parent-area-code" type="text" name="parent_area_code" value="{{ old('parent_area_code') }}" class="form-control">
                                     </div>
                                     <div class="col-8">
-                                        <label>Phone Number</label>
-                                        <input type="text" name="parent_phone" value="{{ old('parent_phone') }}" class="form-control">
+                                        <label for="parent-phone">Phone Number</label>
+                                        <input id="parent-phone" type="text" name="parent_phone" value="{{ old('parent_phone') }}" class="form-control">
                                     </div>
                                 </div>
 
                                 <div class="form-group mt-2">
-                                    <label>Password</label>
-                                    <input type="password" name="parent_password" class="form-control">
+                                    <label for="parent-password">Password</label>
+                                    <input id="parent-password" type="password" name="parent_password" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -145,47 +148,47 @@
                         <div class="tab-pane fade" id="address_tab">
 
                             <div class="form-group">
-                                <label>Address Line 1</label>
-                                <input type="text" name="address_line_1" value="{{ old('address_line_1') }}" class="form-control">
+                                <label for="address-line-1">Address Line 1</label>
+                                <input id="address-line-1" type="text" name="address_line_1" value="{{ old('address_line_1') }}" class="form-control">
                             </div>
 
                             <div class="form-group">
-                                <label>Address Line 2</label>
-                                <input type="text" name="address_line_2" value="{{ old('address_line_2') }}" class="form-control">
+                                <label for="address-line-2">Address Line 2</label>
+                                <input id="address-line-2" type="text" name="address_line_2" value="{{ old('address_line_2') }}" class="form-control">
                             </div>
 
                             <div class="form-row">
                                 <div class="col">
-                                    <label>City</label>
-                                    <input type="text" name="city" value="{{ old('city') }}" class="form-control">
+                                    <label for="city">City</label>
+                                    <input id="city" type="text" name="city" value="{{ old('city') }}" class="form-control">
                                 </div>
                                 <div class="col">
-                                    <label>Province</label>
-                                    <input type="text" name="province" value="{{ old('province') }}" class="form-control">
+                                    <label for="province">Province</label>
+                                    <input id="province" type="text" name="province" value="{{ old('province') }}" class="form-control">
                                 </div>
                             </div>
 
                             <div class="form-row mt-2">
                                 <div class="col">
-                                    <label>Country</label>
-                                    <input type="text" name="country" value="{{ old('country') }}" class="form-control">
+                                    <label for="country">Country</label>
+                                    <input id="country" type="text" name="country" value="{{ old('country') }}" class="form-control">
                                 </div>
                                 <div class="col">
-                                    <label>Postal Code</label>
-                                    <input type="text" name="postal" value="{{ old('postal') }}" class="form-control">
+                                    <label for="postal">Postal Code</label>
+                                    <input id="postal" type="text" name="postal" value="{{ old('postal') }}" class="form-control">
                                 </div>
                             </div>
 
                             <hr>
 
                             <div class="form-group">
-                                <label>Student Email</label>
-                                <input type="email" name="email" value="{{ old('email') }}" class="form-control">
+                                <label for="email">Student Email</label>
+                                <input id="email" type="email" name="email" value="{{ old('email') }}" class="form-control">
                             </div>
 
                             <div class="form-group">
-                                <label>Student Password</label>
-                                <input type="password" name="password" class="form-control">
+                                <label for="password">Student Password</label>
+                                <input id="password" type="password" name="password" class="form-control">
                             </div>
                         </div>
 
@@ -196,7 +199,7 @@
                     
                     <button id="prev" type="button" class="btn btn-primary">Previous</button>
                     <button id="next" type="button" class="btn btn-primary">Next</button>
-                    <button id="submit" type="submit" class="btn btn-primary">Submit</button>
+                    <button id="submit" type="submit" class="btn btn-primary">Add Student</button>
                 </div>
 
             </form>

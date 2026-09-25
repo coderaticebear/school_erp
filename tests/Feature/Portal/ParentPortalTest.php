@@ -37,7 +37,7 @@ test('the dashboard lists each child with class, attendance and latest result', 
 });
 
 test('a parent can open each page for their own child', function (string $page) {
-    $this->get("/parent/children/{$this->kids[0]->id}{$page}")->assertSuccessful()->assertSee('Maya')->assertSee('All children');
+    $this->get("/parent/children/{$this->kids[0]->id}{$page}")->assertSuccessful()->assertSee('Maya')->assertSee('All Children');
 })->with(['' => '', 'timetable' => '/timetable', 'attendance' => '/attendance', 'results' => '/results']);
 
 test('a parent cannot see another family\'s child', function (string $page) {
