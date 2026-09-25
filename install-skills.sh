@@ -27,6 +27,12 @@ for arg in "$@"; do
     esac
 done
 
+# Extra `npx skills add` flags per skill, so each one is reinstalled the way it was first
+# installed (skills-lock.json does not record them). No entry = install for all agents.
+declare -A SKILL_ADD_OPTIONS=(
+    [apple-design]="-a claude-code"
+)
+
 # Skills that Laravel Boost installs automatically but this project does not use (see SKILLS.md).
 EXCLUDED_BOOST_SKILLS=(tailwindcss-development deploying-to-cloud)
 
@@ -47,14 +53,16 @@ if [[ -f skills-lock.json ]]; then
         name="${entry%%$'\t'*}"
         source="${entry#*$'\t'}"
 
-        skill_dir=".agents/skills/$name"
+        # Works for both install styles: a link into .agents/skills/ or a copy in .claude/skills/.
+        skill_dir=".claude/skills/$name"
+        read -r -a extra_options <<< "${SKILL_ADD_OPTIONS[$name]:-}"
 
         # Reinstalling replaces the skill directory (and its node_modules), so only do it when needed.
-        if [[ -f "$skill_dir/SKILL.md" && -e ".claude/skills/$name" ]] && ! $FORCE; then
+        if [[ -f "$skill_dir/SKILL.md" ]] && ! $FORCE; then
             info "Skill '$name' is already installed (use --force to reinstall)"
         else
-            info "Installing skill '$name' from $source"
-            npx -y skills add "$source" --skill "$name" --yes
+            info "Installing skill '$name' from $source ${extra_options[*]:-}"
+            npx -y skills add "$source" --skill "$name" --yes "${extra_options[@]}"
         fi
 
         # Installed files are restored by this script, so keep them out of git.
