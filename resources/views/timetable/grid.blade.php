@@ -51,7 +51,7 @@
                                             data-teacher="{{ $entry?->teacher_id }}"
                                         @endif>
                                         @if ($entry)
-                                            <div class="slot-title">{{ $entry->subject->subject_name }}</div>
+                                            <div class="slot-title d-flex align-items-center" style="gap: .4rem"><span class="subject-dot {{ \App\Services\TimetableGrid::dotFor($entry->subject_id) }}" aria-hidden="true"></span>{{ $entry->subject->subject_name }}</div>
                                             <div class="slot-meta">{{ $mode === 'teacher' ? $entry->division->label : $entry->teacher->full_name }}</div>
                                         @else
                                             <div class="slot-title">Free</div>

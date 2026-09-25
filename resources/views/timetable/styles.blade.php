@@ -15,19 +15,24 @@
         background: repeating-linear-gradient(135deg, rgba(0,0,0,.03), rgba(0,0,0,.03) 10px, rgba(0,0,0,.06) 10px, rgba(0,0,0,.06) 20px);
         border: 1px dashed rgba(0, 0, 0, 0.15);
     }
-    .bg-soft-blue { background: #e7f0ff; }
-    .bg-soft-green { background: #e6f6ef; }
-    .bg-soft-orange { background: #fff1dd; }
-    .bg-soft-purple { background: #efe9ff; }
-    .bg-soft-teal { background: #e3f7f7; }
-    .bg-soft-pink { background: #fde8ef; }
-    .bg-soft-yellow { background: #fdf6d8; }
-    .bg-soft-indigo { background: #e8eafc; }
-    .bg-soft-gray { background: #f1f3f5; }
     .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 14px; }
     .legend-swatch { width: 18px; height: 18px; border-radius: 4px; margin-right: 10px; border: 1px solid rgba(0, 0, 0, 0.08); }
 
+    /* Phone: day picker + list (timetable/day-list.blade.php) */
+    .timetable-day-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; }
+    .timetable-day-tab { min-height: 52px; border: 1px solid #c3c9d1; border-radius: 10px; background: #fff; color: #1c2330; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; padding: 4px 0; }
+    .timetable-day-tab.active { background: #1f3b73; border-color: #1f3b73; color: #fff; }
+    .timetable-day-today { font-size: 11px; font-weight: 600; }
+    .timetable-day-row { display: flex; gap: 12px; align-items: stretch; margin-bottom: 8px; }
+    .timetable-day-time { width: 3.5rem; flex-shrink: 0; padding-top: 10px; font-size: 13px; color: #56606b; line-height: 1.3; }
+    .timetable-day-lesson { flex-grow: 1; border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; }
+    .timetable-day-subject { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; }
+    .timetable-day-meta { font-size: 14px; color: #3d4652; }
+    .timetable-day-break, .timetable-day-free { flex-grow: 1; display: flex; align-items: center; justify-content: center; min-height: 40px; border-radius: 12px; border: 1px dashed #c3c9d1; color: #56606b; font-weight: 600; font-size: 14px; }
+
     @media print {
+        .timetable-day-list { display: none !important; }
+        .timetable-grid-wrap { display: block !important; }
         .main-sidebar, .main-header, .main-footer, .no-print, .btn { display: none !important; }
         .content-wrapper { margin-left: 0 !important; background: #fff; }
         .col-lg-9 { flex: 0 0 100%; max-width: 100%; }

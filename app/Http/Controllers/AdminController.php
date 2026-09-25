@@ -36,6 +36,7 @@ class AdminController extends Controller
             'studentCount' => Students::whereHas('login', fn ($query) => $query->where('is_active', true))->count(),
             'teacherCount' => Teachers::whereHas('login', fn ($query) => $query->where('is_active', true))->count(),
             'today' => $academicYear ? $reports->attendanceToday($academicYear) : null,
+            'todayByDivision' => $academicYear ? $reports->attendanceTodayByDivision($academicYear) : collect(),
             'lowAttendance' => $academicYear ? $reports->attendanceByStudent($academicYear, now()->startOfMonth(), now()->startOfDay())->take(5) : collect(),
             'latestExam' => $latestExam,
             'passRate' => $complete > 0 ? round(100 * $examSummary->sum('passed') / $complete, 1) : null,

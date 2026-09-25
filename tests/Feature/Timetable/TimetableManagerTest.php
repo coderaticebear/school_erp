@@ -191,7 +191,7 @@ test('lessons whose teacher was unassigned are flagged', function () {
     TimetableEntry::factory()->create(slotPayload());
     $this->division->teachers()->detach($this->teacher->id);
 
-    $this->get('/admin/timetable')->assertSeeInOrder(['Needs Attention', '1']);
+    $this->get('/admin/timetable')->assertSeeInOrder(['Needs attention', '1']);
 });
 
 test('the database blocks a teacher in two places at once', function () {

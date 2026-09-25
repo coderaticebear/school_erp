@@ -66,12 +66,30 @@ class TimetableGrid
     }
 
     /**
-     * A stable soft colour class per subject, matching the timetable CSS palette.
+     * Subject colour names, in the order subjects are assigned them (by id).
+     *
+     * @var list<string>
+     */
+    public const SUBJECT_COLOURS = ['blue', 'green', 'teal', 'orange', 'purple', 'pink', 'yellow', 'indigo'];
+
+    /**
+     * A stable pastel background class per subject (school-theme.css), used wherever a subject appears.
      */
     public static function colorFor(int $subjectId): string
     {
-        $palette = ['bg-soft-blue', 'bg-soft-green', 'bg-soft-teal', 'bg-soft-orange', 'bg-soft-purple', 'bg-soft-pink', 'bg-soft-yellow', 'bg-soft-indigo'];
+        return 'bg-soft-'.self::subjectColour($subjectId);
+    }
 
-        return $palette[$subjectId % count($palette)];
+    /**
+     * The matching dot colour class for a subject.
+     */
+    public static function dotFor(int $subjectId): string
+    {
+        return 'dot-'.self::subjectColour($subjectId);
+    }
+
+    protected static function subjectColour(int $subjectId): string
+    {
+        return self::SUBJECT_COLOURS[$subjectId % count(self::SUBJECT_COLOURS)];
     }
 }

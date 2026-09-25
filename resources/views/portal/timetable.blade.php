@@ -22,7 +22,10 @@
         <div class="card">
             <div class="card-header"><h2 class="card-title">{{ $enrolment->division->label }} · {{ $academicYear->year }}</h2></div>
             <div class="card-body">
-                @include('timetable.grid', ['grid' => $grid, 'mode' => 'division'])
+                @include('timetable.day-list', ['grid' => $grid, 'mode' => 'division'])
+                <div class="d-none d-md-block timetable-grid-wrap">
+                    @include('timetable.grid', ['grid' => $grid, 'mode' => 'division'])
+                </div>
             </div>
         </div>
     @endif

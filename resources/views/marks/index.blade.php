@@ -42,7 +42,7 @@
                                 @php($done = $sheet['students'] > 0 && $sheet['entered'] >= $sheet['students'])
                                 <tr>
                                     <td>{{ $sheet['division']->label }}</td>
-                                    <td>{{ $sheet['subject']->subject_name }}</td>
+                                    <td><x-subject-chip :subject="$sheet['subject']" /></td>
                                     <td>
                                         <span @class(['badge', 'badge-success' => $done, 'badge-warning' => ! $done && $sheet['entered'] > 0, 'badge-light' => $sheet['entered'] === 0])>
                                             {{ $sheet['entered'] }}/{{ $sheet['students'] }}

@@ -123,12 +123,23 @@ test('the admin dashboard shows real counts, today\'s attendance and the latest 
 
     $this->get('/admin/dashboard')
         ->assertSuccessful()
-        ->assertSee('Active students')
-        ->assertSeeInOrder(['<p class="small-box-value">1</p>', 'Active students'], false)
+        ->assertSeeInOrder(['Active students', '<p class="stat-value">1</p>'], false)
         ->assertSee('50%')
-        ->assertSee('1/2 divisions marked')
+        ->assertSee('Every division marked')
         ->assertSee('No published results yet')
-        ->assertDontSee('95%');
+        ->assertDontSee('95%')
+        ->assertDontSee('small-box');
+});
+
+test('the admin dashboard lists today\'s attendance per division with its class teacher', function () {
+    $teacher = Teachers::factory()->create(['first_name' => 'Ada', 'last_name' => 'Lead']);
+    $this->division->teachers()->attach($teacher->id, ['class_teacher' => true]);
+    attend($this->good, '2026-03-18', Attendance::PRESENT);
+    attend($this->poor, '2026-03-18', Attendance::ABSENT);
+
+    $this->get('/admin/dashboard')
+        ->assertSeeInOrder([$this->division->label, 'Ada Lead', 'Marked · 1 of 2 present'])
+        ->assertSeeInOrder([$this->other->label, 'No class teacher', 'No students']);
 });
 
 test('reports are admin-only', function (int $role) {
@@ -137,3 +148,9 @@ test('reports are admin-only', function (int $role) {
     $this->get('/admin/reports/attendance')->assertForbidden();
     $this->get('/admin/reports/exams')->assertForbidden();
 })->with(['teacher' => Login::ROLE_TEACHER, 'student' => Login::ROLE_STUDENT, 'parent' => Login::ROLE_PARENT]);
+
+test('the dashboard flags divisions with students that are not marked today', function () {
+    StudentClass::factory()->create(['class_division_id' => $this->other->id]);
+
+    $this->get('/admin/dashboard')->assertSee('2 of 2 divisions not marked yet');
+});

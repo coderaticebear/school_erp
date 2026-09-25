@@ -148,6 +148,42 @@ class SchoolReports
     }
 
     /**
+     * Today's attendance for each division: who the class teacher is, how many students are
+     * enrolled, how many are marked and how many attended.
+     *
+     * @return Collection<int, array{division: Divisions, classTeacher: string|null, students: int, marked: int, attended: int}>
+     */
+    public function attendanceTodayByDivision(AcademicYear $academicYear): Collection
+    {
+        $students = StudentClass::query()
+            ->where('academic_year_id', $academicYear->id)
+            ->selectRaw('class_division_id, count(*) as students')
+            ->groupBy('class_division_id')
+            ->pluck('students', 'class_division_id');
+
+        $today = Attendance::query()
+            ->where('academic_year_id', $academicYear->id)
+            ->where('date', now()->toDateString())
+            ->selectRaw("division_id, count(*) as marked, sum(case when status in ('present','late') then 1 else 0 end) as attended")
+            ->groupBy('division_id')
+            ->get()
+            ->keyBy('division_id');
+
+        return Divisions::query()
+            ->with(['class', 'teachers' => fn ($query) => $query->wherePivot('class_teacher', true)])
+            ->get()
+            ->sortBy('label')
+            ->values()
+            ->map(fn (Divisions $division) => [
+                'division' => $division,
+                'classTeacher' => $division->teachers->first()?->full_name,
+                'students' => (int) ($students[$division->id] ?? 0),
+                'marked' => (int) ($today[$division->id]->marked ?? 0),
+                'attended' => (int) ($today[$division->id]->attended ?? 0),
+            ]);
+    }
+
+    /**
      * Today's attendance across the school.
      *
      * @return array{marked_divisions: int, divisions: int, records: int, attended: int, percent: float|null}

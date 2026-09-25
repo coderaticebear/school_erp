@@ -59,7 +59,7 @@ test('the dashboard shows when attendance is already marked', function () {
     $enrolment = StudentClass::factory()->create(['class_division_id' => $this->division->id]);
     Attendance::factory()->create(['student_id' => $enrolment->student_id, 'division_id' => $this->division->id, 'date' => today()]);
 
-    $this->get('/teacher/dashboard')->assertSee('Marked')->assertSee('1/1');
+    $this->get('/teacher/dashboard')->assertSee('Marked')->assertSee('1 of 1')->assertSee('All marked');
 });
 
 test('my timetable is hidden until published, then shows the teacher\'s week', function () {

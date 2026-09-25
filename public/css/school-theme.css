@@ -1,25 +1,85 @@
 /*
  * School ERP theme, loaded after AdminLTE on every page (see vendor/adminlte/master.blade.php).
  *
- * Bootstrap 4's default blue, green and teal fail WCAG AA contrast (4.5:1) with white text or
- * on white backgrounds. These overrides darken them just enough to pass. Ratios are against white.
+ * Design tokens (Step D, approved mockup). Each colour means one thing; ratios are text contrast.
  *
- *   primary  #0062cc  5.80:1   (Bootstrap #007bff was 3.98:1)
- *   success  #1e7e34  5.14:1   (#28a745 was 3.13:1)
- *   info     #117a8b  5.02:1   (#17a2b8 was 3.04:1)
- *   warning text/outline  #856404  5.49:1   (#ffc107 was 1.63:1; yellow fills keep dark text)
- *   muted text  #5a6268  5.74:1 on the #f4f6f9 page background (#6c757d was 4.33:1)
+ *   ink       #1f3b73  primary actions, current page, crest     10.9:1 on white
+ *   text      #1c2330  body text                                15.8:1
+ *   muted     #56606b  secondary text                            6.4:1 (5.9:1 on the page)
+ *   page      #f5f6f8  page background; cards are white with #e3e6ea lines
+ *   good      #1e7e34  on #e6f4ea                                 5.1:1
+ *   attention #8a5300  on #fff4e0                                 5.8:1
+ *   problem   #b42318  on #fdecea                                 5.8:1 (6.6:1 on white)
+ *
+ * Subject colours (the signature) are pastel fills with dark text (13.7:1), plus a dot colour.
+ * Status colours are never used for actions; actions are ink or neutral outline.
  */
 
 :root {
-    --erp-primary: #0062cc;
-    --erp-primary-hover: #004c9e;
-    --erp-success: #1e7e34;
-    --erp-success-hover: #19692c;
-    --erp-info: #117a8b;
-    --erp-info-hover: #0e6674;
-    --erp-warning-text: #856404;
-    --erp-muted: #5a6268;
+    --erp-ink: #1f3b73;
+    --erp-ink-hover: #152a55;
+    --erp-ink-tint: #e8eef9;
+    --erp-text: #1c2330;
+    --erp-text-2: #3d4652;
+    --erp-muted: #56606b;
+    --erp-page: #f5f6f8;
+    --erp-card: #ffffff;
+    --erp-line: #e3e6ea;
+    --erp-line-strong: #c3c9d1;
+    --erp-hover: #f0f2f5;
+
+    --erp-good: #1e7e34;
+    --erp-good-tint: #e6f4ea;
+    --erp-attention: #8a5300;
+    --erp-attention-tint: #fff4e0;
+    --erp-problem: #b42318;
+    --erp-problem-tint: #fdecea;
+    --erp-neutral-tint: #eceef1;
+
+    --erp-radius: 12px;
+    --erp-radius-sm: 8px;
+
+    --erp-font: "Source Sans 3", "Source Sans Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --erp-font-brand: "Source Serif 4", Georgia, serif;
+}
+
+/* ---------- Base ---------- */
+
+body {
+    font-family: var(--erp-font);
+    color: var(--erp-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.content-wrapper,
+body.login-page,
+body.register-page {
+    background-color: var(--erp-page);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    color: var(--erp-text);
+}
+
+a {
+    color: var(--erp-ink);
+}
+
+a:hover {
+    color: var(--erp-ink-hover);
+}
+
+.text-primary { color: var(--erp-ink) !important; }
+.text-success { color: var(--erp-good) !important; }
+.text-warning { color: var(--erp-attention) !important; }
+.text-danger { color: var(--erp-problem) !important; }
+.text-info { color: #0e6674 !important; }
+.text-muted { color: var(--erp-muted) !important; }
+.text-secondary { color: var(--erp-muted) !important; }
+
+code {
+    color: #a61d5f;
 }
 
 /* ---------- Skip link and main landmark ---------- */
@@ -30,9 +90,9 @@
     top: -3rem;
     z-index: 2000;
     padding: .5rem 1rem;
-    background: var(--erp-primary);
+    background: var(--erp-ink);
     color: #fff;
-    border-radius: .25rem;
+    border-radius: var(--erp-radius-sm);
     transition: top .15s;
 }
 
@@ -46,12 +106,109 @@ main#main-content:focus {
     outline: none;
 }
 
-/* The auth logo is the page's <h1>; keep AdminLTE's look without the light weight. */
+/* ---------- Identity: crest and wordmark ---------- */
+
+.school-wordmark {
+    font-family: var(--erp-font-brand);
+    font-weight: 600;
+    color: var(--erp-ink);
+}
+
+/* Sign-in pages: the crest and name are the page's <h1>. */
 h1.login-logo,
 h1.register-logo {
-    font-size: 2.1rem;
-    font-weight: 400;
+    font-size: 1.75rem;
+    font-weight: 600;
     line-height: 1.2;
+}
+
+h1.login-logo a,
+h1.register-logo a {
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    color: var(--erp-ink);
+}
+
+.login-box .card,
+.register-box .card {
+    border-top: 0;
+}
+
+/* ---------- Top bar ---------- */
+
+.main-header.navbar {
+    background: var(--erp-card);
+    border-bottom: 1px solid var(--erp-line);
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: var(--erp-text-2);
+}
+
+/* ---------- Sidebar (light) ---------- */
+
+.main-sidebar,
+.main-sidebar.sidebar-light-primary {
+    background: var(--erp-card);
+    border-right: 1px solid var(--erp-line);
+    box-shadow: none !important;
+}
+
+.main-sidebar .brand-link {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    height: calc(3.5rem + 1px);
+    padding: 0 1.1rem;
+    border-bottom: 1px solid var(--erp-line) !important;
+    background: var(--erp-card);
+}
+
+.main-sidebar .brand-link .brand-crest {
+    flex-shrink: 0;
+}
+
+.main-sidebar .brand-link .brand-text {
+    font-size: 1.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-light-primary .nav-sidebar > .nav-item > .nav-link {
+    color: var(--erp-text-2);
+    border-radius: var(--erp-radius-sm);
+}
+
+.sidebar-light-primary .nav-sidebar > .nav-item > .nav-link:hover {
+    background: var(--erp-hover);
+    color: var(--erp-text);
+}
+
+.sidebar-light-primary .nav-sidebar > .nav-item > .nav-link .nav-icon {
+    color: #6b7480;
+}
+
+.sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active,
+.sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active:hover {
+    background: var(--erp-ink-tint);
+    color: var(--erp-ink);
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active .nav-icon {
+    color: var(--erp-ink);
+}
+
+.nav-sidebar .nav-header {
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #6b7480;
+    padding: 1rem 1rem .35rem;
 }
 
 /* ---------- Page header (x-page-header) ---------- */
@@ -66,7 +223,13 @@ h1.register-logo {
 
 .page-header h1 {
     font-size: 1.75rem;
+    font-weight: 600;
     line-height: 1.2;
+}
+
+.page-header-subtitle {
+    font-size: .95rem;
+    margin-top: .15rem;
 }
 
 .page-header-actions {
@@ -80,201 +243,323 @@ h1.register-logo {
     margin: 0;
 }
 
-/* ---------- Sidebar ---------- */
+/* ---------- Cards ---------- */
 
-.nav-sidebar .nav-header {
-    font-size: .75rem;
+.card {
+    border: 1px solid var(--erp-line);
+    border-radius: var(--erp-radius);
+    box-shadow: none;
+}
+
+.card.card-outline,
+.card-primary.card-outline {
+    border-top: 1px solid var(--erp-line);
+}
+
+.card > .card-header,
+.card-primary:not(.card-outline) > .card-header {
+    background: transparent;
+    color: var(--erp-text);
+    border-bottom: 1px solid var(--erp-line);
+    padding: .9rem 1.25rem;
+}
+
+.card > .card-header .card-title {
+    font-size: 1.125rem;
     font-weight: 600;
-    letter-spacing: .05em;
-    text-transform: uppercase;
-    color: #c2c7d0;
-    padding-top: 1rem;
 }
 
-/* ---------- Links and text ---------- */
-
-a {
-    color: var(--erp-primary);
+.card > .card-footer {
+    background: transparent;
+    border-top: 1px solid var(--erp-line);
 }
 
-a:hover {
-    color: var(--erp-primary-hover);
+.card > .list-group-flush > .list-group-item {
+    border-color: var(--erp-line);
 }
 
-.text-primary { color: var(--erp-primary) !important; }
+/* ---------- Stat cards (dashboards) ---------- */
 
-.btn-link {
-    color: var(--erp-primary);
+.stat-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    padding: 1.1rem 1.25rem;
+    background: var(--erp-card);
+    border: 1px solid var(--erp-line);
+    border-radius: var(--erp-radius);
 }
 
-.btn-link:hover {
-    color: var(--erp-primary-hover);
-}
-.text-success { color: var(--erp-success) !important; }
-.text-info { color: var(--erp-info) !important; }
-.text-warning { color: var(--erp-warning-text) !important; }
-.text-muted { color: var(--erp-muted) !important; }
-
-.navbar-light .navbar-nav .nav-link {
-    color: #495057;
+.stat-label {
+    font-size: .9rem;
+    color: var(--erp-muted);
+    margin: 0;
 }
 
-.btn-tool {
-    color: #6c757d;
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0;
+    color: var(--erp-text);
 }
 
-/* ---------- Primary ---------- */
+.stat-context {
+    font-size: .9rem;
+    margin: 0;
+}
+
+.stat-context a {
+    font-weight: 600;
+}
+
+/* ---------- Buttons: ink for the one primary action, neutral outline otherwise ---------- */
+
+.btn {
+    border-radius: var(--erp-radius-sm);
+    font-weight: 600;
+}
+
+.btn-sm {
+    border-radius: 6px;
+}
 
 .btn-primary,
 .btn-primary.disabled,
 .btn-primary:disabled {
-    background-color: var(--erp-primary);
-    border-color: var(--erp-primary);
+    background-color: var(--erp-ink);
+    border-color: var(--erp-ink);
 }
 
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:not(:disabled):not(.disabled):active,
 .btn-primary:not(:disabled):not(.disabled).active {
-    background-color: var(--erp-primary-hover);
-    border-color: var(--erp-primary-hover);
+    background-color: var(--erp-ink-hover);
+    border-color: var(--erp-ink-hover);
 }
 
 .btn-outline-primary {
-    color: var(--erp-primary);
-    border-color: var(--erp-primary);
+    color: var(--erp-ink);
+    border-color: var(--erp-ink);
 }
 
 .btn-outline-primary:hover,
 .btn-outline-primary:not(:disabled):not(.disabled):active,
 .btn-outline-primary:not(:disabled):not(.disabled).active {
-    background-color: var(--erp-primary);
-    border-color: var(--erp-primary);
+    background-color: var(--erp-ink);
+    border-color: var(--erp-ink);
     color: #fff;
 }
 
-.bg-primary,
-.badge-primary {
-    background-color: var(--erp-primary) !important;
+.btn-outline-secondary {
+    color: var(--erp-text-2);
+    border-color: var(--erp-line-strong);
+    background: var(--erp-card);
 }
 
-.card-primary.card-outline {
-    border-top-color: var(--erp-primary);
+.btn-outline-secondary:hover,
+.btn-outline-secondary:not(:disabled):not(.disabled):active,
+.btn-outline-secondary:not(:disabled):not(.disabled).active {
+    background-color: var(--erp-hover);
+    border-color: var(--erp-line-strong);
+    color: var(--erp-text);
 }
 
-.card-primary:not(.card-outline) > .card-header {
-    background-color: var(--erp-primary);
-}
-
-.nav-pills .nav-link.active,
-.nav-pills .show > .nav-link,
-.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active {
-    background-color: var(--erp-primary);
-}
-
-.page-link {
-    color: var(--erp-primary);
-}
-
-.page-item.active .page-link {
-    background-color: var(--erp-primary);
-    border-color: var(--erp-primary);
-}
-
-.custom-control-input:checked ~ .custom-control-label::before {
-    background-color: var(--erp-primary);
-    border-color: var(--erp-primary);
-}
-
-/* ---------- Success ---------- */
-
-.btn-success,
-.bg-success,
-.badge-success {
-    background-color: var(--erp-success) !important;
-    border-color: var(--erp-success);
-}
-
-.btn-success:hover,
-.btn-success:focus {
-    background-color: var(--erp-success-hover) !important;
-    border-color: var(--erp-success-hover);
-}
-
-.btn-outline-success {
-    color: var(--erp-success);
-    border-color: var(--erp-success);
-}
-
-.btn-outline-success:hover {
-    background-color: var(--erp-success);
-    border-color: var(--erp-success);
+/* Toggle groups (attendance status): the pressed button is ink (beats the outline hover/active rule). */
+.btn-group-toggle > .btn-outline-secondary.active,
+.btn-group-toggle > .btn-outline-secondary:not(:disabled):not(.disabled).active,
+.btn-group-toggle > .btn-outline-secondary:not(:disabled):not(.disabled):active {
+    background-color: var(--erp-ink);
+    border-color: var(--erp-ink);
     color: #fff;
 }
 
-/* ---------- Info ---------- */
-
-.btn-info,
-.bg-info,
-.badge-info {
-    background-color: var(--erp-info) !important;
-    border-color: var(--erp-info);
+.btn-outline-danger {
+    color: var(--erp-problem);
+    border-color: var(--erp-problem);
 }
 
-.btn-info:hover,
-.btn-info:focus {
-    background-color: var(--erp-info-hover) !important;
-    border-color: var(--erp-info-hover);
-}
-
-.btn-outline-info {
-    color: var(--erp-info);
-    border-color: var(--erp-info);
-}
-
-.btn-outline-info:hover {
-    background-color: var(--erp-info);
-    border-color: var(--erp-info);
+.btn-outline-danger:hover {
+    background-color: var(--erp-problem);
+    border-color: var(--erp-problem);
     color: #fff;
 }
-
-/* ---------- Warning (yellow fills keep dark text; text/outline use dark amber) ---------- */
 
 .btn-outline-warning {
-    color: var(--erp-warning-text);
-    border-color: #d39e00;
+    color: var(--erp-attention);
+    border-color: #c28a2c;
 }
 
 .btn-outline-warning:hover {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #212529;
+    background-color: var(--erp-attention-tint);
+    border-color: #c28a2c;
+    color: var(--erp-attention);
 }
 
-/* ---------- Secondary and code ---------- */
+.btn-outline-success {
+    color: var(--erp-good);
+    border-color: var(--erp-good);
+}
+
+.btn-outline-success:hover {
+    background-color: var(--erp-good);
+    border-color: var(--erp-good);
+    color: #fff;
+}
+
+.btn-outline-info {
+    color: #0e6674;
+    border-color: #0e6674;
+}
+
+.btn-outline-info:hover {
+    background-color: #0e6674;
+    border-color: #0e6674;
+    color: #fff;
+}
+
+/* Solid status buttons should not be used for actions; if one appears, keep it readable. */
+.btn-success { background-color: var(--erp-good); border-color: var(--erp-good); }
+.btn-danger { background-color: var(--erp-problem); border-color: var(--erp-problem); }
+.btn-info { background-color: #0e6674; border-color: #0e6674; }
+.btn-warning { background-color: #ffc107; border-color: #ffc107; color: #1c2330; }
+
+.btn-link {
+    color: var(--erp-ink);
+    font-weight: 600;
+}
+
+.btn-link:hover {
+    color: var(--erp-ink-hover);
+}
+
+.btn-tool {
+    color: var(--erp-muted);
+}
+
+/* ---------- Forms ---------- */
+
+.form-control,
+.custom-select {
+    border-color: var(--erp-line-strong);
+    border-radius: var(--erp-radius-sm);
+    color: var(--erp-text);
+}
+
+.form-control:focus,
+.custom-select:focus {
+    border-color: var(--erp-ink);
+    box-shadow: 0 0 0 .2rem rgba(31, 59, 115, .2);
+}
+
+.input-group > .form-control:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group-append > .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--erp-ink);
+    border-color: var(--erp-ink);
+}
+
+label:not(.form-check-label):not(.custom-file-label):not(.btn) {
+    font-weight: 600;
+}
+
+/* ---------- Tabs, pills, pagination ---------- */
+
+.nav-pills .nav-link {
+    border-radius: var(--erp-radius-sm);
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: var(--erp-ink);
+}
 
 /* Inactive tabs in page content (not the sidebar, which also uses .nav-pills). */
 .content-wrapper .nav-pills .nav-link:not(.active) {
     color: var(--erp-muted);
 }
 
-
-.btn-outline-secondary {
-    color: var(--erp-muted);
-    border-color: var(--erp-muted);
+.page-link {
+    color: var(--erp-ink);
 }
 
-.btn-outline-secondary:hover {
-    background-color: var(--erp-muted);
-    border-color: var(--erp-muted);
-    color: #fff;
+.page-item.active .page-link {
+    background-color: var(--erp-ink);
+    border-color: var(--erp-ink);
 }
 
-code {
-    color: #a61d5f;
+/* ---------- Badges: status is tinted text, never a loud fill ---------- */
+
+.badge {
+    font-weight: 600;
+    font-size: 80%;
+    padding: .3em .6em;
+    border-radius: 6px;
+}
+
+.badge-success { background: var(--erp-good-tint) !important; color: var(--erp-good) !important; }
+.badge-warning { background: var(--erp-attention-tint) !important; color: var(--erp-attention) !important; }
+.badge-danger { background: var(--erp-problem-tint) !important; color: var(--erp-problem) !important; }
+.badge-secondary { background: var(--erp-neutral-tint) !important; color: var(--erp-text-2) !important; }
+.badge-light { background: var(--erp-hover) !important; color: var(--erp-text-2) !important; }
+.badge-primary { background: var(--erp-ink-tint) !important; color: var(--erp-ink) !important; }
+.badge-info { background: #e3f2f5 !important; color: #0e6674 !important; }
+
+/* ---------- Alerts ---------- */
+
+.alert {
+    border-radius: var(--erp-radius-sm);
+    border: 1px solid transparent;
+}
+
+.alert-success { background: var(--erp-good-tint); border-color: #b7dfc2; color: #155724; }
+.alert-danger { background: var(--erp-problem-tint); border-color: #f4c1bb; color: #8a1c13; }
+.alert-warning { background: var(--erp-attention-tint); border-color: #f1d49c; color: #6b4000; }
+.alert-info { background: #e3f2f5; border-color: #b3dbe2; color: #0b525d; }
+.alert-light { background: var(--erp-card); border-color: var(--erp-line); color: var(--erp-text); }
+
+.alert .close {
+    color: inherit;
+    opacity: .7;
 }
 
 /* ---------- Tables ---------- */
+
+.table {
+    color: var(--erp-text);
+}
+
+.table thead th {
+    border-bottom: 1px solid var(--erp-line);
+    border-top: 0;
+    color: var(--erp-muted);
+    font-size: .875rem;
+    font-weight: 600;
+}
+
+.table td,
+.table th {
+    border-color: var(--erp-line);
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f7f8fa;
+}
+
+/* Keeps absolutely positioned screen-reader text (.sr-only) inside the scroll area on phones. */
+.table-responsive {
+    position: relative;
+}
 
 /* Wraps a bare checkbox/radio in a table cell so the whole ~32px square is clickable. */
 .hit-target {
@@ -294,15 +579,138 @@ code {
     cursor: pointer;
 }
 
-
-/* Keeps absolutely positioned screen-reader text (.sr-only) inside the scroll area on phones. */
-.table-responsive {
-    position: relative;
+.progress {
+    background: var(--erp-hover);
+    border-radius: 999px;
 }
 
-/* ---------- Dashboard tiles ---------- */
+.progress-bar.bg-success { background-color: var(--erp-good) !important; }
+.progress-bar.bg-danger { background-color: var(--erp-problem) !important; }
 
-/* Tile values are data, not headings; this keeps AdminLTE's h3 look on a <p>. */
+/* ---------- Attendance sheet: rows on desktop, stacked cards on phones ---------- */
+
+.attendance-head,
+.attendance-row {
+    display: grid;
+    grid-template-columns: minmax(10rem, 1fr) auto minmax(12rem, 1.1fr);
+    gap: .5rem 1rem;
+    align-items: center;
+    padding: .65rem 1.25rem;
+}
+
+.attendance-head {
+    border-bottom: 1px solid var(--erp-line);
+    color: var(--erp-muted);
+    font-size: .875rem;
+    font-weight: 600;
+}
+
+.attendance-row + .attendance-row {
+    border-top: 1px solid var(--erp-line);
+}
+
+.attendance-name {
+    font-weight: 600;
+}
+
+.attendance-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem 1rem;
+}
+
+@media (max-width: 767.98px) {
+    .attendance-row {
+        grid-template-columns: 1fr;
+        padding: .9rem 1rem;
+    }
+
+    .attendance-name {
+        font-size: 1.05rem;
+    }
+
+    /* Four equal 44px buttons across the full width. */
+    .attendance-status {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: .375rem;
+    }
+
+    .attendance-status > .btn {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 !important;
+        border-radius: var(--erp-radius-sm) !important;
+        padding: .25rem;
+    }
+
+    /* The save bar stays reachable while scrolling a long class. */
+    .attendance-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        background: var(--erp-card);
+        border-radius: 0 0 var(--erp-radius) var(--erp-radius);
+    }
+
+    .attendance-actions .btn {
+        width: 100%;
+        min-height: 48px;
+    }
+}
+
+@media (min-width: 768px) {
+    .d-md-grid {
+        display: grid !important;
+    }
+}
+
+/* ---------- Subject colours (the signature) ---------- */
+
+.bg-soft-blue { background: #e7f0ff; }
+.bg-soft-green { background: #e6f6ef; }
+.bg-soft-teal { background: #e3f7f7; }
+.bg-soft-orange { background: #fff1dd; }
+.bg-soft-purple { background: #efe9ff; }
+.bg-soft-pink { background: #fde8ef; }
+.bg-soft-yellow { background: #fdf6d8; }
+.bg-soft-indigo { background: #e8eafc; }
+.bg-soft-gray { background: #f1f3f5; }
+
+.dot-blue { background: #3b6fd8; }
+.dot-green { background: #2e8b57; }
+.dot-teal { background: #1f8a8a; }
+.dot-orange { background: #d9822b; }
+.dot-purple { background: #7c5cd6; }
+.dot-pink { background: #d24b7c; }
+.dot-yellow { background: #b8940f; }
+.dot-indigo { background: #5563c9; }
+
+.subject-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .2rem .65rem;
+    border-radius: 999px;
+    font-weight: 600;
+    color: var(--erp-text);
+    white-space: nowrap;
+}
+
+.subject-dot {
+    display: inline-block;
+    width: .6rem;
+    height: .6rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ---------- Legacy AdminLTE tiles (kept harmless if any remain) ---------- */
+
 .small-box > .inner > .small-box-value {
     font-size: 2.2rem;
     font-weight: 700;

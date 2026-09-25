@@ -14,9 +14,9 @@ return [
     |
     */
 
-    'title' => 'School ERP',
+    'title' => env('SCHOOL_NAME', 'School ERP'),
     'title_prefix' => '',
-    'title_postfix' => ' | School ERP',
+    'title_postfix' => ' | '.env('SCHOOL_NAME', 'School ERP'),
 
     /*
     |--------------------------------------------------------------------------
@@ -63,12 +63,12 @@ return [
     |
     */
 
-    'logo' => '<b>School</b> ERP',
+    'logo' => e(env('SCHOOL_NAME', 'School ERP')),
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'School ERP',
+    'logo_img_alt' => '',
 
     /*
     |--------------------------------------------------------------------------
@@ -198,7 +198,7 @@ return [
     'classes_content_wrapper' => '',
     'classes_content_header' => '',
     'classes_content' => '',
-    'classes_sidebar' => 'sidebar-dark-primary elevation-4',
+    'classes_sidebar' => 'sidebar-light-primary',
     'classes_sidebar_nav' => '',
     'classes_topnav' => 'navbar-white navbar-light',
     'classes_topnav_nav' => 'navbar-expand',

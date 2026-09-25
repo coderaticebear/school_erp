@@ -1,10 +1,12 @@
 @extends('adminlte::page')
 
-@section('title', 'Admin Dashboard')
+@section('title', 'Dashboard')
 
 @section('content_header')
-    <x-page-header title="Dashboard" :subtitle="$academicYear?->year" />
+    <x-page-header title="Dashboard" :subtitle="collect([$academicYear?->year, now()->format('l, M j')])->filter()->join(' · ')" />
 @stop
+
+@php($unmarked = $todayByDivision->filter(fn ($row) => $row['students'] > 0 && $row['marked'] === 0)->count())
 
 @section('content')
     @unless ($academicYear)
@@ -12,65 +14,114 @@
     @endunless
 
     <div class="row">
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-                <div class="inner"><p class="small-box-value">{{ $teacherCount }}</p><p>Active teachers</p></div>
-                <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
-                <a href="{{ route('admin.teachers.index') }}" class="small-box-footer">Manage <i class="fas fa-arrow-circle-right"></i></a>
+        <div class="col-sm-6 col-xl-3 mb-3">
+            <div class="stat-card">
+                <p class="stat-label">Active students</p>
+                <p class="stat-value">{{ $studentCount }}</p>
+                <p class="stat-context"><a href="{{ route('admin.students.index') }}">View students</a></p>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-warning">
-                <div class="inner"><p class="small-box-value">{{ $studentCount }}</p><p>Active students</p></div>
-                <div class="icon"><i class="fas fa-user-graduate"></i></div>
-                <a href="{{ route('admin.students.index') }}" class="small-box-footer">Manage <i class="fas fa-arrow-circle-right"></i></a>
+        <div class="col-sm-6 col-xl-3 mb-3">
+            <div class="stat-card">
+                <p class="stat-label">Active teachers</p>
+                <p class="stat-value">{{ $teacherCount }}</p>
+                <p class="stat-context"><a href="{{ route('admin.teachers.index') }}">View teachers</a></p>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-success">
-                <div class="inner">
-                    <p class="small-box-value">{{ $today && $today['percent'] !== null ? $today['percent'].'%' : '—' }}</p>
-                    <p>Attendance today · {{ $today['marked_divisions'] ?? 0 }}/{{ $today['divisions'] ?? 0 }} divisions marked</p>
-                </div>
-                <div class="icon"><i class="fas fa-chart-pie"></i></div>
-                <a href="{{ route('admin.reports.attendance') }}" class="small-box-footer">Attendance Report <i class="fas fa-arrow-circle-right"></i></a>
+        <div class="col-sm-6 col-xl-3 mb-3">
+            <div class="stat-card">
+                <p class="stat-label">Attendance today</p>
+                <p class="stat-value">{{ $today && $today['percent'] !== null ? $today['percent'].'%' : '—' }}</p>
+                <p class="stat-context">
+                    @if ($unmarked > 0)
+                        <span class="text-warning font-weight-bold">{{ $unmarked }} of {{ $todayByDivision->count() }} {{ Str::plural('division', $todayByDivision->count()) }} not marked yet</span>
+                    @elseif ($todayByDivision->isNotEmpty())
+                        <span class="text-success font-weight-bold">Every division marked</span>
+                    @else
+                        <span class="text-muted">No divisions yet</span>
+                    @endif
+                </p>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-danger">
-                <div class="inner">
-                    <p class="small-box-value">{{ $passRate !== null ? $passRate.'%' : '—' }}</p>
-                    <p>{{ $latestExam ? 'Pass rate · '.$latestExam->name : 'No published results yet' }}</p>
-                </div>
-                <div class="icon"><i class="fas fa-poll"></i></div>
-                <a href="{{ route('admin.reports.exams', $latestExam ? ['exam' => $latestExam->id] : []) }}" class="small-box-footer">Exam Report <i class="fas fa-arrow-circle-right"></i></a>
+        <div class="col-sm-6 col-xl-3 mb-3">
+            <div class="stat-card">
+                <p class="stat-label">{{ $latestExam ? 'Pass rate · '.$latestExam->name : 'Pass rate' }}</p>
+                <p class="stat-value">{{ $passRate !== null ? $passRate.'%' : '—' }}</p>
+                <p class="stat-context">
+                    @if ($latestExam)
+                        <a href="{{ route('admin.reports.exams', ['exam' => $latestExam->id]) }}">Exam report</a>
+                    @else
+                        <span class="text-muted">No published results yet</span>
+                    @endif
+                </p>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-xl-7">
             <div class="card">
-                <div class="card-header"><h2 class="card-title"><i class="fas fa-user-clock mr-2"></i>Low Attendance This Month (Below {{ config('school.low_attendance_percent') }}%)</h2></div>
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-baseline">
+                    <h2 class="card-title">Attendance Today</h2>
+                    <span class="text-muted">{{ $todayByDivision->filter(fn ($row) => $row['marked'] > 0)->count() }} of {{ $todayByDivision->count() }} divisions marked</span>
+                </div>
                 <ul class="list-group list-group-flush">
-                    @forelse ($lowAttendance as $row)
-                        <li class="list-group-item d-flex justify-content-between">
-                            <a href="{{ route('admin.students.show', $row['student']) }}">{{ $row['student']->first_name }} {{ $row['student']->last_name }}</a>
-                            <span><small class="text-muted mr-2">{{ $row['division']?->label }}</small><span class="badge badge-danger">{{ $row['percent'] }}%</span></span>
+                    @forelse ($todayByDivision as $row)
+                        <li class="list-group-item d-flex flex-wrap align-items-center" style="gap: .25rem 1rem">
+                            <a href="{{ route('admin.reports.attendance', ['division' => $row['division']->id, 'from' => today()->toDateString(), 'to' => today()->toDateString()]) }}" class="font-weight-bold" style="min-width: 7rem">{{ $row['division']->label }}</a>
+                            <span class="text-muted flex-grow-1">{{ $row['classTeacher'] ?? 'No class teacher' }}</span>
+                            @if ($row['students'] === 0)
+                                <span class="badge badge-secondary">No students</span>
+                            @elseif ($row['marked'] === 0)
+                                <span class="badge badge-warning">Not marked</span>
+                            @else
+                                <span class="badge badge-success">Marked · {{ $row['attended'] }} of {{ $row['marked'] }} present</span>
+                            @endif
                         </li>
                     @empty
-                        <li class="list-group-item text-muted">No students below the threshold this month.</li>
+                        <li class="list-group-item text-muted">No divisions yet. <a href="{{ route('admin.classes.index') }}">Add classes and divisions</a>.</li>
                     @endforelse
                 </ul>
             </div>
         </div>
-        <div class="col-lg-6">
+
+        <div class="col-xl-5">
             <div class="card">
-                <div class="card-header"><h2 class="card-title"><i class="fas fa-tasks mr-2"></i>Setup Checklist</h2></div>
+                <div class="card-header">
+                    <h2 class="card-title float-none">Low Attendance This Month</h2>
+                    <p class="text-muted mb-0 small">Below {{ config('school.low_attendance_percent') }}%</p>
+                </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><i class="fas {{ $academicYear ? 'fa-check-circle text-success' : 'fa-circle text-muted' }} mr-2"></i><a href="{{ route('admin.academic-years.index') }}">Active academic year</a></li>
-                    <li class="list-group-item"><i class="fas {{ $timetablePublished ? 'fa-check-circle text-success' : 'fa-circle text-muted' }} mr-2"></i><a href="{{ route('admin.timetable') }}">Timetable published</a></li>
-                    <li class="list-group-item"><i class="fas {{ $latestExam ? 'fa-check-circle text-success' : 'fa-circle text-muted' }} mr-2"></i><a href="{{ route('admin.exams.index') }}">Exam results published</a></li>
+                    @forelse ($lowAttendance as $row)
+                        <li class="list-group-item d-flex flex-wrap align-items-center" style="gap: .25rem 1rem">
+                            <a href="{{ route('admin.students.show', $row['student']) }}" class="font-weight-bold flex-grow-1">{{ $row['student']->first_name }} {{ $row['student']->last_name }}</a>
+                            <span class="text-muted">{{ $row['division']?->label }}</span>
+                            <span class="badge badge-danger">{{ $row['percent'] }}%</span>
+                        </li>
+                    @empty
+                        <li class="list-group-item text-muted">No students below {{ config('school.low_attendance_percent') }}% this month.</li>
+                    @endforelse
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h2 class="card-title">Setup Checklist</h2></div>
+                <ul class="list-group list-group-flush">
+                    @foreach ([
+                        ['Active academic year', (bool) $academicYear, route('admin.academic-years.index')],
+                        ['Timetable published', $timetablePublished, route('admin.timetable')],
+                        ['Exam results published', (bool) $latestExam, route('admin.exams.index')],
+                    ] as [$label, $done, $url])
+                        <li class="list-group-item d-flex align-items-center" style="gap: .6rem">
+                            @if ($done)
+                                <i class="fas fa-check text-success" aria-hidden="true"></i>
+                            @else
+                                <i class="far fa-circle text-muted" aria-hidden="true"></i>
+                            @endif
+                            <a href="{{ $url }}">{{ $label }}</a>
+                            <span class="ml-auto text-muted small">{{ $done ? 'Done' : 'To do' }}</span>
+                        </li>
+                    @endforeach
                 </ul>
             </div>
         </div>

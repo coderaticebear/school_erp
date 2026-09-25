@@ -12,16 +12,18 @@
         <div class="alert alert-info">There is no active academic year.</div>
     @else
         <div class="row">
-            <div class="col-md-3 col-6">
-                <div class="info-box"><span class="info-box-icon bg-success"><i class="fas fa-percent"></i></span>
-                    <div class="info-box-content"><span class="info-box-text">Attendance</span><span class="info-box-number">{{ $summary['percent'] !== null ? $summary['percent'].'%' : '—' }}</span></div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-card">
+                    <p class="stat-label">Attendance</p>
+                    <p class="stat-value">{{ $summary['percent'] !== null ? $summary['percent'].'%' : '—' }}</p>
                 </div>
             </div>
             @foreach (\App\Models\Attendance::STATUSES as $status => $label)
                 @continue($status === 'present')
-                <div class="col-md-3 col-6">
-                    <div class="info-box"><span class="info-box-icon {{ str_replace('badge-', 'bg-', \App\Models\Attendance::badgeClass($status)) }}"><i class="fas fa-calendar-times"></i></span>
-                        <div class="info-box-content"><span class="info-box-text">{{ $label }}</span><span class="info-box-number">{{ $summary[$status] }}</span></div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="stat-card">
+                        <p class="stat-label">{{ $label }}</p>
+                        <p class="stat-value">{{ $summary[$status] }}</p>
                     </div>
                 </div>
             @endforeach

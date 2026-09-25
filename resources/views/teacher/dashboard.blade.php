@@ -9,43 +9,42 @@
     @include('partials.alerts')
 
     <div class="row">
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-                <div class="inner">
-                    <p class="small-box-value">{{ $teacher->divisions->count() }}</p>
-                    <p>Divisions</p>
-                </div>
-                <div class="icon"><i class="fas fa-school"></i></div>
-                <a href="{{ route('teacher.classes') }}" class="small-box-footer">My Classes <i class="fas fa-arrow-circle-right"></i></a>
+        <div class="col-sm-6 col-xl-3 mb-3">
+            <div class="stat-card">
+                <p class="stat-label">Lessons today</p>
+                <p class="stat-value">{{ $todaysLessons->count() }}</p>
+                <p class="stat-context"><a href="{{ route('teacher.timetable') }}">My Timetable</a></p>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-success">
-                <div class="inner">
-                    <p class="small-box-value">{{ $todaysLessons->count() }}</p>
-                    <p>Lessons today</p>
-                </div>
-                <div class="icon"><i class="fas fa-chalkboard"></i></div>
-                <a href="{{ route('teacher.timetable') }}" class="small-box-footer">My Timetable <i class="fas fa-arrow-circle-right"></i></a>
+        <div class="col-sm-6 col-xl-3 mb-3">
+            <div class="stat-card">
+                <p class="stat-label">Attendance marked today</p>
+                <p class="stat-value">{{ $markedToday->count() }} of {{ $teacher->divisions->count() }}</p>
+                <p class="stat-context">
+                    @if ($teacher->divisions->count() > $markedToday->count())
+                        <a href="{{ route('teacher.attendance') }}">Take Attendance</a>
+                    @else
+                        <span class="text-success font-weight-bold">All marked</span>
+                    @endif
+                </p>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-warning">
-                <div class="inner">
-                    <p class="small-box-value">{{ $markedToday->count() }}/{{ $teacher->divisions->count() }}</p>
-                    <p>Attendance marked today</p>
-                </div>
-                <div class="icon"><i class="fas fa-clipboard-check"></i></div>
-                <a href="{{ route('teacher.attendance') }}" class="small-box-footer">Take Attendance <i class="fas fa-arrow-circle-right"></i></a>
+        <div class="col-sm-6 col-xl-3 mb-3">
+            <div class="stat-card">
+                <p class="stat-label">Divisions</p>
+                <p class="stat-value">{{ $teacher->divisions->count() }}</p>
+                <p class="stat-context"><a href="{{ route('teacher.classes') }}">My Classes</a></p>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-secondary">
-                <div class="inner">
-                    <p class="small-box-value">{{ $teacher->subjects->count() }}</p>
-                    <p>{{ $teacher->subjects->pluck('subject_name')->join(', ') ?: 'Subjects' }}</p>
-                </div>
-                <div class="icon"><i class="fas fa-book"></i></div>
+        <div class="col-sm-6 col-xl-3 mb-3">
+            <div class="stat-card">
+                <p class="stat-label">Subjects</p>
+                <p class="stat-value">{{ $teacher->subjects->count() }}</p>
+                <p class="stat-context d-flex flex-wrap" style="gap: .35rem">
+                    @foreach ($teacher->subjects as $subject)
+                        <x-subject-chip :subject="$subject" />
+                    @endforeach
+                </p>
             </div>
         </div>
     </div>
@@ -53,26 +52,22 @@
     <div class="row">
         <div class="col-lg-7">
             <div class="card">
-                <div class="card-header"><h2 class="card-title"><i class="fas fa-calendar-day mr-2"></i>Today, {{ now()->format('l, M j') }}</h2></div>
+                <div class="card-header"><h2 class="card-title">Today, {{ now()->format('l, M j') }}</h2></div>
                 <div class="card-body p-0">
                     @if (! $published)
                         <p class="text-muted p-3 mb-0">The timetable has not been published yet.</p>
                     @elseif ($todaysLessons->isEmpty())
                         <p class="text-muted p-3 mb-0">No lessons today.</p>
                     @else
-                        <div class="table-responsive">
-                            <table class="table mb-0">
-                                <tbody>
-                                    @foreach ($todaysLessons as $lesson)
-                                        <tr>
-                                            <td class="text-nowrap text-muted">{{ $lesson->period->time_range }}</td>
-                                            <td><strong>{{ $lesson->subject->subject_name }}</strong></td>
-                                            <td>{{ $lesson->division->label }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                        <ul class="list-group list-group-flush">
+                            @foreach ($todaysLessons as $lesson)
+                                <li class="list-group-item d-flex flex-wrap align-items-center" style="gap: .35rem 1rem">
+                                    <span class="text-muted text-nowrap" style="min-width: 6.5rem">{{ $lesson->period->time_range }}</span>
+                                    <x-subject-chip :subject="$lesson->subject" />
+                                    <span class="text-muted ml-auto">{{ $lesson->division->label }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
                     @endif
                 </div>
             </div>

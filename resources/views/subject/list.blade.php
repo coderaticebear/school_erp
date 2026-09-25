@@ -43,7 +43,7 @@
                             <tbody>
                                 @forelse ($subjects as $subject)
                                     <tr>
-                                        <td>{{ $subject->subject_name }}</td>
+                                        <td><x-subject-chip :subject="$subject" /></td>
                                         <td>{{ $subject->periods_per_week ?? 'Auto' }}</td>
                                         <td>{{ $subject->teachers->map->full_name->join(', ') ?: '—' }}</td>
                                         <td class="text-right text-nowrap">

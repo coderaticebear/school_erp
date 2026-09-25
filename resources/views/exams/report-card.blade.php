@@ -41,7 +41,7 @@
                             @foreach ($subjects as $subject)
                                 @php($mark = $row['marks'][$subject->id] ?? null)
                                 <tr>
-                                    <td>{{ $subject->subject_name }}</td>
+                                    <td><x-subject-chip :subject="$subject" plain /></td>
                                     <td @class(['text-center', 'text-danger' => $mark && ($mark->is_absent || $mark->marks < $exam->pass_marks)])>
                                         {{ $mark ? ($mark->is_absent ? 'Absent' : rtrim(rtrim(number_format($mark->marks, 2), '0'), '.').' / '.$exam->max_marks) : 'Not entered' }}
                                     </td>
