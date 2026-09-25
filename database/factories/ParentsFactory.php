@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Parents;
 use App\Models\Login;
+use App\Models\Parents;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ParentsFactory extends Factory
@@ -22,6 +22,8 @@ class ParentsFactory extends Factory
             'province' => $this->faker->state,
             'country' => $this->faker->country,
             'postal' => $this->faker->postcode,
+            'area_code' => (string) $this->faker->numberBetween(200, 999),
+            'phone_number' => $this->faker->numerify('#######'),
         ];
     }
 }

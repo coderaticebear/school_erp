@@ -2,60 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcademicYear;
+use App\Models\Divisions;
+use App\Models\Exam;
+use App\Models\Login;
 use App\Models\Parents;
+use App\Models\StudentClass;
 use App\Models\Students;
 use App\Models\Teachers;
-use App\Models\AcademicYear;
-use App\Models\StudentClass;
 use App\Pipelines\SanitizeInput;
+use App\Services\SchoolReports;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class AdminController extends Controller
 {
     //
 
-    public function index()
+    public function index(SchoolReports $reports): View
     {
+        $academicYear = AcademicYear::current();
 
-        $studentCount = Students::count();
-        $teacherCount = Teachers::count();
+        $latestExam = $academicYear
+            ? Exam::query()->where('academic_year_id', $academicYear->id)->whereNotNull('results_published_at')->latest('results_published_at')->first()
+            : null;
 
-        $data = [
-            'studentCount' => $studentCount,
-            'teacherCount' => $teacherCount,
-        ];
+        $examSummary = $latestExam ? $reports->examByDivision($latestExam) : collect();
+        $complete = $examSummary->sum('complete');
 
-        return view('admin.dashboard')->with('data', $data);
-    }
-
-    public function getCurrentAcademicYear() {
-        $academicYear = AcademicYear::where('is_active', true)->first();
-        return $academicYear;
+        return view('admin.dashboard', [
+            'academicYear' => $academicYear,
+            'studentCount' => Students::whereHas('login', fn ($query) => $query->where('is_active', true))->count(),
+            'teacherCount' => Teachers::whereHas('login', fn ($query) => $query->where('is_active', true))->count(),
+            'today' => $academicYear ? $reports->attendanceToday($academicYear) : null,
+            'lowAttendance' => $academicYear ? $reports->attendanceByStudent($academicYear, now()->startOfMonth(), now()->startOfDay())->take(5) : collect(),
+            'latestExam' => $latestExam,
+            'passRate' => $complete > 0 ? round(100 * $examSummary->sum('passed') / $complete, 1) : null,
+            'timetablePublished' => (bool) $academicYear?->timetable_published_at,
+        ]);
     }
 
     public function viewStudent($id)
     {
-        DB::enableQueryLog();
-
         $id = SanitizeInput::run([$id])[0];
 
         if (! ctype_digit((string) $id)) {
             abort(404, 'Invalid student ID');
         }
 
-        $academicYear = $this->getCurrentAcademicYear();
-        $student = Students::with(['parent.login'])->findOrFail($id);
+        $academicYear = AcademicYear::current();
+        $student = Students::with(['parent.login', 'login'])->findOrFail($id);
         $parent = $student->parent;
-        $classDetails = StudentClass::query()
-        ->where('student_id', $student->id)
-        ->where('academic_year_id', $academicYear->id)
-        ->with(['division.class'])->firstOrFail();
+        $classDetails = $academicYear
+            ? StudentClass::query()
+                ->where('student_id', $student->id)
+                ->where('academic_year_id', $academicYear->id)
+                ->with(['division.class'])
+                ->first()
+            : null;
 
         $data = [
             'student_id' => $student->id,
             'roll_number' => $student->roll_number ?? 'N/A',
-            'status' => $student->status,
+            'is_active' => (bool) $student->login?->is_active,
             'student_name' => "{$student->first_name} {$student->last_name}",
             'parent_name' => $parent
                 ? "{$parent->first_name} {$parent->last_name}"
@@ -70,11 +79,16 @@ class AdminController extends Controller
             'date_of_birth' => date('j F Y', strtotime($student->date_of_birth)) ?? 'N/A',
             'gender' => $student->gender ?? 'N/A',
             'blood_group' => $student->blood_group ?? 'N/A',
-            'division_name' => $classDetails->division->division_name,
-            'class_name' => $classDetails->division->class->class_name,
-            'academic_year' => $academicYear->year,
+            'division_name' => $classDetails?->division?->division_name ?? 'Not assigned',
+            'class_name' => $classDetails?->division?->class?->class_name ?? 'Not assigned',
+            'academic_year' => $academicYear?->year ?? 'N/A',
         ];
-        return view('student.profile', compact('data'));
+
+        $exams = $academicYear
+            ? Exam::query()->where('academic_year_id', $academicYear->id)->orderByDesc('starts_on')->get()
+            : collect();
+
+        return view('student.profile', compact('data', 'exams', 'student'));
     }
 
     public function addStudent()
@@ -87,7 +101,12 @@ class AdminController extends Controller
             ];
         })->toArray();
 
-        return view('student.add')->with('data', $data);
+        $divisions = Divisions::with('class')
+            ->get()
+            ->sortBy(fn (Divisions $division) => [$division->class->class_name ?? '', $division->division_name])
+            ->values();
+
+        return view('student.add')->with(['data' => $data, 'divisions' => $divisions]);
     }
 
     public function getParentByEmail(Request $request)
@@ -96,22 +115,14 @@ class AdminController extends Controller
             'email' => 'required|string|email',
         ]);
 
-        $parent = Parents::join('login', 'login.id', '=', 'parents.login_id')
-            ->where('login.email', $validated['email'])
-            ->value('parents.id');
+        $parent = Parents::query()
+            ->whereHas('login', fn ($query) => $query
+                ->whereRaw('lower(email) = ?', [strtolower($validated['email'])])
+                ->where('role', Login::ROLE_PARENT))
+            ->value('id');
 
         return response()->json([
             'parent_id' => $parent,
         ]);
     }
-
-    public function assignClassTeacher($id, $classDivisionId) {
-
-    }
 }
-/**
- *
- * To assign a class teacher, we need two tables.
- * Teacher-division - to track each teachers teaching on each division with a flg to mark if its class teacher or not
- * Also table to track which subjects each teacher teaches!
- */

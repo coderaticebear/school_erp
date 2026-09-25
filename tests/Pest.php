@@ -12,7 +12,7 @@
 */
 
 pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -41,7 +41,21 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Create a login with the given role (plus its teacher/student/parent profile) and authenticate as it.
+ */
+function actingAsRole(int $role): App\Models\Login
 {
-    // ..
+    $login = App\Models\Login::factory()->create(['role' => $role]);
+
+    match ($role) {
+        App\Models\Login::ROLE_TEACHER => App\Models\Teachers::factory()->create(['login_id' => $login->id]),
+        App\Models\Login::ROLE_STUDENT => App\Models\Students::factory()->create(['login_id' => $login->id]),
+        App\Models\Login::ROLE_PARENT => App\Models\Parents::factory()->create(['login_id' => $login->id]),
+        default => null,
+    };
+
+    test()->actingAs($login);
+
+    return $login;
 }

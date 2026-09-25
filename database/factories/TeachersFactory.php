@@ -2,9 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Teachers;
 use App\Models\Login;
-use App\Models\Subjects;
+use App\Models\Teachers;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TeachersFactory extends Factory
@@ -15,7 +14,6 @@ class TeachersFactory extends Factory
     {
         return [
             'login_id' => Login::factory()->teacher(),
-            'subject_id' => Subjects::factory(),
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
             'address_line_1' => $this->faker->streetAddress,

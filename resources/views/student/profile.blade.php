@@ -3,6 +3,7 @@
 @section('title', 'Student Profile')
 
 @section('content')
+@include('partials.alerts')
 <div class="row">
     <!-- LEFT COLUMN -->
     <div class="col-md-4">
@@ -16,7 +17,7 @@
                 >
 
                 <h3 class="profile-username">{{ $data['student_name'] }}</h3>
-                <p class="text-muted">N/A</p>
+                <p class="text-muted">{{ $data['class_name'] }} - {{ $data['division_name'] }}</p>
 
                 <ul class="list-group list-group-unbordered mb-3 text-left">
                     <li class="list-group-item">
@@ -29,14 +30,35 @@
                     </li>
                     <li class="list-group-item">
                         <b>Status</b>
-                        <span class="float-right text-success">Active</span>
+                        @if ($data['is_active'])
+                            <span class="float-right text-success">Active</span>
+                        @else
+                            <span class="float-right text-secondary">Inactive</span>
+                        @endif
                     </li>
                 </ul>
 
-                <a href="#" class="btn btn-primary btn-block">
+                <a href="{{ route('admin.students.edit', $data['student_id']) }}" class="btn btn-primary btn-block">
                     Edit Student
                 </a>
             </div>
+        </div>
+
+        <!-- REPORT CARDS -->
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Report Cards</h3></div>
+            <ul class="list-group list-group-flush">
+                @forelse ($exams as $exam)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{{ route('admin.exams.report-card', [$exam, $student]) }}">{{ $exam->name }}</a>
+                        @if ($exam->isPublished())
+                            <span class="badge badge-success">Published</span>
+                        @endif
+                    </li>
+                @empty
+                    <li class="list-group-item text-muted">No exams yet.</li>
+                @endforelse
+            </ul>
         </div>
 
         <!-- PARENT DETAILS -->

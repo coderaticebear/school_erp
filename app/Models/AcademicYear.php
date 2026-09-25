@@ -15,11 +15,26 @@ class AcademicYear extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'academic_year',
+        'year',
         'is_active',
+        'timetable_published_at',
     ];
 
-    public function studentClass() {
+    protected function casts(): array
+    {
+        return ['is_active' => 'boolean', 'timetable_published_at' => 'datetime'];
+    }
+
+    /**
+     * The academic year currently marked as active, if any.
+     */
+    public static function current(): ?self
+    {
+        return static::query()->where('is_active', true)->first();
+    }
+
+    public function studentClass()
+    {
         return $this->hasMany(StudentClass::class, 'academic_year_id');
     }
 }

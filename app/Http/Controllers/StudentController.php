@@ -2,191 +2,191 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreStudentRequest;
+use App\Http\Requests\UpdateStudentRequest;
+use App\Models\AcademicYear;
 use App\Models\Divisions;
 use App\Models\Login;
+use App\Models\Parents;
 use App\Models\StudentClass;
 use App\Models\Students;
-use App\Models\Parents;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 
 class StudentController extends Controller
 {
-    //
-
-    public function index()
+    /**
+     * Create the student's login and profile, attach (or create) the parent,
+     * and enrol the student in a division for the active academic year.
+     */
+    public function store(StoreStudentRequest $request): RedirectResponse
     {
-        return view('student.dashboard');
-    }
+        $validated = $request->validated();
 
-    public function addStudent(Request $request)
-    {
+        $academicYear = AcademicYear::current();
 
+        if (! $academicYear) {
+            return back()->withInput()->with('error', 'There is no active academic year. Activate one before adding students.');
+        }
 
-        DB::beginTransaction();
+        $address = [
+            'address_line_1' => $validated['address_line_1'],
+            'address_line_2' => $validated['address_line_2'] ?? null,
+            'city' => $validated['city'],
+            'province' => $validated['province'],
+            'country' => $validated['country'],
+            'postal' => $validated['postal'],
+        ];
 
         try {
-            // --- 1. VALIDATION ---
-            $validated = $request->validate([
-                'first_name' => 'required|max:255|string',
-                'last_name' => 'required|max:255|string',
+            DB::transaction(function () use ($validated, $address, $academicYear) {
+                $parentId = $validated['parent_id'] ?? null;
 
-                'dob' => 'required|string',
-                'gender' => 'required|string',
-                'blood_group' => 'required|string',
+                if (! $parentId) {
+                    $parentLogin = Login::create([
+                        'email' => $validated['p_email'],
+                        'password' => bcrypt($validated['parent_password']),
+                        'role' => Login::ROLE_PARENT,
+                        'is_active' => true,
+                    ]);
 
-                'address_line_1' => 'required|max:255|string',
-                'address_line_2' => 'nullable|max:255|string',
-                'city' => 'required|max:255|string',
-                'province' => 'required|max:255|string',
-                'country' => 'required|max:255|string',
-                'postal' => 'required|max:255|string',
+                    $parentId = Parents::create([
+                        'login_id' => $parentLogin->id,
+                        'first_name' => $validated['parent_first_name'],
+                        'last_name' => $validated['parent_last_name'],
+                        'area_code' => $validated['parent_area_code'],
+                        'phone_number' => $validated['parent_phone'],
+                        ...$address,
+                    ])->id;
+                }
 
-                'email' => 'required|email|max:255|unique:login,email',
-                'password' => 'required|max:255',
-            ]);
-
-            $parentLogin = Login::where('email', $request->p_email)->where('role', 4)->first();
-
-            if (! $parentLogin) {
-                $parentLoginValidated = $request->validate([
-                    'parent_first_name' => 'required|string',
-                    'parent_last_name' => 'required|string',
-                    'parent_area_code' => 'required|string',
-                    'parent_phone' => 'required|string',
-                    'p_email' => 'required|email|max:255|unique:login,email',
-                    'parent_password' => 'required|max:255',
-                ]);
-                //Create Parent Login
-                $newParentlogin = Login::create([
-                    'email' => $parentLoginValidated['p_email'],
-                    'password' => bcrypt($parentLoginValidated['parent_password']),
-                    'role' => 4,
+                $login = Login::create([
+                    'email' => $validated['email'],
+                    'password' => bcrypt($validated['password']),
+                    'role' => Login::ROLE_STUDENT,
                     'is_active' => true,
                 ]);
-                $finalParentLoginId = $newParentlogin->id;
 
-                //create parent record
-                $newParentRecord = Parents::create([
-                    'login_id' => $finalParentLoginId,
-                    'first_name' => $parentLoginValidated['parent_first_name'],
-                    'last_name' => $parentLoginValidated['parent_last_name'],
-
-                    'address_line_1' => $validated['address_line_1'],
-                    'address_line_2' => $validated['address_line_2'] ?? null,
-                    'city' => $validated['city'],
-                    'province' => $validated['province'],
-                    'country' => $validated['country'],
-                    'postal' => $validated['postal'],
-
-                    'area_code' => $parentLoginValidated['parent_area_code'],
-                    'phone_number' => $parentLoginValidated['parent_phone'],
+                $student = Students::create([
+                    'login_id' => $login->id,
+                    'parent_id' => $parentId,
+                    'first_name' => $validated['first_name'],
+                    'last_name' => $validated['last_name'],
+                    'date_of_birth' => $validated['dob'],
+                    'gender' => $validated['gender'],
+                    'blood_group' => $validated['blood_group'],
+                    ...$address,
                 ]);
-                $finalParentId = $newParentRecord->id;
-            } else {
-                $parentLoginValidated = $request->validate([
-                    'parent_id' => 'required|integer',
+
+                StudentClass::create([
+                    'student_id' => $student->id,
+                    'class_division_id' => $validated['class_division_id'],
+                    'academic_year_id' => $academicYear->id,
+                    'is_active' => true,
                 ]);
-                $finalParentId = $parentLoginValidated['parent_id'];
-            }
+            });
+        } catch (\Throwable $e) {
+            Log::error('Failed to add student', ['exception' => $e]);
 
-            // --- 2. CREATE LOGIN USER STUDENT---
-            $login = Login::create([
-                'email' => $validated['email'],
-                'password' => bcrypt($validated['password']),
-                'role' => 3, // student = 3
-                'is_active' => true,
-            ]);
+            return back()->withInput()->with('error', 'The student could not be saved. Please try again.');
+        }
 
-            // --- 3. CREATE STUDENT RECORD ---
-            $student = Students::create([
-                'login_id' => $login->id,
-                'parent_id' => $finalParentId,
+        return redirect()->route('admin.addStudent')->with('success', 'Student added successfully!');
+    }
+
+    public function getStudent(): View
+    {
+        $academicYear = AcademicYear::current();
+
+        $students = Students::query()
+            ->with([
+                'parent',
+                'login',
+                'StudentClasses' => fn ($query) => $query
+                    ->where('academic_year_id', $academicYear?->id)
+                    ->with('division.class'),
+            ])
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get();
+
+        return view('student.list', compact('students'));
+    }
+
+    public function edit(Students $student): View
+    {
+        $academicYear = AcademicYear::current();
+        $student->load('login');
+
+        $currentDivisionId = $academicYear
+            ? StudentClass::query()
+                ->where('student_id', $student->id)
+                ->where('academic_year_id', $academicYear->id)
+                ->value('class_division_id')
+            : null;
+
+        $divisions = Divisions::with('class')->get()
+            ->sortBy(fn (Divisions $division) => [$division->class->class_name ?? '', $division->division_name])
+            ->values();
+
+        return view('student.edit', compact('student', 'divisions', 'currentDivisionId', 'academicYear'));
+    }
+
+    /**
+     * Update the student's profile and login, and move them to a division for the active year.
+     */
+    public function update(UpdateStudentRequest $request, Students $student): RedirectResponse
+    {
+        $validated = $request->validated();
+        $academicYear = AcademicYear::current();
+
+        if (! $academicYear) {
+            return back()->withInput()->with('error', 'There is no active academic year. Activate one before changing classes.');
+        }
+
+        DB::transaction(function () use ($validated, $student, $academicYear) {
+            $student->update([
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
-
+                'date_of_birth' => $validated['dob'],
+                'gender' => $validated['gender'],
+                'blood_group' => $validated['blood_group'],
                 'address_line_1' => $validated['address_line_1'],
                 'address_line_2' => $validated['address_line_2'] ?? null,
                 'city' => $validated['city'],
                 'province' => $validated['province'],
                 'country' => $validated['country'],
                 'postal' => $validated['postal'],
-                'date_of_birth' => $validated['dob'],
-                'gender' => $validated['gender'],
-                'blood_group' => $validated['blood_group'],
             ]);
 
-            DB::commit();
+            $student->login->email = $validated['email'];
 
-            return redirect()->back()->with('success', 'Student added successfully!');
+            if (filled($validated['password'] ?? null)) {
+                $student->login->password = bcrypt($validated['password']);
+            }
 
-        } catch (\Exception $e) {
+            $student->login->save();
 
-            DB::rollBack();
+            StudentClass::updateOrCreate(
+                ['student_id' => $student->id, 'academic_year_id' => $academicYear->id],
+                ['class_division_id' => $validated['class_division_id'], 'is_active' => true],
+            );
+        });
 
-            return redirect()->back()->with('error', 'Failed to add student: '.$e->getMessage());
-        }
-    }
-
-    public function assignClass($student_id, $division_id)
-    {
-        if ($student_id != null && $division_id != null) {
-            $current_class = StudentClass::create([
-                'student_id' => $student_id,
-                'class_division_id' => $division_id,
-                'is_active' => true,
-            ]);
-
-            return $current_class->id;
-        }
-
-        return false;
-
+        return redirect()->route('admin.students.show', $student)->with('success', 'Student updated.');
     }
 
     /**
-     * Don't run this function, It's a seeder function for student_classes table
+     * Activate or deactivate the student's login.
      */
-    public function randomizeClass()
+    public function toggleActive(Students $student): RedirectResponse
     {
-        // $divisions = Divisions::all();
-        $students = Students::all();
+        $student->login->update(['is_active' => ! $student->login->is_active]);
 
-        $students->map(function ($student) {
-            $this->assignClass($student->id, random_int(1, 6));
-        });
-    }
+        $state = $student->login->is_active ? 'activated' : 'deactivated';
 
-    public function getStudent($id = null)
-    {
-        if ($id) {
-            $student = Students::with('parent')
-                ->find($id);
-
-            if (! $student) {
-                abort(404, 'Student not found');
-            }
-
-            $data = [[
-                'sfname' => $student->first_name,
-                'slname' => $student->last_name,
-                'pfname' => $student->parent->first_name ?? '',
-                'plname' => $student->parent->last_name ?? '',
-            ]];
-        } else {
-            $students = Students::with('parent')->get();
-
-            $data = $students->map(function ($student) {
-                return [
-                    'sid' => $student->id,
-                    'sfname' => $student->first_name,
-                    'slname' => $student->last_name,
-                    'pfname' => $student->parent->first_name ?? '',
-                    'plname' => $student->parent->last_name ?? '',
-                ];
-            })->toArray();
-        }
-
-        return view('student.list')->with('data', $data);
+        return back()->with('success', "{$student->first_name} {$student->last_name} {$state}.");
     }
 }
