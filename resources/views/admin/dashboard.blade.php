@@ -3,7 +3,7 @@
 @section('title', 'Admin Dashboard')
 
 @section('content_header')
-    <h1>Dashboard <small class="text-muted">{{ $academicYear?->year }}</small></h1>
+    <x-page-header title="Dashboard" :subtitle="$academicYear?->year" />
 @stop
 
 @section('content')

@@ -2,13 +2,10 @@
 @section('title', 'Attendance Report')
 
 @section('content_header')
-    <div class="d-flex flex-wrap justify-content-between align-items-center">
-        <h1>Attendance Report</h1>
-        <div class="no-print">
-            <a href="{{ request()->fullUrlWithQuery(['format' => 'csv']) }}" class="btn btn-outline-secondary"><i class="fas fa-file-export mr-1"></i> Export Students</a>
-            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1"></i> Print</button>
-        </div>
-    </div>
+    <x-page-header title="Attendance Report">
+        <a href="{{ request()->fullUrlWithQuery(['format' => 'csv']) }}" class="btn btn-outline-secondary"><i class="fas fa-file-export mr-1" aria-hidden="true"></i> Export Students</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
+    </x-page-header>
 @stop
 
 @section('content')

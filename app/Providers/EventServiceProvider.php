@@ -16,24 +16,30 @@ class EventServiceProvider extends ServiceProvider
     }
 
     /**
-     * Sidebar items for a role. Only link to pages that exist.
+     * Sidebar items for a role: links (text, url, icon) and optional group headers.
+     * Only link to pages that exist.
      *
-     * @return list<array{text: string, url: string, icon: string}>
+     * @return list<array{text: string, url: string, icon: string}|array{header: string}>
      */
     public static function menuFor(int $role): array
     {
         return match ($role) {
             Login::ROLE_ADMIN => [
                 ['text' => 'Dashboard', 'url' => 'admin/dashboard', 'icon' => 'fas fa-tachometer-alt'],
-                ['text' => 'Manage Students', 'url' => 'students', 'icon' => 'fas fa-user-graduate'],
-                ['text' => 'Manage Teachers', 'url' => 'teachers', 'icon' => 'fas fa-chalkboard-teacher'],
-                ['text' => 'Manage Subjects', 'url' => 'subjects', 'icon' => 'fas fa-book'],
+                ['header' => 'People'],
+                ['text' => 'Students', 'url' => 'students', 'icon' => 'fas fa-user-graduate'],
+                ['text' => 'Teachers', 'url' => 'teachers', 'icon' => 'fas fa-chalkboard-teacher'],
+                ['header' => 'Academics'],
                 ['text' => 'Classes & Divisions', 'url' => 'admin/classes', 'icon' => 'fas fa-school'],
+                ['text' => 'Subjects', 'url' => 'subjects', 'icon' => 'fas fa-book'],
                 ['text' => 'Academic Years', 'url' => 'admin/academic-years', 'icon' => 'fas fa-calendar'],
-                ['text' => 'Timetable Manager', 'url' => 'admin/timetable', 'icon' => 'fas fa-calendar-alt'],
+                ['header' => 'Timetable'],
+                ['text' => 'Timetable', 'url' => 'admin/timetable', 'icon' => 'fas fa-calendar-alt'],
                 ['text' => 'Bell Schedule', 'url' => 'admin/periods', 'icon' => 'fas fa-bell'],
+                ['header' => 'Exams'],
                 ['text' => 'Exams & Results', 'url' => 'admin/exams', 'icon' => 'fas fa-poll'],
                 ['text' => 'Marks Entry', 'url' => 'marks', 'icon' => 'fas fa-pen'],
+                ['header' => 'Reports'],
                 ['text' => 'Attendance Report', 'url' => 'admin/reports/attendance', 'icon' => 'fas fa-chart-bar'],
                 ['text' => 'Exam Report', 'url' => 'admin/reports/exams', 'icon' => 'fas fa-chart-line'],
             ],
@@ -65,9 +71,6 @@ class EventServiceProvider extends ServiceProvider
             if (! Auth::check()) {
                 return;
             }
-
-            // Shared header
-            $event->menu->add('MAIN NAVIGATION');
 
             foreach (self::menuFor((int) Auth::user()->role) as $item) {
                 $event->menu->add($item);

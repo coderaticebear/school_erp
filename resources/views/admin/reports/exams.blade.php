@@ -2,15 +2,12 @@
 @section('title', 'Exam Report')
 
 @section('content_header')
-    <div class="d-flex flex-wrap justify-content-between align-items-center">
-        <h1>Exam Report</h1>
+    <x-page-header title="Exam Report">
         @if ($exam)
-            <div class="no-print">
-                <a href="{{ route('admin.reports.exams', ['exam' => $exam->id, 'format' => 'csv']) }}" class="btn btn-outline-secondary"><i class="fas fa-file-export mr-1"></i> Export</a>
-                <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1"></i> Print</button>
-            </div>
+            <a href="{{ route('admin.reports.exams', ['exam' => $exam->id, 'format' => 'csv']) }}" class="btn btn-outline-secondary"><i class="fas fa-file-export mr-1" aria-hidden="true"></i> Export</a>
+            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
         @endif
-    </div>
+    </x-page-header>
 @stop
 
 @section('content')

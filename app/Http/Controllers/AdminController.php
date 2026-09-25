@@ -99,10 +99,11 @@ class AdminController extends Controller
             ->whereHas('login', fn ($query) => $query
                 ->whereRaw('lower(email) = ?', [strtolower($validated['email'])])
                 ->where('role', Login::ROLE_PARENT))
-            ->value('id');
+            ->first(['id', 'first_name', 'last_name']);
 
         return response()->json([
-            'parent_id' => $parent,
+            'parent_id' => $parent?->id,
+            'name' => $parent ? trim("{$parent->first_name} {$parent->last_name}") : null,
         ]);
     }
 }

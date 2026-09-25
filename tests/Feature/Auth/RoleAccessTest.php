@@ -67,7 +67,7 @@ test('non-admins cannot reach admin pages or actions', function (int $role) {
 test('every sidebar link points at a registered route', function (int $role) {
     $paths = collect(Route::getRoutes())->map(fn ($route) => trim($route->uri(), '/'));
 
-    foreach (EventServiceProvider::menuFor($role) as $item) {
+    foreach (array_filter(EventServiceProvider::menuFor($role), fn ($item) => isset($item['url'])) as $item) {
         expect($paths)->toContain(trim($item['url'], '/'));
     }
 })->with([Login::ROLE_ADMIN, Login::ROLE_TEACHER, Login::ROLE_STUDENT, Login::ROLE_PARENT]);
@@ -75,7 +75,7 @@ test('every sidebar link points at a registered route', function (int $role) {
 test('each role can open every page in its own sidebar', function (int $role) {
     actingAsRole($role);
 
-    foreach (EventServiceProvider::menuFor($role) as $item) {
+    foreach (array_filter(EventServiceProvider::menuFor($role), fn ($item) => isset($item['url'])) as $item) {
         $this->get('/'.$item['url'])->assertSuccessful();
     }
 })->with([Login::ROLE_ADMIN, Login::ROLE_TEACHER, Login::ROLE_STUDENT, Login::ROLE_PARENT]);

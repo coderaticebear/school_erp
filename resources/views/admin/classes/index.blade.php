@@ -3,12 +3,11 @@
 @section('title', 'Classes & Divisions')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1>Classes &amp; Divisions</h1>
+    <x-page-header title="Classes & Divisions">
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addClass">
-            <i class="fas fa-plus mr-1"></i> Add Class
+            <i class="fas fa-plus mr-1" aria-hidden="true"></i> Add Class
         </button>
-    </div>
+    </x-page-header>
 @stop
 
 @section('content')
@@ -51,12 +50,12 @@
                                             <td>{{ $division->students_count }}</td>
                                             <td>{{ $division->teachers->first()?->full_name ?? '—' }}</td>
                                             <td class="text-right pr-3 text-nowrap">
-                                                <a href="{{ route('admin.divisions.teachers.edit', $division) }}" class="btn btn-xs btn-outline-primary">Teachers</a>
-                                                <button type="button" class="btn btn-xs btn-outline-secondary" data-toggle="modal" data-target="#editDivision{{ $division->id }}">Rename</button>
+                                                <a href="{{ route('admin.divisions.teachers.edit', $division) }}" class="btn btn-sm btn-outline-primary">Teachers</a>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#editDivision{{ $division->id }}">Rename</button>
                                                 <form action="{{ route('admin.divisions.destroy', $division) }}" method="post" class="d-inline" onsubmit="return confirm('Delete division {{ $division->division_name }}?')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-xs btn-outline-danger">Delete</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -91,7 +90,7 @@
                             <input type="text" name="class_name" class="form-control" value="{{ $class->class_name }}" maxlength="10" aria-label="Class Name">
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-primary">Save</button>
                         </div>
                     </form>
@@ -112,7 +111,7 @@
                                 <input type="text" name="division_name" class="form-control" value="{{ $division->division_name }}" maxlength="10" aria-label="Division name">
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
                                 <button type="submit" class="btn btn-primary">Save</button>
                             </div>
                         </form>
@@ -137,7 +136,7 @@
                     <input type="text" id="class_name" name="class_name" class="form-control" placeholder="Grade 8" maxlength="10" value="{{ old('class_name') }}">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Add</button>
                 </div>
             </form>

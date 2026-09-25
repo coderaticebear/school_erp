@@ -2,7 +2,7 @@
 @section('title', 'Marks · '.$subject->subject_name)
 
 @section('content_header')
-    <h1>{{ $exam->name }} · {{ $subject->subject_name }} · {{ $division->label }}</h1>
+    <x-page-header :title="$subject->subject_name.' · '.$division->label" :subtitle="$exam->name" />
 @stop
 
 @section('content')
@@ -41,7 +41,7 @@
                                             @error("marks.{$student->id}.value")<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </td>
                                         <td class="align-middle">
-                                            <input type="checkbox" name="marks[{{ $student->id }}][absent]" aria-label="{{ $student->first_name }} {{ $student->last_name }} was absent" value="1" @checked($absent) @disabled($exam->isPublished())>
+                                            <label class="hit-target"><input type="checkbox" name="marks[{{ $student->id }}][absent]" aria-label="{{ $student->first_name }} {{ $student->last_name }} was absent" value="1" @checked($absent) @disabled($exam->isPublished())></label>
                                         </td>
                                         <td>
                                             <input type="text" name="marks[{{ $student->id }}][remark]" aria-label="Remark for {{ $student->first_name }} {{ $student->last_name }}" maxlength="255" class="form-control form-control-sm" value="{{ old("marks.{$student->id}.remark", $mark?->remark) }}" @disabled($exam->isPublished())>
@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="{{ route('marks.index', ['exam' => $exam->id]) }}" class="btn btn-secondary">Back</a>
+                    <a href="{{ route('marks.index', ['exam' => $exam->id]) }}" class="btn btn-outline-secondary">Back</a>
                     @unless ($exam->isPublished())
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Save Marks</button>
                     @endunless

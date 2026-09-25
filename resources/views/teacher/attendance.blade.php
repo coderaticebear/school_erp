@@ -2,7 +2,7 @@
 @section('title', 'Attendance')
 
 @section('content_header')
-    <h1>Attendance</h1>
+    <x-page-header title="Attendance" />
 @stop
 
 @section('content')
@@ -48,7 +48,7 @@
                                             Not marked yet. Everyone starts as present.
                                         @endif
                                     </span>
-                                    <button type="button" class="btn btn-xs btn-outline-success" id="allPresent">Mark All Present</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="allPresent">Mark All Present</button>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover mb-0">

@@ -2,7 +2,7 @@
 @section('title', 'Exams')
 
 @section('content_header')
-    <h1>Exams {{ $academicYear ? '· '.$academicYear->year : '' }}</h1>
+    <x-page-header title="Exams" :subtitle="$academicYear?->year" />
 @stop
 
 @section('content')
@@ -86,7 +86,7 @@
                         </div>
                         <div class="modal-body">@include('admin.exams.fields', ['exam' => $exam])</div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-primary">Save</button>
                         </div>
                     </form>

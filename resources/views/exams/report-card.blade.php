@@ -2,15 +2,12 @@
 @section('title', 'Report Card')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center no-print">
-        <h1>Report Card</h1>
-        <div>
-            @isset($backUrl)
-                <a href="{{ $backUrl }}" class="btn btn-secondary">Back</a>
-            @endisset
-            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1"></i> Print</button>
-        </div>
-    </div>
+    <x-page-header title="Report Card">
+        @isset($backUrl)
+            <a href="{{ $backUrl }}" class="btn btn-outline-secondary">Back</a>
+        @endisset
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
+    </x-page-header>
 @stop
 
 @section('content')

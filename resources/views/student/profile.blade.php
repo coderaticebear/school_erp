@@ -6,17 +6,11 @@
 @section('title', $fullName)
 
 @section('content_header')
-    <div class="d-flex flex-wrap justify-content-between align-items-center">
-        <div>
-            <h1 class="mb-0">{{ $fullName }}</h1>
-            <p class="text-muted mb-0">
-                {{ $enrolment?->division?->label ?? 'Not assigned to a class' }}{{ $academicYear ? ' · '.$academicYear->year : '' }}
-            </p>
-        </div>
-        <a href="{{ route('admin.students.edit', $student) }}" class="btn btn-primary mt-2 mt-sm-0">
+    <x-page-header :title="$fullName" :subtitle="($enrolment?->division?->label ?? 'Not assigned to a class').($academicYear ? ' · '.$academicYear->year : '')">
+        <a href="{{ route('admin.students.edit', $student) }}" class="btn btn-primary">
             <i class="fas fa-pen mr-1" aria-hidden="true"></i> Edit Student
         </a>
-    </div>
+    </x-page-header>
 @stop
 
 @section('content')

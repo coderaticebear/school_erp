@@ -2,21 +2,17 @@
 @section('title', $exam->name)
 
 @section('content_header')
-    <div class="d-flex flex-wrap justify-content-between align-items-center">
-        <div>
-            <h1 class="mb-0">{{ $exam->name }}</h1>
-            <small class="text-muted">Out of {{ $exam->max_marks }} · pass mark {{ $exam->pass_marks }}{{ $exam->starts_on ? ' · starts '.$exam->starts_on->format('M j, Y') : '' }}</small>
-        </div>
-        <form action="{{ route('admin.exams.publish', $exam) }}" method="post" class="mt-2 mt-sm-0">
+    <x-page-header :title="$exam->name" :subtitle="'Out of '.$exam->max_marks.' · pass mark '.$exam->pass_marks.($exam->starts_on ? ' · starts '.$exam->starts_on->format('M j, Y') : '')">
+        <form action="{{ route('admin.exams.publish', $exam) }}" method="post" class="d-flex align-items-center">
             @csrf
             @if ($exam->isPublished())
-                <span class="badge badge-success mr-2">Published {{ $exam->results_published_at->diffForHumans() }}</span>
+                <span class="text-muted mr-2">Published {{ $exam->results_published_at->diffForHumans() }}</span>
                 <button type="submit" class="btn btn-outline-warning">Unpublish</button>
             @else
-                <button type="submit" class="btn btn-success" onclick="return confirm('Publish results? Students and parents will see them, and marks will be locked.')"><i class="fas fa-upload mr-1"></i> Publish Results</button>
+                <button type="submit" class="btn btn-primary" onclick="return confirm('Publish results? Students and parents will see them, and marks will be locked.')"><i class="fas fa-upload mr-1" aria-hidden="true"></i> Publish Results</button>
             @endif
         </form>
-    </div>
+    </x-page-header>
 @stop
 
 @section('content')

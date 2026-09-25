@@ -2,7 +2,7 @@
 @section('title', 'Marks Entry')
 
 @section('content_header')
-    <h1>Marks Entry</h1>
+    <x-page-header title="Marks Entry" />
 @stop
 
 @section('content')

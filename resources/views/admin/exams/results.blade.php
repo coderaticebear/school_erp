@@ -2,13 +2,10 @@
 @section('title', $exam->name.' Results')
 
 @section('content_header')
-    <div class="d-flex flex-wrap justify-content-between align-items-center">
-        <h1>{{ $exam->name }} · {{ $division->label }}</h1>
-        <div class="no-print">
-            <a href="{{ route('admin.exams.results', [$exam, $division, 'format' => 'csv']) }}" class="btn btn-outline-secondary"><i class="fas fa-file-export mr-1"></i> Export</a>
-            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1"></i> Print</button>
-        </div>
-    </div>
+    <x-page-header :title="$division->label.' Results'" :subtitle="$exam->name">
+        <a href="{{ route('admin.exams.results', [$exam, $division, 'format' => 'csv']) }}" class="btn btn-outline-secondary"><i class="fas fa-file-export mr-1" aria-hidden="true"></i> Export</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
+    </x-page-header>
 @stop
 
 @section('content')
@@ -46,7 +43,7 @@
                             <td>
                                 <span @class(['badge', 'badge-success' => $row['result'] === 'Pass', 'badge-danger' => $row['result'] === 'Fail', 'badge-secondary' => $row['result'] === 'Incomplete'])>{{ $row['result'] }}</span>
                             </td>
-                            <td class="no-print"><a href="{{ route('admin.exams.report-card', [$exam, $row['student']]) }}" class="btn btn-xs btn-outline-primary">Report Card</a></td>
+                            <td class="no-print"><a href="{{ route('admin.exams.report-card', [$exam, $row['student']]) }}" class="btn btn-sm btn-outline-primary">Report Card</a></td>
                         </tr>
                     @empty
                         <tr><td colspan="{{ $subjects->count() + 7 }}" class="text-center text-muted">No students are enrolled in {{ $division->label }}.</td></tr>
@@ -55,7 +52,7 @@
             </table>
         </div>
     </div>
-    <a href="{{ route('admin.exams.show', $exam) }}" class="btn btn-secondary no-print">Back to {{ $exam->name }}</a>
+    <a href="{{ route('admin.exams.show', $exam) }}" class="btn btn-outline-secondary no-print">Back to {{ $exam->name }}</a>
 @stop
 
 @include('timetable.styles')

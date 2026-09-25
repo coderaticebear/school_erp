@@ -182,14 +182,29 @@ test('an empty parent_id with no new-parent details is a validation error, not a
         ->assertSessionHasErrors(['p_email', 'parent_first_name']);
 });
 
-test('the student list shows class and status', function () {
+test('the student list links each name to the profile and flags only inactive students', function () {
     $enrolment = StudentClass::factory()->create(['class_division_id' => $this->division->id]);
+    $inactive = Students::factory()->create(['first_name' => 'Dormant']);
+    $inactive->login->update(['is_active' => false]);
 
     $this->get('/students')
         ->assertSuccessful()
-        ->assertSee($enrolment->student->first_name)
+        ->assertSee(route('admin.students.show', $enrolment->student))
         ->assertSee($this->division->division_name)
-        ->assertSee('Active');
+        ->assertSeeInOrder(['Dormant', 'Inactive'])
+        ->assertSee(route('admin.students.edit', $enrolment->student))
+        ->assertDontSee('Deactivate');
+
+    expect(substr_count($this->get('/students')->getContent(), '>Inactive</span>'))->toBe(1);
+});
+
+test('a student is deactivated from the edit page', function () {
+    $student = Students::factory()->create();
+
+    $this->get("/admin/students/{$student->id}/edit")->assertSee('Deactivate Student');
+    $this->from("/admin/students/{$student->id}/edit")->post("/admin/students/{$student->id}/toggle-active")
+        ->assertRedirect("/admin/students/{$student->id}/edit");
+    $this->get("/admin/students/{$student->id}/edit")->assertSee('Reactivate Student');
 });
 
 test('the edit student form is prefilled with the current class', function () {

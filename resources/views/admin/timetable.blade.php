@@ -4,42 +4,34 @@
 @php($colorFor = fn (int $subjectId) => \App\Services\TimetableGrid::colorFor($subjectId))
 
 @section('content_header')
-    <div class="d-flex flex-wrap align-items-center justify-content-between">
-        <div>
-            <h1 class="mb-0">Timetable Manager</h1>
-            <small class="text-muted">Build, review, and publish weekly schedules{{ $academicYear ? ' for '.$academicYear->year : '' }}</small>
-        </div>
+    <x-page-header title="Timetable" :subtitle="$academicYear ? 'Weekly schedules for '.$academicYear->year : null">
         @if ($academicYear && $divisions->isNotEmpty())
-            <div class="mt-3 mt-sm-0 no-print">
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                        <i class="fas fa-magic mr-1"></i> Generate
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        @if ($division)
-                            <form action="{{ route('admin.timetable.generate') }}" method="post" onsubmit="return confirm('Replace the timetable of {{ $division->label }}?')">
-                                @csrf
-                                <input type="hidden" name="division_id" value="{{ $division->id }}">
-                                <button type="submit" class="dropdown-item">Only {{ $division->label }}</button>
-                            </form>
-                        @endif
-                        <form action="{{ route('admin.timetable.generate') }}" method="post" onsubmit="return confirm('Replace the timetables of ALL divisions?')">
-                            @csrf
-                            <button type="submit" class="dropdown-item">All Divisions</button>
-                        </form>
-                    </div>
-                </div>
-                @if ($division || $teacher)
-                    <a href="{{ route('admin.timetable.export', $teacher ? ['teacher' => $teacher->id] : ['division' => $division->id]) }}" class="btn btn-outline-secondary mr-2">
-                        <i class="fas fa-file-export mr-1"></i> Export
-                    </a>
-                @endif
-                <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
-                    <i class="fas fa-print mr-1"></i> Print
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-magic mr-1" aria-hidden="true"></i> Generate
                 </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    @if ($division)
+                        <form action="{{ route('admin.timetable.generate') }}" method="post" onsubmit="return confirm('Replace the timetable of {{ $division->label }}?')">
+                            @csrf
+                            <input type="hidden" name="division_id" value="{{ $division->id }}">
+                            <button type="submit" class="dropdown-item">Only {{ $division->label }}</button>
+                        </form>
+                    @endif
+                    <form action="{{ route('admin.timetable.generate') }}" method="post" onsubmit="return confirm('Replace the timetables of ALL divisions?')">
+                        @csrf
+                        <button type="submit" class="dropdown-item">All Divisions</button>
+                    </form>
+                </div>
             </div>
+            @if ($division || $teacher)
+                <a href="{{ route('admin.timetable.export', $teacher ? ['teacher' => $teacher->id] : ['division' => $division->id]) }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-file-export mr-1" aria-hidden="true"></i> Export
+                </a>
+            @endif
+            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
         @endif
-    </div>
+    </x-page-header>
 @stop
 
 @section('content')
@@ -243,7 +235,7 @@
                                 <button type="submit" class="btn btn-outline-danger" id="clearButton">Clear Slot</button>
                             </form>
                             <div>
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
                                 @unless (empty($editOptions['subjects']))
                                     <button type="submit" form="slotForm" class="btn btn-primary">Save</button>
                                 @endunless

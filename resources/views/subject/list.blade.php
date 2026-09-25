@@ -3,7 +3,7 @@
 @section('title', 'Subjects')
 
 @section('content_header')
-    <h1>Subjects</h1>
+    <x-page-header title="Subjects" />
 @stop
 
 @section('content')
@@ -83,7 +83,7 @@
                         <input id="periods-per-week-{{ $subject->id }}" type="number" name="periods_per_week" class="form-control" min="1" max="60" value="{{ $subject->periods_per_week }}">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>

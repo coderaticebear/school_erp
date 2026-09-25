@@ -2,7 +2,7 @@
 @section('title', 'Parent Dashboard')
 
 @section('content_header')
-    <h1>Welcome, {{ $parent->first_name }}</h1>
+    <x-page-header :title="'Welcome, '.$parent->first_name" />
 @stop
 
 @section('content')

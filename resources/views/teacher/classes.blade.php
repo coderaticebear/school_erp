@@ -2,7 +2,7 @@
 @section('title', 'My Classes')
 
 @section('content_header')
-    <h1>My Classes</h1>
+    <x-page-header title="My Classes" />
 @stop
 
 @section('content')
