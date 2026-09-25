@@ -23,5 +23,6 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
-# Agent skill dependencies
-.agents/skills/*/node_modules/
+# Agent skills restored by ./install-skills.sh (see SKILLS.md)
+/.claude/skills/playwright-skill
+/.agents/
