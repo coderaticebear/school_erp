@@ -18,6 +18,13 @@ use Illuminate\View\View;
 class StudentController extends Controller
 {
     /**
+     * Fields never kept in the session when a failed form is sent back with its input.
+     *
+     * @var list<string>
+     */
+    protected const PASSWORD_FIELDS = ['password', 'parent_password'];
+
+    /**
      * Create the student's login and profile, attach (or create) the parent,
      * and enrol the student in a division for the active academic year.
      */
@@ -28,7 +35,7 @@ class StudentController extends Controller
         $academicYear = AcademicYear::current();
 
         if (! $academicYear) {
-            return back()->withInput()->with('error', 'There is no active academic year. Activate one before adding students.');
+            return back()->withInput($request->except(self::PASSWORD_FIELDS))->with('error', 'There is no active academic year. Activate one before adding students.');
         }
 
         $address = [
@@ -90,7 +97,7 @@ class StudentController extends Controller
         } catch (\Throwable $e) {
             Log::error('Failed to add student', ['exception' => $e]);
 
-            return back()->withInput()->with('error', 'The student could not be saved. Please try again.');
+            return back()->withInput($request->except(self::PASSWORD_FIELDS))->with('error', 'The student could not be saved. Please try again.');
         }
 
         return redirect()->route('admin.addStudent')->with('success', 'Student added successfully!');
@@ -143,7 +150,7 @@ class StudentController extends Controller
         $academicYear = AcademicYear::current();
 
         if (! $academicYear) {
-            return back()->withInput()->with('error', 'There is no active academic year. Activate one before changing classes.');
+            return back()->withInput($request->except(self::PASSWORD_FIELDS))->with('error', 'There is no active academic year. Activate one before changing classes.');
         }
 
         DB::transaction(function () use ($validated, $student, $academicYear) {

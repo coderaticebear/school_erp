@@ -120,6 +120,8 @@ The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
 ### Input sanitization and validation
 `App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).
 
+**Never keep password fields in the session.** Failed forms send their input back through the session, which is stored in the `sessions` table. Laravel already leaves out `password`, `password_confirmation` and `current_password`. Add any other password-type field (e.g. `parent_password`) to `$exceptions->dontFlash()` in `bootstrap/app.php`. Never call a bare `back()->withInput()`; pass `$request->except([...password fields])` instead (see `StudentController::PASSWORD_FIELDS`). Tests: `expectSessionWithoutPasswords()` in `StudentManagementTest`.
+
 ### Seeding and demo logins
 `DatabaseSeeder` uses model factories in `database/factories` (for example `Login::factory()->admin()`). It creates a single active `2025-2026` academic year, then classes and divisions, teachers, parents and students. It then calls `LoginSeeder`, which creates demo accounts with full profiles. Their password is `password`: `admin@example.com`, `teacher@example.com`, `student@example.com` (enrolled), and `parent@example.com` (the demo student's parent).
 
