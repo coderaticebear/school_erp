@@ -38,26 +38,28 @@
             <div class="card">
                 <div class="card-header"><h3 class="card-title">By division</h3></div>
                 <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead><tr><th class="pl-3">Division</th><th>Students</th><th>Days marked</th><th>Attendance</th></tr></thead>
-                        <tbody>
-                            @foreach ($byDivision as $row)
-                                <tr>
-                                    <td class="pl-3"><a href="{{ request()->fullUrlWithQuery(['division' => $row['division']->id]) }}">{{ $row['division']->label }}</a></td>
-                                    <td>{{ $row['students'] }}</td>
-                                    <td>{{ $row['days'] }}</td>
-                                    <td style="min-width: 200px">
-                                        @if ($row['percent'] !== null)
-                                            <div class="progress progress-sm mb-1"><div class="progress-bar {{ $row['percent'] < config('school.low_attendance_percent') ? 'bg-danger' : 'bg-success' }}" style="width: {{ $row['percent'] }}%"></div></div>
-                                            <small>{{ $row['percent'] }}%</small>
-                                        @else
-                                            <span class="text-muted">Not marked</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead><tr><th class="pl-3">Division</th><th>Students</th><th>Days marked</th><th>Attendance</th></tr></thead>
+                            <tbody>
+                                @foreach ($byDivision as $row)
+                                    <tr>
+                                        <td class="pl-3"><a href="{{ request()->fullUrlWithQuery(['division' => $row['division']->id]) }}">{{ $row['division']->label }}</a></td>
+                                        <td>{{ $row['students'] }}</td>
+                                        <td>{{ $row['days'] }}</td>
+                                        <td style="min-width: 200px">
+                                            @if ($row['percent'] !== null)
+                                                <div class="progress progress-sm mb-1"><div class="progress-bar {{ $row['percent'] < config('school.low_attendance_percent') ? 'bg-danger' : 'bg-success' }}" style="width: {{ $row['percent'] }}%"></div></div>
+                                                <small>{{ $row['percent'] }}%</small>
+                                            @else
+                                                <span class="text-muted">Not marked</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         @endunless
@@ -67,24 +69,26 @@
                 <h3 class="card-title">{{ $division ? 'Students in '.$division->label : 'Students below '.config('school.low_attendance_percent').'%' }}</h3>
             </div>
             <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead><tr><th class="pl-3">Student</th>@unless ($division)<th>Division</th>@endunless<th>Present</th><th>Late</th><th>Absent</th><th>Excused</th><th>%</th></tr></thead>
-                    <tbody>
-                        @forelse ($byStudent as $row)
-                            <tr>
-                                <td class="pl-3"><a href="{{ route('admin.students.show', $row['student']) }}">{{ $row['student']->first_name }} {{ $row['student']->last_name }}</a></td>
-                                @unless ($division)<td>{{ $row['division']?->label }}</td>@endunless
-                                <td>{{ $row['present'] }}</td>
-                                <td>{{ $row['late'] }}</td>
-                                <td>{{ $row['absent'] }}</td>
-                                <td>{{ $row['excused'] }}</td>
-                                <td><span class="badge {{ $row['percent'] < config('school.low_attendance_percent') ? 'badge-danger' : 'badge-success' }}">{{ $row['percent'] }}%</span></td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="7" class="text-center text-muted">{{ $division ? 'No attendance recorded in this period.' : 'No students below the threshold.' }}</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th class="pl-3">Student</th>@unless ($division)<th>Division</th>@endunless<th>Present</th><th>Late</th><th>Absent</th><th>Excused</th><th>%</th></tr></thead>
+                        <tbody>
+                            @forelse ($byStudent as $row)
+                                <tr>
+                                    <td class="pl-3"><a href="{{ route('admin.students.show', $row['student']) }}">{{ $row['student']->first_name }} {{ $row['student']->last_name }}</a></td>
+                                    @unless ($division)<td>{{ $row['division']?->label }}</td>@endunless
+                                    <td>{{ $row['present'] }}</td>
+                                    <td>{{ $row['late'] }}</td>
+                                    <td>{{ $row['absent'] }}</td>
+                                    <td>{{ $row['excused'] }}</td>
+                                    <td><span class="badge {{ $row['percent'] < config('school.low_attendance_percent') ? 'badge-danger' : 'badge-success' }}">{{ $row['percent'] }}%</span></td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="7" class="text-center text-muted">{{ $division ? 'No attendance recorded in this period.' : 'No students below the threshold.' }}</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     @endif

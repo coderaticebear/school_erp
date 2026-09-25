@@ -30,49 +30,51 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Year</th>
-                                <th>Status</th>
-                                <th>Enrolments</th>
-                                <th class="text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($academicYears as $academicYear)
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
                                 <tr>
-                                    <td>{{ $academicYear->year }}</td>
-                                    <td>
-                                        @if ($academicYear->is_active)
-                                            <span class="badge badge-success">Active</span>
-                                        @else
-                                            <span class="badge badge-secondary">Inactive</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $academicYear->student_class_count }}</td>
-                                    <td class="text-right text-nowrap">
-                                        @unless ($academicYear->is_active)
-                                            <form action="{{ route('admin.academic-years.activate', $academicYear) }}" method="post" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-outline-success">Make Active</button>
-                                            </form>
-                                        @endunless
-                                        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editYear{{ $academicYear->id }}">Edit</button>
-                                        @unless ($academicYear->is_active)
-                                            <form action="{{ route('admin.academic-years.destroy', $academicYear) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $academicYear->year }}?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                            </form>
-                                        @endunless
-                                    </td>
+                                    <th>Year</th>
+                                    <th>Status</th>
+                                    <th>Enrolments</th>
+                                    <th class="text-right">Actions</th>
                                 </tr>
-                            @empty
-                                <tr><td colspan="4" class="text-center text-muted">No academic years yet.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse ($academicYears as $academicYear)
+                                    <tr>
+                                        <td>{{ $academicYear->year }}</td>
+                                        <td>
+                                            @if ($academicYear->is_active)
+                                                <span class="badge badge-success">Active</span>
+                                            @else
+                                                <span class="badge badge-secondary">Inactive</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $academicYear->student_class_count }}</td>
+                                        <td class="text-right text-nowrap">
+                                            @unless ($academicYear->is_active)
+                                                <form action="{{ route('admin.academic-years.activate', $academicYear) }}" method="post" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">Make Active</button>
+                                                </form>
+                                            @endunless
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editYear{{ $academicYear->id }}">Edit</button>
+                                            @unless ($academicYear->is_active)
+                                                <form action="{{ route('admin.academic-years.destroy', $academicYear) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $academicYear->year }}?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                </form>
+                                            @endunless
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="4" class="text-center text-muted">No academic years yet.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

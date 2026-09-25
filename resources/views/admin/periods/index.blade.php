@@ -43,43 +43,45 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Period</th>
-                                <th>Time</th>
-                                <th>Type</th>
-                                <th>Lessons</th>
-                                <th class="text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($periods as $period)
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
                                 <tr>
-                                    <td>{{ $period->label }}</td>
-                                    <td>{{ $period->time_range }}</td>
-                                    <td>
-                                        @if ($period->is_break)
-                                            <span class="badge badge-secondary">Break</span>
-                                        @else
-                                            <span class="badge badge-info">Teaching</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $period->entries_count }}</td>
-                                    <td class="text-right text-nowrap">
-                                        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editPeriod{{ $period->id }}">Edit</button>
-                                        <form action="{{ route('admin.periods.destroy', $period) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $period->label }}?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                        </form>
-                                    </td>
+                                    <th>Period</th>
+                                    <th>Time</th>
+                                    <th>Type</th>
+                                    <th>Lessons</th>
+                                    <th class="text-right">Actions</th>
                                 </tr>
-                            @empty
-                                <tr><td colspan="5" class="text-center text-muted">No periods yet.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse ($periods as $period)
+                                    <tr>
+                                        <td>{{ $period->label }}</td>
+                                        <td>{{ $period->time_range }}</td>
+                                        <td>
+                                            @if ($period->is_break)
+                                                <span class="badge badge-secondary">Break</span>
+                                            @else
+                                                <span class="badge badge-info">Teaching</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $period->entries_count }}</td>
+                                        <td class="text-right text-nowrap">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editPeriod{{ $period->id }}">Edit</button>
+                                            <form action="{{ route('admin.periods.destroy', $period) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $period->label }}?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="5" class="text-center text-muted">No periods yet.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             <p class="text-muted small">School days: {{ implode(', ', \App\Services\TimetableGrid::days()) }} (set <code>SCHOOL_DAYS</code> in <code>.env</code> to change).</p>

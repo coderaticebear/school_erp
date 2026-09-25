@@ -17,43 +17,45 @@
             @csrf
             <div class="card">
                 <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Student</th>
-                                <th style="width: 160px">Marks</th>
-                                <th style="width: 100px">Absent</th>
-                                <th>Remark</th>
-                                <th style="width: 80px">Grade</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($students as $student)
-                                @php($mark = $existing[$student->id] ?? null)
-                                @php($value = old("marks.{$student->id}.value", $mark && ! $mark->is_absent ? rtrim(rtrim(number_format($mark->marks, 2, '.', ''), '0'), '.') : ''))
-                                @php($absent = (bool) old("marks.{$student->id}.absent", $mark?->is_absent))
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
                                 <tr>
-                                    <td class="align-middle">{{ $student->first_name }} {{ $student->last_name }}</td>
-                                    <td>
-                                        <input type="number" step="0.01" min="0" max="{{ $exam->max_marks }}" name="marks[{{ $student->id }}][value]" value="{{ $value }}"
-                                               @class(['form-control', 'form-control-sm', 'is-invalid' => $errors->has("marks.{$student->id}.value")]) @disabled($exam->isPublished())>
-                                        @error("marks.{$student->id}.value")<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                    </td>
-                                    <td class="align-middle">
-                                        <input type="checkbox" name="marks[{{ $student->id }}][absent]" value="1" @checked($absent) @disabled($exam->isPublished())>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="marks[{{ $student->id }}][remark]" maxlength="255" class="form-control form-control-sm" value="{{ old("marks.{$student->id}.remark", $mark?->remark) }}" @disabled($exam->isPublished())>
-                                    </td>
-                                    <td class="align-middle">
-                                        @if ($mark)
-                                            <span class="badge {{ $mark->is_absent || $mark->marks < $exam->pass_marks ? 'badge-danger' : 'badge-success' }}">{{ $mark->is_absent ? 'AB' : $exam->gradeFor($mark->marks) }}</span>
-                                        @endif
-                                    </td>
+                                    <th>Student</th>
+                                    <th style="width: 160px">Marks</th>
+                                    <th style="width: 100px">Absent</th>
+                                    <th>Remark</th>
+                                    <th style="width: 80px">Grade</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($students as $student)
+                                    @php($mark = $existing[$student->id] ?? null)
+                                    @php($value = old("marks.{$student->id}.value", $mark && ! $mark->is_absent ? rtrim(rtrim(number_format($mark->marks, 2, '.', ''), '0'), '.') : ''))
+                                    @php($absent = (bool) old("marks.{$student->id}.absent", $mark?->is_absent))
+                                    <tr>
+                                        <td class="align-middle">{{ $student->first_name }} {{ $student->last_name }}</td>
+                                        <td>
+                                            <input type="number" step="0.01" min="0" max="{{ $exam->max_marks }}" name="marks[{{ $student->id }}][value]" value="{{ $value }}"
+                                                   @class(['form-control', 'form-control-sm', 'is-invalid' => $errors->has("marks.{$student->id}.value")]) @disabled($exam->isPublished())>
+                                            @error("marks.{$student->id}.value")<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        </td>
+                                        <td class="align-middle">
+                                            <input type="checkbox" name="marks[{{ $student->id }}][absent]" value="1" @checked($absent) @disabled($exam->isPublished())>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="marks[{{ $student->id }}][remark]" maxlength="255" class="form-control form-control-sm" value="{{ old("marks.{$student->id}.remark", $mark?->remark) }}" @disabled($exam->isPublished())>
+                                        </td>
+                                        <td class="align-middle">
+                                            @if ($mark)
+                                                <span class="badge {{ $mark->is_absent || $mark->marks < $exam->pass_marks ? 'badge-danger' : 'badge-success' }}">{{ $mark->is_absent ? 'AB' : $exam->gradeFor($mark->marks) }}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="card-footer">
                     <a href="{{ route('marks.index', ['exam' => $exam->id]) }}" class="btn btn-secondary">Back</a>

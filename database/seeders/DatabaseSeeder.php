@@ -59,14 +59,28 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // Teachers per division, with one class teacher each
+        $teachers->load('subjects');
+
+        // Each division gets one teacher per subject, choosing the least-loaded teacher
+        // so nobody is booked for more lessons than the week has (keeps the demo timetable complete).
         $divisions = Divisions::all();
+        $load = [];
 
-        foreach ($divisions as $index => $division) {
-            $assigned = $teachers->shuffle()->take(5);
+        foreach ($divisions as $division) {
+            $assigned = [];
 
-            foreach ($assigned as $position => $teacher) {
-                $division->teachers()->attach($teacher->id, ['class_teacher' => $position === 0]);
+            foreach ($subjects as $subject) {
+                $teacher = $teachers
+                    ->filter(fn (Teachers $candidate) => $candidate->subjects->contains('id', $subject->id))
+                    ->sortBy(fn (Teachers $candidate) => $load[$candidate->id] ?? 0)
+                    ->first();
+
+                $load[$teacher->id] = ($load[$teacher->id] ?? 0) + 1;
+                $assigned[$teacher->id] = true;
+            }
+
+            foreach (array_keys($assigned) as $position => $teacherId) {
+                $division->teachers()->attach($teacherId, ['class_teacher' => $position === 0]);
             }
         }
 

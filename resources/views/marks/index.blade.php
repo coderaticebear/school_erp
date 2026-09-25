@@ -27,37 +27,39 @@
 
         <div class="card">
             <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Division</th>
-                            <th>Subject</th>
-                            <th>Progress</th>
-                            <th class="text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($sheets as $sheet)
-                            @php($done = $sheet['students'] > 0 && $sheet['entered'] >= $sheet['students'])
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
                             <tr>
-                                <td>{{ $sheet['division']->label }}</td>
-                                <td>{{ $sheet['subject']->subject_name }}</td>
-                                <td>
-                                    <span @class(['badge', 'badge-success' => $done, 'badge-warning' => ! $done && $sheet['entered'] > 0, 'badge-light' => $sheet['entered'] === 0])>
-                                        {{ $sheet['entered'] }}/{{ $sheet['students'] }}
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <a href="{{ route('marks.sheet', [$exam, $sheet['division'], $sheet['subject']]) }}" class="btn btn-sm btn-outline-primary">
-                                        {{ $exam->isPublished() ? 'View' : ($sheet['entered'] ? 'Edit marks' : 'Enter marks') }}
-                                    </a>
-                                </td>
+                                <th>Division</th>
+                                <th>Subject</th>
+                                <th>Progress</th>
+                                <th class="text-right">Action</th>
                             </tr>
-                        @empty
-                            <tr><td colspan="4" class="text-center text-muted">You have no division and subject to enter marks for.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse ($sheets as $sheet)
+                                @php($done = $sheet['students'] > 0 && $sheet['entered'] >= $sheet['students'])
+                                <tr>
+                                    <td>{{ $sheet['division']->label }}</td>
+                                    <td>{{ $sheet['subject']->subject_name }}</td>
+                                    <td>
+                                        <span @class(['badge', 'badge-success' => $done, 'badge-warning' => ! $done && $sheet['entered'] > 0, 'badge-light' => $sheet['entered'] === 0])>
+                                            {{ $sheet['entered'] }}/{{ $sheet['students'] }}
+                                        </span>
+                                    </td>
+                                    <td class="text-right">
+                                        <a href="{{ route('marks.sheet', [$exam, $sheet['division'], $sheet['subject']]) }}" class="btn btn-sm btn-outline-primary">
+                                            {{ $exam->isPublished() ? 'View' : ($sheet['entered'] ? 'Edit marks' : 'Enter marks') }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="4" class="text-center text-muted">You have no division and subject to enter marks for.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     @endif

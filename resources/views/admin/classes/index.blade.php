@@ -34,36 +34,38 @@
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        <table class="table table-sm mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="pl-3">Division</th>
-                                    <th>Students</th>
-                                    <th>Class Teacher</th>
-                                    <th class="text-right pr-3">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($class->divisions as $division)
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <thead>
                                     <tr>
-                                        <td class="pl-3">{{ $division->division_name }}</td>
-                                        <td>{{ $division->students_count }}</td>
-                                        <td>{{ $division->teachers->first()?->full_name ?? '—' }}</td>
-                                        <td class="text-right pr-3 text-nowrap">
-                                            <a href="{{ route('admin.divisions.teachers.edit', $division) }}" class="btn btn-xs btn-outline-primary">Teachers</a>
-                                            <button type="button" class="btn btn-xs btn-outline-secondary" data-toggle="modal" data-target="#editDivision{{ $division->id }}">Rename</button>
-                                            <form action="{{ route('admin.divisions.destroy', $division) }}" method="post" class="d-inline" onsubmit="return confirm('Delete division {{ $division->division_name }}?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-xs btn-outline-danger">Delete</button>
-                                            </form>
-                                        </td>
+                                        <th class="pl-3">Division</th>
+                                        <th>Students</th>
+                                        <th>Class Teacher</th>
+                                        <th class="text-right pr-3">Actions</th>
                                     </tr>
-                                @empty
-                                    <tr><td colspan="4" class="text-center text-muted">No divisions yet.</td></tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @forelse ($class->divisions as $division)
+                                        <tr>
+                                            <td class="pl-3">{{ $division->division_name }}</td>
+                                            <td>{{ $division->students_count }}</td>
+                                            <td>{{ $division->teachers->first()?->full_name ?? '—' }}</td>
+                                            <td class="text-right pr-3 text-nowrap">
+                                                <a href="{{ route('admin.divisions.teachers.edit', $division) }}" class="btn btn-xs btn-outline-primary">Teachers</a>
+                                                <button type="button" class="btn btn-xs btn-outline-secondary" data-toggle="modal" data-target="#editDivision{{ $division->id }}">Rename</button>
+                                                <form action="{{ route('admin.divisions.destroy', $division) }}" method="post" class="d-inline" onsubmit="return confirm('Delete division {{ $division->division_name }}?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-xs btn-outline-danger">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="4" class="text-center text-muted">No divisions yet.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="card-footer">
                         <form action="{{ route('admin.divisions.store') }}" method="post" class="form-inline">

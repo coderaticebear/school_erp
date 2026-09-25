@@ -180,3 +180,24 @@ test('saving replaces only the targeted divisions', function () {
     expect(TimetableEntry::where('division_id', $divisions[0]->id)->count())->toBe(0)
         ->and(TimetableEntry::where('division_id', $divisions[1]->id)->count())->toBe(slotCount());
 });
+
+test('an overbooked teacher is named in the issues', function () {
+    $year = AcademicYear::factory()->create(['is_active' => true]);
+    $subject = Subjects::factory()->create();
+    $teacher = Teachers::factory()->create(['first_name' => 'Busy', 'last_name' => 'Bee']);
+    $teacher->subjects()->attach($subject->id);
+    Divisions::factory()->count(2)->create()->each(fn ($division) => $division->teachers()->attach($teacher->id, ['class_teacher' => false]));
+
+    $issues = app(TimetableGenerator::class)->generate($year, Divisions::with('class')->get(), seed: 1)['issues'];
+
+    expect(collect($issues)->first(fn ($issue) => str_contains($issue, 'Busy Bee needs '.(2 * slotCount()).' lessons')))->not->toBeNull();
+});
+
+test('the demo seed data can be fully scheduled', function () {
+    $this->seed();
+
+    $year = AcademicYear::current();
+    $result = app(TimetableGenerator::class)->generate($year, Divisions::with('class')->get(), seed: 3);
+
+    expect($result['unscheduled'])->toBe([])->and($result['issues'])->toBe([]);
+});

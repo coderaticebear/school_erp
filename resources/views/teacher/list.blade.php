@@ -14,50 +14,52 @@
 
     <div class="card">
         <div class="card-body">
-            <table id="teacherList" class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Subjects</th>
-                        <th>Divisions</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($teachers as $teacher)
+            <div class="table-responsive">
+                <table id="teacherList" class="table table-bordered table-hover">
+                    <thead>
                         <tr>
-                            <td>{{ $teacher->full_name }}</td>
-                            <td>{{ $teacher->login?->email }}</td>
-                            <td>{{ $teacher->subjects->pluck('subject_name')->join(', ') ?: '—' }}</td>
-                            <td>
-                                @foreach ($teacher->divisions as $division)
-                                    <span @class(['badge', 'badge-primary' => $division->pivot->class_teacher, 'badge-light' => ! $division->pivot->class_teacher])
-                                          @if ($division->pivot->class_teacher) title="Class teacher" @endif>{{ $division->label }}</span>
-                                @endforeach
-                            </td>
-                            <td>
-                                @if ($teacher->login?->is_active)
-                                    <span class="badge badge-success">Active</span>
-                                @else
-                                    <span class="badge badge-secondary">Inactive</span>
-                                @endif
-                            </td>
-                            <td class="text-nowrap">
-                                <button type="button" class="btn btn-xs btn-outline-info view-button" data-url="{{ route('admin.teachers.show', $teacher) }}">View</button>
-                                <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-xs btn-outline-primary">Edit</a>
-                                <form action="{{ route('admin.teachers.toggle-active', $teacher) }}" method="post" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-xs btn-outline-{{ $teacher->login?->is_active ? 'warning' : 'success' }}">
-                                        {{ $teacher->login?->is_active ? 'Deactivate' : 'Activate' }}
-                                    </button>
-                                </form>
-                            </td>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subjects</th>
+                            <th>Divisions</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($teachers as $teacher)
+                            <tr>
+                                <td>{{ $teacher->full_name }}</td>
+                                <td>{{ $teacher->login?->email }}</td>
+                                <td>{{ $teacher->subjects->pluck('subject_name')->join(', ') ?: '—' }}</td>
+                                <td>
+                                    @foreach ($teacher->divisions as $division)
+                                        <span @class(['badge', 'badge-primary' => $division->pivot->class_teacher, 'badge-light' => ! $division->pivot->class_teacher])
+                                              @if ($division->pivot->class_teacher) title="Class teacher" @endif>{{ $division->label }}</span>
+                                    @endforeach
+                                </td>
+                                <td>
+                                    @if ($teacher->login?->is_active)
+                                        <span class="badge badge-success">Active</span>
+                                    @else
+                                        <span class="badge badge-secondary">Inactive</span>
+                                    @endif
+                                </td>
+                                <td class="text-nowrap">
+                                    <button type="button" class="btn btn-xs btn-outline-info view-button" data-url="{{ route('admin.teachers.show', $teacher) }}">View</button>
+                                    <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-xs btn-outline-primary">Edit</a>
+                                    <form action="{{ route('admin.teachers.toggle-active', $teacher) }}" method="post" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-xs btn-outline-{{ $teacher->login?->is_active ? 'warning' : 'success' }}">
+                                            {{ $teacher->login?->is_active ? 'Deactivate' : 'Activate' }}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

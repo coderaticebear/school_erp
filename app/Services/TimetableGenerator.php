@@ -6,6 +6,7 @@ use App\Models\AcademicYear;
 use App\Models\Divisions;
 use App\Models\Period;
 use App\Models\Subjects;
+use App\Models\Teachers;
 use App\Models\TimetableEntry;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -125,6 +126,8 @@ class TimetableGenerator
         }
 
         $entries = array_map(fn (array $entry) => ['academic_year_id' => $academicYear->id, ...$entry], $best['entries'] ?? []);
+
+        array_push($issues, ...$this->overloadIssues($best['teacherFor'] ?? [], $plans, $baseBusy, $slotCount));
 
         return [
             'entries' => $entries,
@@ -293,7 +296,46 @@ class TimetableGenerator
             'entries' => $entries,
             'unscheduled' => $unscheduled,
             'missing' => array_sum(array_map('array_sum', $unscheduled)),
+            'teacherFor' => $teacherFor,
         ];
+    }
+
+    /**
+     * Name teachers who were given more lessons than the week has periods, so the admin knows what to change.
+     *
+     * @param  array<int, array<int, int>>  $teacherFor
+     * @param  array<int, array{candidates: array<int, list<int>>, targets: array<int, int>}>  $plans
+     * @param  array<string, true>  $busy  slots already used by divisions not being regenerated
+     * @return list<string>
+     */
+    protected function overloadIssues(array $teacherFor, array $plans, array $busy, int $slotCount): array
+    {
+        $load = [];
+
+        foreach ($teacherFor as $divisionId => $subjects) {
+            foreach ($subjects as $subjectId => $teacherId) {
+                $load[$teacherId] = ($load[$teacherId] ?? 0) + ($plans[$divisionId]['targets'][$subjectId] ?? 0);
+            }
+        }
+
+        foreach (array_keys($busy) as $key) {
+            $teacherId = (int) strtok($key, ':');
+            $load[$teacherId] = ($load[$teacherId] ?? 0) + 1;
+        }
+
+        $overloaded = array_filter($load, fn (int $lessons) => $lessons > $slotCount);
+
+        if ($overloaded === []) {
+            return [];
+        }
+
+        $names = Teachers::query()->whereKey(array_keys($overloaded))->get()->keyBy('id');
+
+        return collect($overloaded)
+            ->map(fn (int $lessons, int $teacherId) => ($names[$teacherId]?->full_name ?? "Teacher #{$teacherId}")
+                ." needs {$lessons} lessons but the week has only {$slotCount} periods. Assign some of their divisions or subjects to another teacher.")
+            ->values()
+            ->all();
     }
 
     /**

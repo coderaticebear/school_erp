@@ -126,24 +126,26 @@
 
                     <!-- ACADEMIC INFO -->
                     <div class="tab-pane" id="academic">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th>Class</th>
-                                <td>{{ $data['class_name'] }}</td>
-                            </tr>
-                            <tr>
-                                <th>Section</th>
-                                <td>{{ $data['division_name'] }}</td>
-                            </tr>
-                            <tr>
-                                <th>Academic Year</th>
-                                <td>{{ $data['academic_year'] }}</td>
-                            </tr>
-                            <tr>
-                                <th>Class Teacher</th>
-                                <td>No teacher has been assigned yet</td>
-                            </tr>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>Class</th>
+                                    <td>{{ $data['class_name'] }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Section</th>
+                                    <td>{{ $data['division_name'] }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Academic Year</th>
+                                    <td>{{ $data['academic_year'] }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Class Teacher</th>
+                                    <td>No teacher has been assigned yet</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
 
                     <!-- ATTENDANCE -->
