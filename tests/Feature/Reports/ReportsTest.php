@@ -124,7 +124,7 @@ test('the admin dashboard shows real counts, today\'s attendance and the latest 
     $this->get('/admin/dashboard')
         ->assertSuccessful()
         ->assertSee('Active students')
-        ->assertSeeInOrder(['<h3>1</h3>', 'Active students'], false)
+        ->assertSeeInOrder(['<p class="small-box-value">1</p>', 'Active students'], false)
         ->assertSee('50%')
         ->assertSee('1/2 divisions marked')
         ->assertSee('No published results yet')

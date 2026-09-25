@@ -25,7 +25,7 @@
                         @endif
                         <form action="{{ route('admin.timetable.generate') }}" method="post" onsubmit="return confirm('Replace the timetables of ALL divisions?')">
                             @csrf
-                            <button type="submit" class="dropdown-item">All divisions</button>
+                            <button type="submit" class="dropdown-item">All Divisions</button>
                         </form>
                     </div>
                 </div>
@@ -67,10 +67,10 @@
                 <div class="card">
                     <div class="card-header border-0">
                         <div class="d-flex flex-wrap align-items-center justify-content-between">
-                            <h3 class="card-title mb-2 mb-sm-0">
+                            <h2 class="card-title mb-2 mb-sm-0">
                                 <i class="fas fa-calendar-alt mr-2 text-primary"></i>
                                 {{ $teacher ? $teacher->full_name : $division->label }}
-                            </h3>
+                            </h2>
                             <div class="text-muted small">
                                 @if ($summary['published_at'])
                                     Published {{ $summary['published_at']->diffForHumans() }}
@@ -132,7 +132,7 @@
             <div class="col-lg-3 no-print">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-sliders-h mr-2"></i>Quick Stats</h3>
+                        <h2 class="card-title"><i class="fas fa-sliders-h mr-2"></i>Quick Stats</h2>
                     </div>
                     <div class="card-body">
                         <div class="info-box bg-light mb-3">
@@ -145,14 +145,14 @@
                         <div class="info-box bg-light mb-3">
                             <span class="info-box-icon bg-success"><i class="fas fa-chalkboard-teacher"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">Lessons scheduled</span>
+                                <span class="info-box-text">Lessons Scheduled</span>
                                 <span class="info-box-number">{{ $summary['lessons'] }}</span>
                             </div>
                         </div>
                         <div class="info-box bg-light mb-0">
                             <span class="info-box-icon bg-warning"><i class="fas fa-exclamation-triangle"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text" title="Lessons whose teacher is inactive, no longer assigned to the division, or no longer teaches the subject">Needs attention</span>
+                                <span class="info-box-text" title="Lessons whose teacher is inactive, no longer assigned to the division, or no longer teaches the subject">Needs Attention</span>
                                 <span class="info-box-number">{{ $summary['attention'] }}</span>
                             </div>
                         </div>
@@ -161,7 +161,7 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-list mr-2"></i>Unscheduled</h3>
+                        <h2 class="card-title"><i class="fas fa-list mr-2"></i>Unscheduled</h2>
                     </div>
                     <div class="card-body p-0">
                         <ul class="list-group list-group-flush">
@@ -187,7 +187,7 @@
                 @if ($legend->isNotEmpty())
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-tags mr-2"></i>Legend</h3>
+                            <h2 class="card-title"><i class="fas fa-tags mr-2"></i>Legend</h2>
                         </div>
                         <div class="card-body">
                             @foreach ($legend as $entry)

@@ -12,7 +12,7 @@
             <div class="col-md-6 col-xl-4">
                 <div class="card card-primary card-outline">
                     <div class="card-header">
-                        <h3 class="card-title">{{ $student->first_name }} {{ $student->last_name }}</h3>
+                        <h2 class="card-title">{{ $student->first_name }} {{ $student->last_name }}</h2>
                     </div>
                     <div class="card-body">
                         <p class="mb-2"><i class="fas fa-school mr-2 text-muted"></i>{{ $child['enrolment']?->division?->label ?? 'Not enrolled this year' }}</p>

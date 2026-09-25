@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="card card-primary">
-                <div class="card-header"><h3 class="card-title">Add Period</h3></div>
+                <div class="card-header"><h2 class="card-title">Add Period</h2></div>
                 <form action="{{ route('admin.periods.store') }}" method="post">
                     @csrf
                     <div class="card-body">
@@ -35,7 +35,7 @@
                             <label class="custom-control-label font-weight-normal" for="is_break">This is a break (no lessons)</label>
                         </div>
                     </div>
-                    <div class="card-footer"><button type="submit" class="btn btn-primary">Add</button></div>
+                    <div class="card-footer"><button type="submit" class="btn btn-primary">Add Period</button></div>
                 </form>
             </div>
         </div>
@@ -100,17 +100,17 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>Label</label>
-                            <input type="text" name="label" class="form-control" value="{{ $period->label }}">
+                            <label for="label-{{ $period->id }}">Label</label>
+                            <input id="label-{{ $period->id }}" type="text" name="label" class="form-control" value="{{ $period->label }}">
                         </div>
                         <div class="form-row">
                             <div class="form-group col-6">
-                                <label>Starts</label>
-                                <input type="time" name="starts_at" class="form-control" value="{{ substr($period->starts_at, 0, 5) }}">
+                                <label for="starts-at-{{ $period->id }}">Starts</label>
+                                <input id="starts-at-{{ $period->id }}" type="time" name="starts_at" class="form-control" value="{{ substr($period->starts_at, 0, 5) }}">
                             </div>
                             <div class="form-group col-6">
-                                <label>Ends</label>
-                                <input type="time" name="ends_at" class="form-control" value="{{ substr($period->ends_at, 0, 5) }}">
+                                <label for="ends-at-{{ $period->id }}">Ends</label>
+                                <input id="ends-at-{{ $period->id }}" type="time" name="ends_at" class="form-control" value="{{ substr($period->ends_at, 0, 5) }}">
                             </div>
                         </div>
                         <div class="custom-control custom-checkbox">

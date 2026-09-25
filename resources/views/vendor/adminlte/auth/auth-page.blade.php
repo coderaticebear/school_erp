@@ -25,10 +25,10 @@
 @section('classes_body'){{ $bodyClasses }}@stop
 
 @section('body')
-    <div class="{{ $authType }}-box">
+    <main id="main-content" tabindex="-1" class="{{ $authType }}-box">
 
-        {{-- Logo --}}
-        <div class="{{ $authType }}-logo">
+        {{-- Logo (the page's main heading) --}}
+        <h1 class="{{ $authType }}-logo">
             <a href="{{ $dashboardUrl }}">
 
                 {{-- Logo Image --}}
@@ -46,14 +46,14 @@
                          @endif>
                 @else
                     <img src="{{ asset(config('adminlte.logo_img')) }}"
-                         alt="{{ config('adminlte.logo_img_alt') }}" height="50">
+                         alt="" height="50">
                 @endif
 
                 {{-- Logo Label --}}
                 {!! config('adminlte.logo', '<b>Admin</b>LTE') !!}
 
             </a>
-        </div>
+        </h1>
 
         {{-- Card Box --}}
         <div class="card {{ config('adminlte.classes_auth_card', 'card-outline card-primary') }}">
@@ -61,9 +61,9 @@
             {{-- Card Header --}}
             @hasSection('auth_header')
                 <div class="card-header {{ config('adminlte.classes_auth_header', '') }}">
-                    <h3 class="card-title float-none text-center">
+                    <h2 class="card-title float-none text-center">
                         @yield('auth_header')
-                    </h3>
+                    </h2>
                 </div>
             @endif
 
@@ -81,7 +81,7 @@
 
         </div>
 
-    </div>
+    </main>
 @stop
 
 @section('adminlte_js')

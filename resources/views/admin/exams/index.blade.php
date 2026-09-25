@@ -14,13 +14,13 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="card card-primary">
-                    <div class="card-header"><h3 class="card-title">Add Exam</h3></div>
+                    <div class="card-header"><h2 class="card-title">Add Exam</h2></div>
                     <form action="{{ route('admin.exams.store') }}" method="post">
                         @csrf
                         <div class="card-body">
                             @include('admin.exams.fields', ['exam' => null])
                         </div>
-                        <div class="card-footer"><button type="submit" class="btn btn-primary">Add</button></div>
+                        <div class="card-footer"><button type="submit" class="btn btn-primary">Add Exam</button></div>
                     </form>
                 </div>
             </div>
@@ -52,7 +52,7 @@
                                                 @endif
                                             </td>
                                             <td class="text-right text-nowrap">
-                                                <a href="{{ route('admin.exams.show', $exam) }}" class="btn btn-sm btn-outline-primary">Open</a>
+                                                <a href="{{ route('admin.exams.show', $exam) }}" class="btn btn-sm btn-outline-primary">View Progress</a>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#editExam{{ $exam->id }}">Edit</button>
                                                 @if ($exam->marks_count === 0)
                                                     <form action="{{ route('admin.exams.destroy', $exam) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $exam->name }}?')">

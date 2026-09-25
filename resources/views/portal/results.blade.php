@@ -13,7 +13,7 @@
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead>
-                        <tr><th class="pl-3">Exam</th><th>Percentage</th><th>Grade</th><th>Result</th><th>Rank</th><th></th></tr>
+                        <tr><th class="pl-3">Exam</th><th>Percentage</th><th>Grade</th><th>Result</th><th>Rank</th><th><span class="sr-only">Report Card</span></th></tr>
                     </thead>
                     <tbody>
                         @forelse ($results as $result)
@@ -28,7 +28,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $row && $row['rank'] ? $row['rank'].' of '.$result['class_size'] : '—' }}</td>
-                                <td class="text-right pr-3"><a href="{{ route($routePrefix.'report-card', [...$routeParams, $result['exam']]) }}" class="btn btn-sm btn-outline-primary">Report card</a></td>
+                                <td class="text-right pr-3"><a href="{{ route($routePrefix.'report-card', [...$routeParams, $result['exam']]) }}" class="btn btn-sm btn-outline-primary">Report Card</a></td>
                             </tr>
                         @empty
                             <tr><td colspan="6" class="text-center text-muted">No results have been published yet.</td></tr>

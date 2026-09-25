@@ -27,11 +27,11 @@
         </form>
 
         <div class="card">
-            <div class="card-header"><h3 class="card-title">By division</h3></div>
+            <div class="card-header"><h2 class="card-title">By Division</h2></div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead><tr><th class="pl-3">Division</th><th>Students</th><th>Complete</th><th>Passed</th><th>Pass rate</th><th>Average</th><th>Top student</th></tr></thead>
+                        <thead><tr><th class="pl-3">Division</th><th>Students</th><th>Complete</th><th>Passed</th><th>Pass Rate</th><th>Average</th><th>Top Student</th></tr></thead>
                         <tbody>
                             @foreach ($byDivision as $row)
                                 <tr>
@@ -51,11 +51,11 @@
         </div>
 
         <div class="card">
-            <div class="card-header"><h3 class="card-title">By subject <small class="text-muted">(out of {{ $exam->max_marks }}, pass {{ $exam->pass_marks }})</small></h3></div>
+            <div class="card-header"><h2 class="card-title">By Subject <small class="text-muted">(out of {{ $exam->max_marks }}, pass {{ $exam->pass_marks }})</small></h2></div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead><tr><th class="pl-3">Subject</th><th>Entries</th><th>Absent</th><th>Average</th><th>Highest</th><th>Pass rate</th></tr></thead>
+                        <thead><tr><th class="pl-3">Subject</th><th>Entries</th><th>Absent</th><th>Average</th><th>Highest</th><th>Pass Rate</th></tr></thead>
                         <tbody>
                             @forelse ($bySubject as $row)
                                 <tr>

@@ -11,9 +11,9 @@
             <div class="col-md-6 col-lg-4">
                 <div class="card card-primary card-outline">
                     <div class="card-header">
-                        <h3 class="card-title">{{ $division->label }}</h3>
+                        <h2 class="card-title">{{ $division->label }}</h2>
                         @if ($division->pivot->class_teacher)
-                            <div class="card-tools"><span class="badge badge-primary">Class teacher</span></div>
+                            <div class="card-tools"><span class="badge badge-primary">Class Teacher</span></div>
                         @endif
                     </div>
                     <div class="card-body">

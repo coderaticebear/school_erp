@@ -23,7 +23,7 @@
             <div class="col-lg-6">
                 <div class="card card-primary card-outline">
                     <div class="card-header">
-                        <h3 class="card-title">{{ $class->class_name }}</h3>
+                        <h2 class="card-title">{{ $class->class_name }}</h2>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-toggle="modal" data-target="#editClass{{ $class->id }}" title="Rename class"><i class="fas fa-pen"></i></button>
                             <form action="{{ route('admin.classes.destroy', $class) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $class->class_name }} and its empty divisions?')">
@@ -71,7 +71,7 @@
                         <form action="{{ route('admin.divisions.store') }}" method="post" class="form-inline">
                             @csrf
                             <input type="hidden" name="class_id" value="{{ $class->id }}">
-                            <input type="text" name="division_name" class="form-control form-control-sm mr-2" placeholder="New division, e.g. C" maxlength="10">
+                            <input type="text" name="division_name" class="form-control form-control-sm mr-2" placeholder="New division, e.g. C" maxlength="10" aria-label="New division name for {{ $class->class_name }}">
                             <button type="submit" class="btn btn-sm btn-primary">Add Division</button>
                         </form>
                     </div>
@@ -88,7 +88,7 @@
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                         </div>
                         <div class="modal-body">
-                            <input type="text" name="class_name" class="form-control" value="{{ $class->class_name }}" maxlength="10">
+                            <input type="text" name="class_name" class="form-control" value="{{ $class->class_name }}" maxlength="10" aria-label="Class Name">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -109,7 +109,7 @@
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                             </div>
                             <div class="modal-body">
-                                <input type="text" name="division_name" class="form-control" value="{{ $division->division_name }}" maxlength="10">
+                                <input type="text" name="division_name" class="form-control" value="{{ $division->division_name }}" maxlength="10" aria-label="Division name">
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -133,7 +133,7 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <label for="class_name">Class name</label>
+                    <label for="class_name">Class Name</label>
                     <input type="text" id="class_name" name="class_name" class="form-control" placeholder="Grade 8" maxlength="10" value="{{ old('class_name') }}">
                 </div>
                 <div class="modal-footer">

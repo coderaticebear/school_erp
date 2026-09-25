@@ -40,8 +40,8 @@ test('the dashboard greets the teacher and lists their divisions', function () {
         ->assertSuccessful()
         ->assertSee($this->teacher->full_name)
         ->assertSee($this->division->label)
-        ->assertSee('Class teacher')
-        ->assertSee('Mark attendance');
+        ->assertSee('Class Teacher')
+        ->assertSee('Mark Attendance');
 });
 
 test('the dashboard shows today\'s lessons only once the timetable is published', function () {

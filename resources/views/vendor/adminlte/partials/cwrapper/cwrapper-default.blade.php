@@ -15,6 +15,8 @@
         @include('adminlte::partials.common.preloader')
     @endif
 
+    <main id="main-content" tabindex="-1">
+
     {{-- Content Header --}}
     @hasSection('content_header')
         <div class="content-header">
@@ -31,5 +33,7 @@
             @yield('content')
         </div>
     </div>
+
+    </main>
 
 </div>

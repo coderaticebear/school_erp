@@ -8,7 +8,7 @@
     .slot-editable:hover { box-shadow: 0 0 0 2px #007bff; }
     .slot-title { font-weight: 700; font-size: .875rem; line-height: 1.25; hyphens: auto; overflow-wrap: normal; word-break: normal; }
     .slot-meta { font-size: 12px; color: #56606a; margin-top: 4px; }
-    .empty-slot { text-align: center; color: #7a838c; }
+    .empty-slot { text-align: center; color: #5a6268; }
     .empty-slot .slot-title { font-weight: 400; }
     .break-slot {
         text-align: center; min-height: 0; font-weight: 600; color: #56606a;

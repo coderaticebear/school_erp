@@ -18,7 +18,7 @@
         <div class="col-lg-4 col-md-6">
             <div class="small-box bg-success">
                 <div class="inner">
-                    <h3>{{ $attendance['percent'] !== null ? $attendance['percent'].'%' : '—' }}</h3>
+                    <p class="small-box-value">{{ $attendance['percent'] !== null ? $attendance['percent'].'%' : '—' }}</p>
                     <p>Attendance this year</p>
                 </div>
                 <div class="icon"><i class="fas fa-clipboard-check"></i></div>
@@ -28,7 +28,7 @@
         <div class="col-lg-4 col-md-6">
             <div class="small-box bg-info">
                 <div class="inner">
-                    <h3>{{ $latestResult && $latestResult['row']['percent'] !== null ? number_format($latestResult['row']['percent'], 1).'%' : '—' }}</h3>
+                    <p class="small-box-value">{{ $latestResult && $latestResult['row']['percent'] !== null ? number_format($latestResult['row']['percent'], 1).'%' : '—' }}</p>
                     <p>{{ $latestResult ? $latestResult['exam']->name.' · '.$latestResult['row']['result'] : 'No published results yet' }}</p>
                 </div>
                 <div class="icon"><i class="fas fa-poll"></i></div>
@@ -38,7 +38,7 @@
         <div class="col-lg-4 col-md-12">
             <div class="small-box bg-warning">
                 <div class="inner">
-                    <h3>{{ $attendance['absent'] }}</h3>
+                    <p class="small-box-value">{{ $attendance['absent'] }}</p>
                     <p>Days absent · {{ $attendance['late'] }} late</p>
                 </div>
                 <div class="icon"><i class="fas fa-user-clock"></i></div>
@@ -50,7 +50,7 @@
     <div class="row">
         <div class="col-lg-7">
             <div class="card">
-                <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar-day mr-2"></i>Today, {{ now()->format('l, M j') }}</h3></div>
+                <div class="card-header"><h2 class="card-title"><i class="fas fa-calendar-day mr-2"></i>Today, {{ now()->format('l, M j') }}</h2></div>
                 <div class="card-body p-0">
                     @if ($todaysLessons->isEmpty())
                         <p class="text-muted p-3 mb-0">No lessons to show today.</p>
@@ -74,7 +74,7 @@
         </div>
         <div class="col-lg-5">
             <div class="card">
-                <div class="card-header"><h3 class="card-title"><i class="fas fa-user-clock mr-2"></i>Recent absences &amp; late arrivals</h3></div>
+                <div class="card-header"><h2 class="card-title"><i class="fas fa-user-clock mr-2"></i>Recent Absences and Late Arrivals</h2></div>
                 <ul class="list-group list-group-flush">
                     @forelse ($recentAbsences as $record)
                         <li class="list-group-item d-flex justify-content-between">

@@ -36,15 +36,15 @@
                                     <tr>
                                         <td class="align-middle">{{ $student->first_name }} {{ $student->last_name }}</td>
                                         <td>
-                                            <input type="number" step="0.01" min="0" max="{{ $exam->max_marks }}" name="marks[{{ $student->id }}][value]" value="{{ $value }}"
+                                            <input type="number" step="0.01" min="0" max="{{ $exam->max_marks }}" name="marks[{{ $student->id }}][value]" aria-label="Marks for {{ $student->first_name }} {{ $student->last_name }}" value="{{ $value }}"
                                                    @class(['form-control', 'form-control-sm', 'is-invalid' => $errors->has("marks.{$student->id}.value")]) @disabled($exam->isPublished())>
                                             @error("marks.{$student->id}.value")<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </td>
                                         <td class="align-middle">
-                                            <input type="checkbox" name="marks[{{ $student->id }}][absent]" value="1" @checked($absent) @disabled($exam->isPublished())>
+                                            <input type="checkbox" name="marks[{{ $student->id }}][absent]" aria-label="{{ $student->first_name }} {{ $student->last_name }} was absent" value="1" @checked($absent) @disabled($exam->isPublished())>
                                         </td>
                                         <td>
-                                            <input type="text" name="marks[{{ $student->id }}][remark]" maxlength="255" class="form-control form-control-sm" value="{{ old("marks.{$student->id}.remark", $mark?->remark) }}" @disabled($exam->isPublished())>
+                                            <input type="text" name="marks[{{ $student->id }}][remark]" aria-label="Remark for {{ $student->first_name }} {{ $student->last_name }}" maxlength="255" class="form-control form-control-sm" value="{{ old("marks.{$student->id}.remark", $mark?->remark) }}" @disabled($exam->isPublished())>
                                         </td>
                                         <td class="align-middle">
                                             @if ($mark)

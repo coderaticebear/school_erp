@@ -94,6 +94,15 @@ Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, 
 - Logout is POST only (AdminLTE's user menu). `Login` uses `Notifiable` so password-reset emails send. `Login::$name` feeds the navbar.
 - `tests/Feature/Auth/RouteProtectionTest.php` fails if a new route lacks `auth` plus a `role:` middleware. Add public routes to its list on purpose, never by accident.
 
+### UI conventions (design review, Steps A and B)
+The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
+- **Colours:** `public/css/school-theme.css` (loaded in `vendor/adminlte/master.blade.php`) overrides Bootstrap's `#007bff`, `#28a745`, `#17a2b8` and outline-warning colours, which fail contrast. Use Bootstrap classes (`btn-primary`, `badge-success` and so on) and let the theme fix them. Don't hard-code those hex values.
+- **Layout:** the layout provides the skip link, `<main id="main-content">` and the labelled sidebar `<nav>`. Don't add another `<main>`.
+- **Headings:** one `<h1>` per page, in `@section('content_header')`, plus `@section('title', ...)`. Card titles are `<h2 class="card-title">`. Dashboard numbers use `<p class="small-box-value">`, not headings.
+- **Form fields:** every field has a `<label for>` linked to its `id` (ids in loops include the record id), or an `aria-label` naming the row, e.g. "Marks for {student}". Never use colour alone for meaning; add text or an icon plus `sr-only` text.
+- **Wording:** Title Case for buttons, headings, card titles, column headers, field labels and status badges. Sentence case for help text, messages and captions. Buttons say what they do ("Add Student", not "Submit").
+- **Dates:** `M j, Y` (Sep 25, 2026); `D, M j` in lists within the current year; `l, M j` for "today" headers.
+
 ### Input sanitization and validation
 `App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).
 
