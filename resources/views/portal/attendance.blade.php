@@ -2,7 +2,7 @@
 @section('title', 'Attendance')
 
 @section('content_header')
-    <h1>Attendance · {{ $student->first_name }}</h1>
+    <x-page-header title="Attendance" :subtitle="$student->first_name.' '.$student->last_name" />
 @stop
 
 @section('content')

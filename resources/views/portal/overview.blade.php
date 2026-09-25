@@ -2,13 +2,10 @@
 @section('title', $student->first_name.' '.$student->last_name)
 
 @section('content_header')
-    <h1>{{ $routePrefix === 'student.' ? 'Welcome, '.$student->first_name : $student->first_name.' '.$student->last_name }}</h1>
-    <small class="text-muted">
-        {{ $enrolment?->division?->label ?? 'Not enrolled in a class this year' }}
-        @if ($enrolment?->division?->teachers->first())
-            · Class teacher: {{ $enrolment->division->teachers->first()->full_name }}
-        @endif
-    </small>
+    @php($classTeacher = $enrolment?->division?->teachers->first())
+    <x-page-header
+        :title="$routePrefix === 'student.' ? 'Welcome, '.$student->first_name : $student->first_name.' '.$student->last_name"
+        :subtitle="($enrolment?->division?->label ?? 'Not enrolled in a class this year').($classTeacher ? ' · Class teacher: '.$classTeacher->full_name : '')" />
 @stop
 
 @section('content')

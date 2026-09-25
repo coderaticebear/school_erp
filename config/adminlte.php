@@ -110,7 +110,9 @@ return [
     */
 
     'preloader' => [
-        'enabled' => true,
+        // Off: pages render in well under a second, and a full-screen overlay on every
+        // navigation only delays them (and ignored reduced-motion settings).
+        'enabled' => false,
         'mode' => 'fullscreen',
         'img' => [
             'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',

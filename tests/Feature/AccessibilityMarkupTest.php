@@ -39,7 +39,7 @@ test('form labels are linked to their fields', function () {
 
     $html = $this->get('/admin/addStudent')->getContent();
 
-    expect($html)->toContain('<label for="first-name">First Name</label>')
+    expect($html)->toContain('<label for="first-name">First Name <span class="text-danger" aria-hidden="true">*</span><span class="sr-only">(required)</span>')
         ->and($html)->toContain('id="first-name"')
         ->and($html)->not->toMatch('/<label>\s*[A-Z]/');
 });

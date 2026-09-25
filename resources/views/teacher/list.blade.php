@@ -3,10 +3,9 @@
 @section('title', 'Teachers')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1>Teachers</h1>
-        <a href="{{ route('admin.teachers.create') }}" class="btn btn-primary"><i class="fas fa-plus mr-1"></i> Add Teacher</a>
-    </div>
+    <x-page-header title="Teachers">
+        <a href="{{ route('admin.teachers.create') }}" class="btn btn-primary"><i class="fas fa-plus mr-1" aria-hidden="true"></i> Add Teacher</a>
+    </x-page-header>
 @stop
 
 @section('content')
@@ -22,14 +21,18 @@
                             <th>Email</th>
                             <th>Subjects</th>
                             <th>Divisions</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="text-right"><span class="sr-only">Actions</span></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($teachers as $teacher)
                             <tr>
-                                <td>{{ $teacher->full_name }}</td>
+                                <td data-order="{{ $teacher->full_name }}">
+                                    <button type="button" class="btn btn-link p-0 align-baseline view-button" data-url="{{ route('admin.teachers.show', $teacher) }}">{{ $teacher->full_name }}</button>
+                                    @unless ($teacher->login?->is_active)
+                                        <span class="badge badge-secondary ml-1">Inactive</span>
+                                    @endunless
+                                </td>
                                 <td>{{ $teacher->login?->email }}</td>
                                 <td>{{ $teacher->subjects->pluck('subject_name')->join(', ') ?: '—' }}</td>
                                 <td>
@@ -45,22 +48,10 @@
                                         </span>
                                     @endforeach
                                 </td>
-                                <td>
-                                    @if ($teacher->login?->is_active)
-                                        <span class="badge badge-success">Active</span>
-                                    @else
-                                        <span class="badge badge-secondary">Inactive</span>
-                                    @endif
-                                </td>
-                                <td class="text-nowrap">
-                                    <button type="button" class="btn btn-xs btn-outline-info view-button" data-url="{{ route('admin.teachers.show', $teacher) }}">View</button>
-                                    <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-xs btn-outline-primary">Edit</a>
-                                    <form action="{{ route('admin.teachers.toggle-active', $teacher) }}" method="post" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-xs btn-outline-{{ $teacher->login?->is_active ? 'warning' : 'success' }}">
-                                            {{ $teacher->login?->is_active ? 'Deactivate' : 'Activate' }}
-                                        </button>
-                                    </form>
+                                <td class="text-right">
+                                    <a href="{{ route('admin.teachers.edit', $teacher) }}" class="btn btn-sm btn-outline-primary">
+                                        Edit<span class="sr-only"> {{ $teacher->full_name }}</span>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach
@@ -80,7 +71,7 @@
                 </div>
                 <div class="modal-body"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -90,7 +81,7 @@
 @section('js')
     <script>
         $(function () {
-            $('#teacherList').DataTable({ responsive: true });
+            $('#teacherList').DataTable({ responsive: true, columnDefs: [{ targets: -1, orderable: false }] });
 
             const escape = (text) => $('<div>').text(text ?? '').html();
 

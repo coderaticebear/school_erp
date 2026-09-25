@@ -54,6 +54,43 @@ h1.register-logo {
     line-height: 1.2;
 }
 
+/* ---------- Page header (x-page-header) ---------- */
+
+.page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem 1rem;
+}
+
+.page-header h1 {
+    font-size: 1.75rem;
+    line-height: 1.2;
+}
+
+.page-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+}
+
+.page-header-actions form {
+    margin: 0;
+}
+
+/* ---------- Sidebar ---------- */
+
+.nav-sidebar .nav-header {
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #c2c7d0;
+    padding-top: 1rem;
+}
+
 /* ---------- Links and text ---------- */
 
 a {
@@ -65,6 +102,14 @@ a:hover {
 }
 
 .text-primary { color: var(--erp-primary) !important; }
+
+.btn-link {
+    color: var(--erp-primary);
+}
+
+.btn-link:hover {
+    color: var(--erp-primary-hover);
+}
 .text-success { color: var(--erp-success) !important; }
 .text-info { color: var(--erp-info) !important; }
 .text-warning { color: var(--erp-warning-text) !important; }
@@ -230,6 +275,25 @@ code {
 }
 
 /* ---------- Tables ---------- */
+
+/* Wraps a bare checkbox/radio in a table cell so the whole ~32px square is clickable. */
+.hit-target {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 2rem;
+    margin: -.25rem 0;
+    cursor: pointer;
+}
+
+.hit-target input {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    cursor: pointer;
+}
+
 
 /* Keeps absolutely positioned screen-reader text (.sr-only) inside the scroll area on phones. */
 .table-responsive {

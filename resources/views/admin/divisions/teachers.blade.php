@@ -3,7 +3,7 @@
 @section('title', 'Division Teachers')
 
 @section('content_header')
-    <h1>Teachers for {{ $division->label }}</h1>
+    <x-page-header :title="'Teachers for '.$division->label" />
 @stop
 
 @section('content')
@@ -38,10 +38,10 @@
                             @forelse ($teachers as $teacher)
                                 <tr @class(['text-muted' => ! $teacher->login?->is_active])>
                                     <td class="pl-3">
-                                        <input type="checkbox" name="teacher_ids[]" value="{{ $teacher->id }}" class="teacher-toggle" aria-label="{{ $teacher->full_name }} teaches this division" @checked($assignedIds->contains($teacher->id))>
+                                        <label class="hit-target"><input type="checkbox" name="teacher_ids[]" value="{{ $teacher->id }}" class="teacher-toggle" aria-label="{{ $teacher->full_name }} teaches this division" @checked($assignedIds->contains($teacher->id))></label>
                                     </td>
                                     <td>
-                                        <input type="radio" name="class_teacher_id" value="{{ $teacher->id }}" class="class-teacher" aria-label="{{ $teacher->full_name }} is the class teacher" @checked($classTeacherId === $teacher->id)>
+                                        <label class="hit-target"><input type="radio" name="class_teacher_id" value="{{ $teacher->id }}" class="class-teacher" aria-label="{{ $teacher->full_name }} is the class teacher" @checked($classTeacherId === $teacher->id)></label>
                                     </td>
                                     <td>
                                         {{ $teacher->full_name }}
@@ -59,7 +59,7 @@
                 </div>
             </div>
             <div class="card-footer">
-                <a href="{{ route('admin.classes.index') }}" class="btn btn-secondary">Back</a>
+                <a href="{{ route('admin.classes.index') }}" class="btn btn-outline-secondary">Back</a>
                 <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </div>

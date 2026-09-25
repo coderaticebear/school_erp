@@ -2,7 +2,7 @@
 @section('title', 'Teacher Dashboard')
 
 @section('content_header')
-    <h1>Welcome, {{ $teacher->full_name }}</h1>
+    <x-page-header :title="'Welcome, '.$teacher->full_name" />
 @stop
 
 @section('content')
@@ -92,7 +92,7 @@
                             @if ($markedToday->contains($division->id))
                                 <span class="badge badge-success">Marked</span>
                             @else
-                                <a href="{{ route('teacher.attendance', ['division' => $division->id]) }}" class="badge badge-warning">Mark Attendance</a>
+                                <a href="{{ route('teacher.attendance', ['division' => $division->id]) }}" class="btn btn-sm btn-outline-primary">Mark Attendance</a>
                             @endif
                         </li>
                     @empty

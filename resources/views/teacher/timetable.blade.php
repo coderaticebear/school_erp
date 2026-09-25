@@ -2,12 +2,11 @@
 @section('title', 'My Timetable')
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1>My Timetable</h1>
+    <x-page-header title="My Timetable">
         @if ($grid)
-            <button type="button" class="btn btn-outline-secondary no-print" onclick="window.print()"><i class="fas fa-print mr-1"></i> Print</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
         @endif
-    </div>
+    </x-page-header>
 @stop
 
 @section('content')

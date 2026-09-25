@@ -38,8 +38,15 @@ test('the teacher list shows teachers with subjects, divisions and status', func
         ->assertSuccessful()
         ->assertSee('Alan Turing')
         ->assertSee($this->subjects[0]->subject_name)
-        ->assertSee($division->division_name)
-        ->assertSee('Active');
+        ->assertSee($division->division_name);
+});
+
+test('inactive teachers are flagged in the list and managed from the edit page', function () {
+    $teacher = Teachers::factory()->create(['first_name' => 'Resting']);
+    $teacher->login->update(['is_active' => false]);
+
+    $this->get('/teachers')->assertSeeInOrder(['Resting', 'Inactive'])->assertDontSee('Deactivate');
+    $this->get("/admin/teachers/{$teacher->id}/edit")->assertSee('Reactivate Teacher');
 });
 
 test('the add teacher form loads with subjects', function () {
