@@ -50,36 +50,38 @@
                                     </span>
                                     <button type="button" class="btn btn-xs btn-outline-success" id="allPresent">Mark all present</button>
                                 </div>
-                                <table class="table table-hover mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Student</th>
-                                            <th>Status</th>
-                                            <th>Remark</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($students as $student)
-                                            @php($record = $existing[$student->id] ?? null)
-                                            @php($current = old("attendance.{$student->id}.status", $record?->status ?? \App\Models\Attendance::PRESENT))
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
                                             <tr>
-                                                <td class="align-middle">{{ $student->first_name }} {{ $student->last_name }}</td>
-                                                <td class="align-middle text-nowrap">
-                                                    <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
-                                                        @foreach (\App\Models\Attendance::STATUSES as $status => $label)
-                                                            <label @class(['btn', 'btn-outline-secondary', 'active' => $current === $status])>
-                                                                <input type="radio" name="attendance[{{ $student->id }}][status]" value="{{ $status }}" @checked($current === $status)> {{ $label }}
-                                                            </label>
-                                                        @endforeach
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="attendance[{{ $student->id }}][remark]" class="form-control form-control-sm" maxlength="255" value="{{ old("attendance.{$student->id}.remark", $record?->remark) }}">
-                                                </td>
+                                                <th>Student</th>
+                                                <th>Status</th>
+                                                <th>Remark</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($students as $student)
+                                                @php($record = $existing[$student->id] ?? null)
+                                                @php($current = old("attendance.{$student->id}.status", $record?->status ?? \App\Models\Attendance::PRESENT))
+                                                <tr>
+                                                    <td class="align-middle">{{ $student->first_name }} {{ $student->last_name }}</td>
+                                                    <td class="align-middle text-nowrap">
+                                                        <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
+                                                            @foreach (\App\Models\Attendance::STATUSES as $status => $label)
+                                                                <label @class(['btn', 'btn-outline-secondary', 'active' => $current === $status])>
+                                                                    <input type="radio" name="attendance[{{ $student->id }}][status]" value="{{ $status }}" @checked($current === $status)> {{ $label }}
+                                                                </label>
+                                                            @endforeach
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" name="attendance[{{ $student->id }}][remark]" class="form-control form-control-sm" maxlength="255" value="{{ old("attendance.{$student->id}.remark", $record?->remark) }}">
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                             <div class="card-footer">
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Save Attendance</button>

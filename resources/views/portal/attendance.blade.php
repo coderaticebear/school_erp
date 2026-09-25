@@ -40,20 +40,22 @@
                 </form>
             </div>
             <div class="card-body p-0">
-                <table class="table table-sm table-hover mb-0">
-                    <thead><tr><th class="pl-3">Date</th><th>Status</th><th>Remark</th></tr></thead>
-                    <tbody>
-                        @forelse ($records as $record)
-                            <tr>
-                                <td class="pl-3">{{ $record->date->format('D, M j, Y') }}</td>
-                                <td><span class="badge {{ \App\Models\Attendance::badgeClass($record->status) }}">{{ \App\Models\Attendance::STATUSES[$record->status] }}</span></td>
-                                <td>{{ $record->remark }}</td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="3" class="text-center text-muted">No attendance recorded{{ $month ? ' this month' : '' }}.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead><tr><th class="pl-3">Date</th><th>Status</th><th>Remark</th></tr></thead>
+                        <tbody>
+                            @forelse ($records as $record)
+                                <tr>
+                                    <td class="pl-3">{{ $record->date->format('D, M j, Y') }}</td>
+                                    <td><span class="badge {{ \App\Models\Attendance::badgeClass($record->status) }}">{{ \App\Models\Attendance::STATUSES[$record->status] }}</span></td>
+                                    <td>{{ $record->remark }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="text-center text-muted">No attendance recorded{{ $month ? ' this month' : '' }}.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     @endif

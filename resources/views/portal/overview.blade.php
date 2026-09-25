@@ -55,17 +55,19 @@
                     @if ($todaysLessons->isEmpty())
                         <p class="text-muted p-3 mb-0">No lessons to show today.</p>
                     @else
-                        <table class="table mb-0">
-                            <tbody>
-                                @foreach ($todaysLessons as $lesson)
-                                    <tr>
-                                        <td class="text-nowrap text-muted">{{ $lesson->period->time_range }}</td>
-                                        <td><strong>{{ $lesson->subject->subject_name }}</strong></td>
-                                        <td>{{ $lesson->teacher->full_name }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <tbody>
+                                    @foreach ($todaysLessons as $lesson)
+                                        <tr>
+                                            <td class="text-nowrap text-muted">{{ $lesson->period->time_range }}</td>
+                                            <td><strong>{{ $lesson->subject->subject_name }}</strong></td>
+                                            <td>{{ $lesson->teacher->full_name }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     @endif
                 </div>
             </div>

@@ -6,7 +6,7 @@
     .slot { border-radius: 10px; padding: 8px 10px; min-height: 64px; border: 1px solid rgba(0, 0, 0, 0.06); }
     .slot-editable { cursor: pointer; transition: box-shadow .15s; }
     .slot-editable:hover { box-shadow: 0 0 0 2px #007bff; }
-    .slot-title { font-weight: 700; letter-spacing: 0.2px; }
+    .slot-title { font-weight: 700; font-size: .875rem; line-height: 1.25; hyphens: auto; overflow-wrap: normal; word-break: normal; }
     .slot-meta { font-size: 12px; color: #56606a; margin-top: 4px; }
     .empty-slot { text-align: center; color: #7a838c; }
     .empty-slot .slot-title { font-weight: 400; }

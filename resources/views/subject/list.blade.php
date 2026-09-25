@@ -30,35 +30,37 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Subject</th>
-                                <th>Periods / week</th>
-                                <th>Teachers</th>
-                                <th class="text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($subjects as $subject)
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
                                 <tr>
-                                    <td>{{ $subject->subject_name }}</td>
-                                    <td>{{ $subject->periods_per_week ?? 'Auto' }}</td>
-                                    <td>{{ $subject->teachers->map->full_name->join(', ') ?: '—' }}</td>
-                                    <td class="text-right text-nowrap">
-                                        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editSubject{{ $subject->id }}">Edit</button>
-                                        <form action="{{ route('admin.subjects.destroy', $subject) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $subject->subject_name }}?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                        </form>
-                                    </td>
+                                    <th>Subject</th>
+                                    <th>Periods / week</th>
+                                    <th>Teachers</th>
+                                    <th class="text-right">Actions</th>
                                 </tr>
-                            @empty
-                                <tr><td colspan="4" class="text-center text-muted">No subjects yet.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse ($subjects as $subject)
+                                    <tr>
+                                        <td>{{ $subject->subject_name }}</td>
+                                        <td>{{ $subject->periods_per_week ?? 'Auto' }}</td>
+                                        <td>{{ $subject->teachers->map->full_name->join(', ') ?: '—' }}</td>
+                                        <td class="text-right text-nowrap">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#editSubject{{ $subject->id }}">Edit</button>
+                                            <form action="{{ route('admin.subjects.destroy', $subject) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $subject->subject_name }}?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="4" class="text-center text-muted">No subjects yet.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

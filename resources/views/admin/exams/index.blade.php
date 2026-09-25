@@ -27,46 +27,48 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Exam</th>
-                                    <th>Starts</th>
-                                    <th>Marks</th>
-                                    <th>Results</th>
-                                    <th class="text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($exams as $exam)
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
                                     <tr>
-                                        <td><a href="{{ route('admin.exams.show', $exam) }}">{{ $exam->name }}</a></td>
-                                        <td>{{ $exam->starts_on?->format('M j, Y') ?? '—' }}</td>
-                                        <td>{{ $exam->pass_marks }} / {{ $exam->max_marks }} <small class="text-muted">({{ $exam->marks_count }} entered)</small></td>
-                                        <td>
-                                            @if ($exam->isPublished())
-                                                <span class="badge badge-success">Published</span>
-                                            @else
-                                                <span class="badge badge-secondary">Draft</span>
-                                            @endif
-                                        </td>
-                                        <td class="text-right text-nowrap">
-                                            <a href="{{ route('admin.exams.show', $exam) }}" class="btn btn-sm btn-outline-primary">Open</a>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#editExam{{ $exam->id }}">Edit</button>
-                                            @if ($exam->marks_count === 0)
-                                                <form action="{{ route('admin.exams.destroy', $exam) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $exam->name }}?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                                </form>
-                                            @endif
-                                        </td>
+                                        <th>Exam</th>
+                                        <th>Starts</th>
+                                        <th>Marks</th>
+                                        <th>Results</th>
+                                        <th class="text-right">Actions</th>
                                     </tr>
-                                @empty
-                                    <tr><td colspan="5" class="text-center text-muted">No exams yet.</td></tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @forelse ($exams as $exam)
+                                        <tr>
+                                            <td><a href="{{ route('admin.exams.show', $exam) }}">{{ $exam->name }}</a></td>
+                                            <td>{{ $exam->starts_on?->format('M j, Y') ?? '—' }}</td>
+                                            <td>{{ $exam->pass_marks }} / {{ $exam->max_marks }} <small class="text-muted">({{ $exam->marks_count }} entered)</small></td>
+                                            <td>
+                                                @if ($exam->isPublished())
+                                                    <span class="badge badge-success">Published</span>
+                                                @else
+                                                    <span class="badge badge-secondary">Draft</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-right text-nowrap">
+                                                <a href="{{ route('admin.exams.show', $exam) }}" class="btn btn-sm btn-outline-primary">Open</a>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#editExam{{ $exam->id }}">Edit</button>
+                                                @if ($exam->marks_count === 0)
+                                                    <form action="{{ route('admin.exams.destroy', $exam) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ $exam->name }}?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                    </form>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="5" class="text-center text-muted">No exams yet.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -111,6 +111,9 @@ Differences from MySQL that cause real bugs here:
 - DDL is transactional, so a failed migration rolls back completely.
 - Use Boost `database-schema` / `database-query` to check real columns and foreign keys before writing queries or migrations.
 
+## Agent skills
+`SKILLS.md` lists the project's skills, where each comes from, and what's intentionally excluded. `./install-skills.sh` restores them after a clone. When a skill is added or removed, update `SKILLS.md`.
+
 ## Docker file sync
 This machine uses the Docker Desktop for Linux context (`desktop-linux`). Laravel's Sail docs recommend `docker context use default` there. With the Desktop context, the container sometimes sees a stale copy of a file that was just replaced, as an editor's atomic save does. Before trusting a test run right after edits, confirm the container matches the host (e.g. `diff <(cat FILE) <(vendor/bin/sail exec -T laravel.test cat FILE)`).
 
@@ -232,6 +235,16 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
     - Execute Node commands: `vendor/bin/sail npm run dev`
     - Execute PHP scripts: `vendor/bin/sail php [script]`
 - View all available Sail commands by running `vendor/bin/sail` without arguments.
+
+=== tests rules ===
+
+# Test Enforcement
+
+- Add or update tests for behavior and logic changes when a test provides meaningful regression coverage.
+- Pure copy, styling, and layout-only changes do not require new or updated tests.
+- When test coverage applies, run the affected tests and ensure they pass.
+- Test the changed behavior and its important failure modes, but do not add tests beyond them.
+- Read the `testing-best-practices` skill before writing tests.
 
 === laravel/core rules ===
 

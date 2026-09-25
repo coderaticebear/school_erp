@@ -23,37 +23,39 @@
                 <h3 class="card-title">Tick the teachers who teach this division, and choose one class teacher.</h3>
             </div>
             <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th class="pl-3" style="width: 90px">Teaches</th>
-                            <th style="width: 120px">Class Teacher</th>
-                            <th>Name</th>
-                            <th>Subjects</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($teachers as $teacher)
-                            <tr @class(['text-muted' => ! $teacher->login?->is_active])>
-                                <td class="pl-3">
-                                    <input type="checkbox" name="teacher_ids[]" value="{{ $teacher->id }}" class="teacher-toggle" @checked($assignedIds->contains($teacher->id))>
-                                </td>
-                                <td>
-                                    <input type="radio" name="class_teacher_id" value="{{ $teacher->id }}" class="class-teacher" @checked($classTeacherId === $teacher->id)>
-                                </td>
-                                <td>
-                                    {{ $teacher->full_name }}
-                                    @unless ($teacher->login?->is_active)
-                                        <span class="badge badge-secondary">Inactive</span>
-                                    @endunless
-                                </td>
-                                <td>{{ $teacher->subjects->pluck('subject_name')->join(', ') ?: '—' }}</td>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th class="pl-3" style="width: 90px">Teaches</th>
+                                <th style="width: 120px">Class Teacher</th>
+                                <th>Name</th>
+                                <th>Subjects</th>
                             </tr>
-                        @empty
-                            <tr><td colspan="4" class="text-center text-muted">No teachers yet. <a href="{{ route('admin.teachers.create') }}">Add a teacher</a>.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse ($teachers as $teacher)
+                                <tr @class(['text-muted' => ! $teacher->login?->is_active])>
+                                    <td class="pl-3">
+                                        <input type="checkbox" name="teacher_ids[]" value="{{ $teacher->id }}" class="teacher-toggle" @checked($assignedIds->contains($teacher->id))>
+                                    </td>
+                                    <td>
+                                        <input type="radio" name="class_teacher_id" value="{{ $teacher->id }}" class="class-teacher" @checked($classTeacherId === $teacher->id)>
+                                    </td>
+                                    <td>
+                                        {{ $teacher->full_name }}
+                                        @unless ($teacher->login?->is_active)
+                                            <span class="badge badge-secondary">Inactive</span>
+                                        @endunless
+                                    </td>
+                                    <td>{{ $teacher->subjects->pluck('subject_name')->join(', ') ?: '—' }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="4" class="text-center text-muted">No teachers yet. <a href="{{ route('admin.teachers.create') }}">Add a teacher</a>.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="card-footer">
                 <a href="{{ route('admin.classes.index') }}" class="btn btn-secondary">Back</a>
