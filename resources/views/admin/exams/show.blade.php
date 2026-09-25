@@ -32,7 +32,7 @@
                         @forelse ($row['subjects'] as $cell)
                             @php($done = $row['students'] > 0 && $cell['entered'] >= $row['students'])
                             <li class="list-group-item d-flex justify-content-between align-items-center py-2">
-                                <a href="{{ route('marks.sheet', [$exam, $row['division'], $cell['subject']]) }}">{{ $cell['subject']->subject_name }}</a>
+                                <a href="{{ route('marks.sheet', [$exam, $row['division'], $cell['subject']]) }}"><x-subject-chip :subject="$cell['subject']" plain /></a>
                                 <span @class(['badge', 'badge-success' => $done, 'badge-warning' => ! $done && $cell['entered'] > 0, 'badge-light' => $cell['entered'] === 0])>{{ $cell['entered'] }}/{{ $row['students'] }}</span>
                             </li>
                         @empty

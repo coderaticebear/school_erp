@@ -3,6 +3,20 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | Identity
+    |--------------------------------------------------------------------------
+    |
+    | The school's name appears in the sidebar, on sign-in pages and in page
+    | titles. The crest shows its initials (derived from the name unless set).
+    |
+    */
+
+    'name' => env('SCHOOL_NAME', 'School ERP'),
+
+    'initials' => env('SCHOOL_INITIALS'),
+
+    /*
+    |--------------------------------------------------------------------------
     | School week
     |--------------------------------------------------------------------------
     |

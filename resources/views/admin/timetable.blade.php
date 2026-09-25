@@ -113,7 +113,7 @@
                         </div>
                         <form action="{{ route('admin.timetable.publish') }}" method="post">
                             @csrf
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-upload mr-1"></i> {{ $summary['published_at'] ? 'Publish Again' : 'Publish Timetable' }}
                             </button>
                         </form>
@@ -124,36 +124,21 @@
             <div class="col-lg-3 no-print">
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title"><i class="fas fa-sliders-h mr-2"></i>Quick Stats</h2>
+                        <h2 class="card-title">Quick Stats</h2>
                     </div>
-                    <div class="card-body">
-                        <div class="info-box bg-light mb-3">
-                            <span class="info-box-icon bg-primary"><i class="fas fa-school"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Divisions</span>
-                                <span class="info-box-number">{{ $divisions->count() }}</span>
-                            </div>
-                        </div>
-                        <div class="info-box bg-light mb-3">
-                            <span class="info-box-icon bg-success"><i class="fas fa-chalkboard-teacher"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">Lessons Scheduled</span>
-                                <span class="info-box-number">{{ $summary['lessons'] }}</span>
-                            </div>
-                        </div>
-                        <div class="info-box bg-light mb-0">
-                            <span class="info-box-icon bg-warning"><i class="fas fa-exclamation-triangle"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text" title="Lessons whose teacher is inactive, no longer assigned to the division, or no longer teaches the subject">Needs Attention</span>
-                                <span class="info-box-number">{{ $summary['attention'] }}</span>
-                            </div>
-                        </div>
-                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Divisions</span><strong>{{ $divisions->count() }}</strong></li>
+                        <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Lessons scheduled</span><strong>{{ $summary['lessons'] }}</strong></li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted" title="Lessons whose teacher is inactive, no longer assigned to the division, or no longer teaches the subject">Needs attention</span>
+                            <strong @class(['text-warning' => $summary['attention'] > 0])>{{ $summary['attention'] }}</strong>
+                        </li>
+                    </ul>
                 </div>
 
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title"><i class="fas fa-list mr-2"></i>Unscheduled</h2>
+                        <h2 class="card-title">Unscheduled</h2>
                     </div>
                     <div class="card-body p-0">
                         <ul class="list-group list-group-flush">
@@ -179,13 +164,13 @@
                 @if ($legend->isNotEmpty())
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title"><i class="fas fa-tags mr-2"></i>Legend</h2>
+                            <h2 class="card-title">Legend</h2>
                         </div>
                         <div class="card-body">
                             @foreach ($legend as $entry)
-                                <div class="legend-item"><span class="legend-swatch {{ $colorFor($entry->subject_id) }}"></span>{{ $entry->subject->subject_name }}</div>
+                                <div class="legend-item"><x-subject-chip :subject="$entry->subject" plain /></div>
                             @endforeach
-                            <div class="legend-item"><span class="legend-swatch bg-soft-gray"></span>Free / Break</div>
+                            <div class="legend-item text-muted"><span class="subject-dot mr-2" style="background: #c3c9d1" aria-hidden="true"></span>Free / Break</div>
                         </div>
                     </div>
                 @endif

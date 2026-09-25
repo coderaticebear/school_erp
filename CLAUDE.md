@@ -94,7 +94,7 @@ Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, 
 - Logout is POST only (AdminLTE's user menu). `Login` uses `Notifiable` so password-reset emails send. `Login::$name` feeds the navbar.
 - `tests/Feature/Auth/RouteProtectionTest.php` fails if a new route lacks `auth` plus a `role:` middleware. Add public routes to its list on purpose, never by accident.
 
-### UI conventions (design review, Steps A–C)
+### UI conventions (design review, Steps A–D)
 The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
 - **Colours:** `public/css/school-theme.css` (loaded in `vendor/adminlte/master.blade.php`) overrides Bootstrap's `#007bff`, `#28a745`, `#17a2b8` and outline-warning colours, which fail contrast. Use Bootstrap classes (`btn-primary`, `badge-success` and so on) and let the theme fix them. Don't hard-code those hex values.
 - **Layout:** the layout provides the skip link, `<main id="main-content">` and the labelled sidebar `<nav>`. Don't add another `<main>`.
@@ -109,6 +109,11 @@ The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
 - **Sidebar:** grouped with `['header' => '…']` items in `EventServiceProvider::menuFor()`. Tests skip header items when checking links.
 - **Small checkboxes/radios** in tables go inside `<label class="hit-target">` (32px click target).
 - The AdminLTE preloader is off (`config/adminlte.php`).
+- **Identity (Step D):** `SCHOOL_NAME` (and optional `SCHOOL_INITIALS`) in `.env` feeds `config('school.name')`, `App\Services\SchoolIdentity`, the `<x-crest>` shield, the serif wordmark and page titles. The serif (Source Serif 4) is used **only** for the school's name; everything else is Source Sans 3.
+- **Tokens:** `public/css/school-theme.css` defines them as CSS variables (`--erp-ink` #1f3b73 for primary actions and the current page, `--erp-page`, `--erp-line`, `--erp-good/attention/problem` with tints). Status colours are for status only, as tinted badges (`badge-success/warning/danger/secondary`). Never use solid green, yellow or red action buttons. The sidebar is AdminLTE's `sidebar-light-primary`.
+- **Dashboards** use `.stat-card` (`.stat-label`, `.stat-value`, `.stat-context`), not AdminLTE small-boxes or info-boxes.
+- **Subjects** always appear in their colour: `<x-subject-chip :subject="$s" />` (or `plain` for dot plus name in tables). `TimetableGrid::colorFor()` / `dotFor()` give the classes, keyed by subject id.
+- **Phone layouts:** student, parent and teacher timetables include `timetable.day-list` (day picker, below 768px) plus the grid in `.d-none.d-md-block`. The attendance sheet uses `.attendance-row` (four 44px status buttons on phones, a sticky save bar with live totals).
 
 ### Input sanitization and validation
 `App\Pipelines\SanitizeInput::run(array $data)` sends input through a Laravel Pipeline (`TrimStrings`, `StripTags`, `NormalizeSpaces`, `EmptyStringToNull` in `app/Pipelines/Sanitizers`). Validation goes in Form Requests (`app/Http/Requests`), which call `SanitizeInput` in `prepareForValidation()`. **Never sanitize password fields**, since that would change the password (see `StoreStudentRequest::$unsanitized`).

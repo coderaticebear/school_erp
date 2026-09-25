@@ -106,7 +106,7 @@ test('the dashboard shows the latest published result', function () {
     $exam = Exam::factory()->published()->create(['name' => 'Spring Test']);
     Mark::factory()->create(['exam_id' => $exam->id, 'student_id' => $this->student->id, 'subject_id' => $this->subject->id, 'division_id' => $this->division->id, 'marks' => 72]);
 
-    $this->get('/student/dashboard')->assertSee('72.0%')->assertSee('Spring Test · Pass');
+    $this->get('/student/dashboard')->assertSee('72.0%')->assertSeeInOrder(['Spring Test', '72.0%', 'Pass']);
 });
 
 test('a student cannot use admin, teacher or parent pages', function () {

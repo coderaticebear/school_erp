@@ -50,41 +50,35 @@
                                     </span>
                                     <button type="button" class="btn btn-sm btn-outline-primary" id="allPresent">Mark All Present</button>
                                 </div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Student</th>
-                                                <th>Status</th>
-                                                <th>Remark</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($students as $student)
-                                                @php($record = $existing[$student->id] ?? null)
-                                                @php($current = old("attendance.{$student->id}.status", $record?->status ?? \App\Models\Attendance::PRESENT))
-                                                <tr>
-                                                    <td class="align-middle">{{ $student->first_name }} {{ $student->last_name }}</td>
-                                                    <td class="align-middle text-nowrap">
-                                                        <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons" role="radiogroup" aria-label="Attendance for {{ $student->first_name }} {{ $student->last_name }}">
-                                                            @foreach (\App\Models\Attendance::STATUSES as $status => $label)
-                                                                <label @class(['btn', 'btn-outline-secondary', 'active' => $current === $status])>
-                                                                    <input type="radio" name="attendance[{{ $student->id }}][status]" value="{{ $status }}" @checked($current === $status)> {{ $label }}
-                                                                </label>
-                                                            @endforeach
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" name="attendance[{{ $student->id }}][remark]" aria-label="Remark for {{ $student->first_name }} {{ $student->last_name }}" class="form-control form-control-sm" maxlength="255" value="{{ old("attendance.{$student->id}.remark", $record?->remark) }}">
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                <div class="attendance-head d-none d-md-grid" aria-hidden="true">
+                                    <span>Student</span><span>Status</span><span>Remark</span>
                                 </div>
+                                <ul class="attendance-list list-unstyled mb-0">
+                                    @foreach ($students as $student)
+                                        @php($record = $existing[$student->id] ?? null)
+                                        @php($current = old("attendance.{$student->id}.status", $record?->status ?? \App\Models\Attendance::PRESENT))
+                                        @php($remark = old("attendance.{$student->id}.remark", $record?->remark))
+                                        @php($fullName = $student->first_name.' '.$student->last_name)
+                                        <li class="attendance-row">
+                                            <div class="attendance-name">{{ $fullName }}</div>
+                                            <div class="btn-group btn-group-toggle attendance-status" data-toggle="buttons" role="radiogroup" aria-label="Attendance for {{ $fullName }}">
+                                                @foreach (\App\Models\Attendance::STATUSES as $status => $label)
+                                                    <label @class(['btn', 'btn-outline-secondary', 'active' => $current === $status])>
+                                                        <input type="radio" name="attendance[{{ $student->id }}][status]" value="{{ $status }}" @checked($current === $status)> {{ $label }}
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                            <div class="attendance-remark">
+                                                <button type="button" class="btn btn-link btn-sm px-0 remark-toggle" @if (filled($remark)) hidden @endif aria-controls="remark-{{ $student->id }}">+ Add remark</button>
+                                                <input type="text" id="remark-{{ $student->id }}" name="attendance[{{ $student->id }}][remark]" aria-label="Remark for {{ $fullName }}" class="form-control form-control-sm" maxlength="255" value="{{ $remark }}" @unless (filled($remark)) hidden @endunless>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
                             </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Save Attendance</button>
+                            <div class="card-footer attendance-actions">
+                                <span class="attendance-summary text-muted" role="status" aria-live="polite" id="attendance-summary"></span>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1" aria-hidden="true"></i> Save Attendance</button>
                             </div>
                         </form>
                     @endif
@@ -113,12 +107,30 @@
 @section('js')
     <script>
         $(function () {
+            const labels = { present: 'present', late: 'late', absent: 'absent', excused: 'excused' };
+
+            const updateSummary = () => {
+                const counts = { present: 0, late: 0, absent: 0, excused: 0 };
+                $('.attendance-status input[type=radio]:checked').each(function () { counts[this.value]++; });
+                $('#attendance-summary').text(Object.keys(labels).map(key => counts[key] + ' ' + labels[key]).join(' · '));
+            };
+
             $('#allPresent').on('click', function () {
                 $('input[type=radio][value=present]').each(function () {
                     $(this).prop('checked', true).closest('.btn-group').find('label').removeClass('active');
                     $(this).closest('label').addClass('active');
                 });
+                updateSummary();
             });
+
+            $('.attendance-status').on('change', 'input[type=radio]', updateSummary);
+
+            $('.remark-toggle').on('click', function () {
+                $(this).prop('hidden', true);
+                $('#' + $(this).attr('aria-controls')).prop('hidden', false).trigger('focus');
+            });
+
+            updateSummary();
         });
     </script>
 @stop

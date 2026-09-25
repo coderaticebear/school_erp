@@ -15,15 +15,7 @@
         class="brand-link {{ config('adminlte.classes_brand') }}"
     @endif>
 
-    {{-- Small brand logo --}}
-    <img src="{{ asset(config('adminlte.logo_img', 'vendor/adminlte/dist/img/AdminLTELogo.png')) }}"
-         alt=""
-         class="{{ config('adminlte.logo_img_class', 'brand-image img-circle elevation-3') }}"
-         style="opacity:.8">
-
-    {{-- Brand text --}}
-    <span class="brand-text font-weight-light {{ config('adminlte.classes_brand_text') }}">
-        {!! config('adminlte.logo', '<b>Admin</b>LTE') !!}
-    </span>
-
+    {{-- School crest and name (config/school.php) --}}
+    <x-crest height="34" class="brand-crest" />
+    <span class="brand-text school-wordmark {{ config('adminlte.classes_brand_text') }}">{{ \App\Services\SchoolIdentity::name() }}</span>
 </a>

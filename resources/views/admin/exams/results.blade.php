@@ -17,7 +17,7 @@
                         <th>Rank</th>
                         <th>Student</th>
                         @foreach ($subjects as $subject)
-                            <th class="text-center">{{ $subject->subject_name }}</th>
+                            <th class="text-center"><x-subject-chip :subject="$subject" plain /></th>
                         @endforeach
                         <th class="text-center">Total</th>
                         <th class="text-center">%</th>

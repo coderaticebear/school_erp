@@ -20,7 +20,10 @@
                 <h2 class="card-title">{{ $teacher->full_name }} · {{ $academicYear->year }}</h2>
             </div>
             <div class="card-body">
-                @include('timetable.grid', ['grid' => $grid, 'mode' => 'teacher'])
+                @include('timetable.day-list', ['grid' => $grid, 'mode' => 'teacher'])
+                <div class="d-none d-md-block timetable-grid-wrap">
+                    @include('timetable.grid', ['grid' => $grid, 'mode' => 'teacher'])
+                </div>
             </div>
         </div>
     @endif
