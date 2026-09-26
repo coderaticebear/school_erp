@@ -25,5 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
         );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Failed forms keep their input in the session; never keep password fields beyond Laravel's defaults.
+        $exceptions->dontFlash(['parent_password']);
     })->create();

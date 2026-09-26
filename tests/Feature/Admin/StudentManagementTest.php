@@ -6,6 +6,7 @@ use App\Models\Login;
 use App\Models\Parents;
 use App\Models\StudentClass;
 use App\Models\Students;
+use Illuminate\Support\Facades\Log;
 
 beforeEach(function () {
     $this->academicYear = AcademicYear::factory()->create(['year' => '2025-2026', 'is_active' => true]);
@@ -328,4 +329,84 @@ test('the student profile shows real class, attendance and contact details', fun
         ->assertDontSee('ParentTown')
         ->assertDontSee('No teacher has been assigned yet')
         ->assertDontSee('No data found');
+});
+
+/**
+ * Fail when any submitted password reached the session, where failed forms keep their input.
+ *
+ * @param  list<string>  $passwords
+ */
+function expectSessionWithoutPasswords(array $passwords): void
+{
+    $session = serialize(session()->all());
+
+    foreach ($passwords as $password) {
+        expect($session)->not->toContain($password);
+    }
+
+    expect(session()->getOldInput())
+        ->not->toHaveKey('password')
+        ->not->toHaveKey('parent_password');
+}
+
+test('a failed add student form keeps its input but never the passwords', function () {
+    $this->from('/admin/addStudent')
+        ->post('/admin/students', studentPayload([
+            'first_name' => '',
+            'password' => 'Student-Secret-7731',
+            'parent_password' => 'Parent-Secret-7732',
+        ]))
+        ->assertRedirect('/admin/addStudent')
+        ->assertSessionHasErrors('first_name')
+        ->assertSessionHasInput('last_name', 'Varghese')
+        ->assertSessionHasInput('p_email', 'mother@example.test');
+
+    expectSessionWithoutPasswords(['Student-Secret-7731', 'Parent-Secret-7732']);
+});
+
+test('adding a student with no active year keeps the input but never the passwords', function () {
+    $this->academicYear->update(['is_active' => false]);
+
+    $this->from('/admin/addStudent')
+        ->post('/admin/students', studentPayload([
+            'password' => 'Student-Secret-7731',
+            'parent_password' => 'Parent-Secret-7732',
+        ]))
+        ->assertRedirect('/admin/addStudent')
+        ->assertSessionHas('error')
+        ->assertSessionHasInput('first_name', 'Asha');
+
+    expect(Students::count())->toBe(0);
+    expectSessionWithoutPasswords(['Student-Secret-7731', 'Parent-Secret-7732']);
+});
+
+test('a student that fails to save keeps the input but never the passwords', function () {
+    Log::spy();
+    Students::creating(fn () => throw new RuntimeException('Simulated database failure'));
+
+    $this->from('/admin/addStudent')
+        ->post('/admin/students', studentPayload([
+            'password' => 'Student-Secret-7731',
+            'parent_password' => 'Parent-Secret-7732',
+        ]))
+        ->assertRedirect('/admin/addStudent')
+        ->assertSessionHas('error', 'The student could not be saved. Please try again.')
+        ->assertSessionHasInput('first_name', 'Asha');
+
+    expect(Login::where('email', 'mother@example.test')->exists())->toBeFalse();
+    Log::shouldHaveReceived('error')->once();
+    expectSessionWithoutPasswords(['Student-Secret-7731', 'Parent-Secret-7732']);
+});
+
+test('editing a student with no active year keeps the input but never the new password', function () {
+    $student = Students::factory()->create();
+    $this->academicYear->update(['is_active' => false]);
+
+    $this->from("/admin/students/{$student->id}/edit")
+        ->put("/admin/students/{$student->id}", studentUpdatePayload($student, ['password' => 'Student-Secret-7733']))
+        ->assertRedirect("/admin/students/{$student->id}/edit")
+        ->assertSessionHas('error')
+        ->assertSessionHasInput('first_name', 'Renamed');
+
+    expectSessionWithoutPasswords(['Student-Secret-7733']);
 });
