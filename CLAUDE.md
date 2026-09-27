@@ -15,8 +15,9 @@ The app runs inside Sail containers (`compose.yaml`: `laravel.test`, `pgsql` on 
 ```bash
 ./vendor/bin/sail up -d                 # start containers (app on APP_PORT, default 80)
 ./vendor/bin/sail down
-./vendor/bin/sail artisan migrate --seed
-./vendor/bin/sail artisan migrate:fresh --seed   # rebuild DB with demo data
+./vendor/bin/sail artisan db:provision-roles school testing          # create/refresh the DB roles (safe to re-run)
+./vendor/bin/sail artisan migrate --database=pgsql_migrations --seed
+./vendor/bin/sail artisan migrate:fresh --database=pgsql_migrations --seed   # rebuild DB with demo data
 ./vendor/bin/sail npm run dev           # Vite: no page uses it now; styling is AdminLTE + public/css/school-theme.css
 ./vendor/bin/sail psql
 
@@ -135,7 +136,15 @@ node .agents/skills/playwright-skill/run.js tests/e2e/smoke.cjs          # read-
 node .agents/skills/playwright-skill/run.js tests/e2e/browser-suite.cjs  # JS interactions, phone layouts; changes some demo data
 node .agents/skills/playwright-skill/run.js tests/e2e/functional.cjs     # full school lifecycle through the UI; writes QA records, run once per database
 ```
-They need the seeded demo database and demo logins. Afterwards, reseed or restore a `pg_dump` snapshot. Screenshots and results go to `storage/app/e2e/` (git-ignored). Attendance steps use the most recent school day, because the attendance page takes no entries on non-school days.
+They need the seeded demo database and demo logins. Afterwards, reseed (`sail artisan migrate:fresh --database=pgsql_migrations --seed`) or restore a `pg_dump` snapshot. Screenshots and results go to `storage/app/e2e/` (git-ignored). Attendance steps use the most recent school day, because the attendance page takes no entries on non-school days.
+
+## Database roles
+The app never connects as a superuser. There are three logins:
+- **`DB_USERNAME` (`school_app`)** is the running app. It can only `SELECT, INSERT, UPDATE, DELETE` rows (and use sequences), with no DDL, no `TRUNCATE`, no role or database creation. Every test runs as this role, so a missing grant fails the suite.
+- **`DB_MIGRATION_USERNAME` (`school_owner`)** owns the database and every table and runs migrations: always pass `--database=pgsql_migrations` to `migrate`/`migrate:fresh`/`migrate:rollback`. A plain `migrate` runs as the app role and fails with a permission error. `tests/TestCase.php` rebuilds the test schema through this connection.
+- **`DB_ADMIN_USERNAME` (Sail's `sail` superuser)** is used only by `php artisan db:provision-roles [databases…]`. The command creates or updates both roles, hands every existing object to the owner, grants the app row access (plus default privileges for future tables) and then signs in as each role to check it. `compose.yaml` creates the superuser from `DB_ADMIN_*`, never from `DB_USERNAME`.
+
+After a fresh clone or a new database volume: `sail up -d`, then `sail artisan db:provision-roles school testing`, then migrate as above. In production, give the app only `DB_USERNAME`/`DB_PASSWORD`; the migration and admin credentials belong to the deploy step.
 
 ## PostgreSQL notes
 Differences from MySQL that cause real bugs here:
