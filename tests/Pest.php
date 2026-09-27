@@ -11,8 +11,8 @@
 |
 */
 
+// Tests\TestCase applies RefreshDatabase itself, so its migration settings (run as the schema owner) take effect.
 pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
 /*

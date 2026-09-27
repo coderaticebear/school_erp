@@ -43,7 +43,8 @@
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
-            "@php artisan migrate --force",
+            "@php artisan db:provision-roles --force",
+            "@php artisan migrate --database=pgsql_migrations --force",
             "npm install",
             "npm run build"
         ],
