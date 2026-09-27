@@ -128,6 +128,15 @@ The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
 ### Tests
 Pest feature tests use `RefreshDatabase` against the `testing` Postgres database. `actingAsRole(Login::ROLE_X)` in `tests/Pest.php` creates and logs in a user with that role, including their teacher, student or parent profile. Tests that depend on "today" pin the clock with `Carbon::setTestNow()`.
 
+### Browser tests (tests/e2e)
+Playwright scripts that drive the running app through Sail at `http://localhost` (set `TARGET_URL` to change it). They run through the playwright-skill runner (`./install-skills.sh` restores it) and are `.cjs` because `package.json` is `"type": "module"`:
+```bash
+node .agents/skills/playwright-skill/run.js tests/e2e/smoke.cjs          # read-only: every page per role, 403s across roles, CSV exports
+node .agents/skills/playwright-skill/run.js tests/e2e/browser-suite.cjs  # JS interactions, phone layouts; changes some demo data
+node .agents/skills/playwright-skill/run.js tests/e2e/functional.cjs     # full school lifecycle through the UI; writes QA records, run once per database
+```
+They need the seeded demo database and demo logins. Afterwards, reseed or restore a `pg_dump` snapshot. Screenshots and results go to `storage/app/e2e/` (git-ignored). Attendance steps use the most recent school day, because the attendance page takes no entries on non-school days.
+
 ## PostgreSQL notes
 Differences from MySQL that cause real bugs here:
 - `LIKE` is case-sensitive. For user-facing search, use `whereLike($col, $value, caseSensitive: false)` or `ilike`, and compare emails with `lower()`.
