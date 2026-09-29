@@ -44,10 +44,8 @@
                 <link rel="stylesheet" href="{{ asset('vendor/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
                 <link rel="stylesheet" href="{{ asset('vendor/adminlte/dist/css/adminlte.min.css') }}">
 
-                @if(config('adminlte.google_fonts.allowed', true))
-                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
-                @endif
+                {{-- Fonts come from our own server, never Google Fonts, so pages don't send visitors' IP addresses elsewhere (SEC-05) --}}
+                <link rel="stylesheet" href="{{ asset('vendor/fonts/fonts.css') }}">
         @endswitch
     @endif
 

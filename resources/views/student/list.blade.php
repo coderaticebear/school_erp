@@ -1,6 +1,7 @@
 @extends('adminlte::page')
 
 @section('title', 'Students')
+@section('plugins.Datatables', true)
 
 @section('content_header')
     <x-page-header title="Students">
@@ -51,7 +52,7 @@
 @section('js')
     <script>
         $(function () {
-            $('#studentList').DataTable({ responsive: true, columnDefs: [{ targets: -1, orderable: false }] });
+            $('#studentList').DataTable({ columnDefs: [{ targets: -1, orderable: false }] });
         });
     </script>
 @stop

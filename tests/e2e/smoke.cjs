@@ -1,4 +1,4 @@
-// SMOKE TEST: every page loads for its role, guests and other roles are kept out, exports download.
+// SMOKE TEST: every page loads for its role without contacting another server, guests and other roles are kept out, exports download.
 // Read-only: it signs in as the demo accounts and never changes data. Run it against the seeded demo database:
 //   node .agents/skills/playwright-skill/run.js tests/e2e/smoke.cjs
 const fs = require('node:fs');
@@ -25,6 +25,13 @@ const ids = JSON.parse(tinker(`
     ]);`));
 const results = [];
 const record = (area, name, ok, detail = '') => { results.push({ area, name, ok, detail }); console.log(`${ok ? 'PASS' : 'FAIL'}  [${area}] ${name}${detail ? '  — ' + detail : ''}`); };
+
+// SEC-05: a page must never make the browser contact another server (fonts, scripts, styles or anything they load).
+const OWN_HOST = new URL(BASE).host;
+const watchOutsideRequests = (page, hosts) => page.on('request', r => {
+    const url = new URL(r.url());
+    if (/^https?:$/.test(url.protocol) && url.host !== OWN_HOST) hosts.add(url.host);
+});
 
 const PAGES = {
     admin: ['/admin/dashboard', '/students', '/admin/addStudent', `/admin/view/student/${ids.studentId}`, `/admin/students/${ids.studentId}/edit`,
@@ -62,6 +69,14 @@ async function signIn(browser, role) {
     }
     const root = await guest.request.get(BASE + '/', { maxRedirects: 0 });
     record('public', 'GET / sends guests to /login', root.status() === 302 && (root.headers().location || '').endsWith('/login'), `HTTP ${root.status()} → ${root.headers().location}`);
+    const guestPage = await guest.newPage();
+    for (const url of ['/login', '/password/reset']) {
+        const outside = new Set();
+        watchOutsideRequests(guestPage, outside);
+        await guestPage.goto(BASE + url, { waitUntil: 'networkidle' });
+        guestPage.removeAllListeners('request');
+        record('public', `${url} contacts no other server`, outside.size === 0, [...outside].join(', '));
+    }
 
     // 2. Guests are sent to /login from every protected page.
     const allPages = [...new Set(Object.values(PAGES).flat()), '/dashboard'];
@@ -79,6 +94,8 @@ async function signIn(browser, role) {
         const { context, page } = await signIn(browser, role);
         const consoleErrors = [];
         const badResponses = [];
+        const outside = new Set();
+        watchOutsideRequests(page, outside);
         page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()); });
         page.on('pageerror', e => consoleErrors.push(e.message));
         page.on('response', r => { if (r.status() >= 400 && r.url().startsWith(BASE)) badResponses.push(`${r.status()} ${r.url()}`); });
@@ -87,8 +104,8 @@ async function signIn(browser, role) {
         record(role, '/dashboard sends the role to its own dashboard', (dash.headers().location || '').endsWith(DASHBOARD[role]), dash.headers().location);
 
         for (const url of urls) {
-            consoleErrors.length = 0; badResponses.length = 0;
-            const response = await page.goto(BASE + url, { waitUntil: 'load' });
+            consoleErrors.length = 0; badResponses.length = 0; outside.clear();
+            const response = await page.goto(BASE + url, { waitUntil: 'networkidle' });
             const status = response.status();
             const info = await page.evaluate(() => ({
                 h1: [...document.querySelectorAll('h1')].map(h => h.textContent.trim()),
@@ -103,6 +120,7 @@ async function signIn(browser, role) {
             if (!info.main) problems.push('no <main>');
             if (consoleErrors.length) problems.push(`console: ${consoleErrors[0].slice(0, 80)}`);
             if (badResponses.length) problems.push(`requests: ${badResponses[0]}`);
+            if (outside.size) problems.push(`contacted another server: ${[...outside].join(', ')}`);
             record(role, `GET ${url}`, problems.length === 0, problems.join('; ') || `"${info.h1[0]}"`);
         }
 

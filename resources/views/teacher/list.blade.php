@@ -1,6 +1,7 @@
 @extends('adminlte::page')
 
 @section('title', 'Teachers')
+@section('plugins.Datatables', true)
 
 @section('content_header')
     <x-page-header title="Teachers">
@@ -28,7 +29,7 @@
                         @foreach ($teachers as $teacher)
                             <tr>
                                 <td data-order="{{ $teacher->full_name }}">
-                                    <button type="button" class="btn btn-link p-0 align-baseline view-button" data-url="{{ route('admin.teachers.show', $teacher) }}">{{ $teacher->full_name }}</button>
+                                    <button type="button" class="btn btn-link p-0 align-baseline text-left view-button" data-url="{{ route('admin.teachers.show', $teacher) }}">{{ $teacher->full_name }}</button>
                                     @unless ($teacher->login?->is_active)
                                         <span class="badge badge-secondary ml-1">Inactive</span>
                                     @endunless
@@ -81,7 +82,7 @@
 @section('js')
     <script>
         $(function () {
-            $('#teacherList').DataTable({ responsive: true, columnDefs: [{ targets: -1, orderable: false }] });
+            $('#teacherList').DataTable({ columnDefs: [{ targets: -1, orderable: false }] });
 
             const escape = (text) => $('<div>').text(text ?? '').html();
 

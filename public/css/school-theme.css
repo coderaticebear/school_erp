@@ -585,6 +585,13 @@ label:not(.form-check-label):not(.custom-file-label):not(.btn) {
     border-color: var(--erp-ink);
 }
 
+/* DataTables (Students and Teachers lists) only switches to dark colours on a .dark class; follow our tokens instead. */
+:root {
+    --dt-order-arrow_color: var(--erp-text-2);
+    --dt-order-arrow_color-current: var(--erp-text);
+    --dt-order-header_outline-hover: 2px solid var(--erp-line);
+}
+
 /* ---------- Badges: status is tinted text, never a loud fill ---------- */
 
 .badge {
