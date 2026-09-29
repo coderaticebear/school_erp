@@ -46,6 +46,15 @@ test('the school name and crest appear in the sidebar and on sign-in', function 
         ->assertSee('class="main-sidebar sidebar-light-primary', false);
 });
 
+test('the sidebar logo links to the role-aware dashboard', function () {
+    AcademicYear::factory()->active()->create();
+    actingAsRole(Login::ROLE_ADMIN);
+
+    $this->get('/admin/dashboard')
+        ->assertSee('href="'.url('dashboard').'"', false)
+        ->assertDontSee('href="'.url('home').'"', false);
+});
+
 test('a subject keeps the same colour everywhere', function () {
     $subject = Subjects::factory()->create();
 

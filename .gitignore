@@ -27,3 +27,6 @@ Thumbs.db
 /.claude/skills/playwright-skill
 /.agents/
 /.claude/skills/apple-design
+
+# Personal Claude Code permissions (kept local, not shared with the team)
+/.claude/settings.json
