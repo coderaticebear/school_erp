@@ -23,6 +23,14 @@ services:
             - sail
         depends_on:
             - pgsql
+            - mailpit
+    mailpit:
+        # Local inbox for the app's emails (http://localhost:8025), so reset links never go to the log.
+        image: 'axllent/mailpit:v1.31.3'
+        ports:
+            - '127.0.0.1:${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+        networks:
+            - sail
     pgadmin:
         image: dpage/pgadmin4:latest
         ports:

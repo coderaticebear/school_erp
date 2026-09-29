@@ -10,12 +10,12 @@ Laravel 12 (PHP 8.2+), PostgreSQL, run through Laravel Sail (Docker). The UI is 
 
 ## Commands
 
-The app runs inside Sail containers (`compose.yaml`: `laravel.test`, `pgsql` on Postgres 18, `pgadmin` on port 5050). Put `./vendor/bin/sail` in front of `artisan` or `composer` commands so they reach the containerized database.
+The app runs inside Sail containers (`compose.yaml`: `laravel.test`, `pgsql` on Postgres 18, `pgadmin` on port 5050, `mailpit` on 127.0.0.1:8025). Put `./vendor/bin/sail` in front of `artisan` or `composer` commands so they reach the containerized database.
 
 ```bash
 ./vendor/bin/sail up -d                 # start containers (app on APP_PORT, default 80)
 ./vendor/bin/sail down
-./vendor/bin/sail artisan db:provision-roles school testing          # create/refresh the DB roles (safe to re-run)
+./vendor/bin/sail artisan db:provision-roles school_erp testing      # create/refresh the DB roles (safe to re-run)
 ./vendor/bin/sail artisan migrate --database=pgsql_migrations --seed
 ./vendor/bin/sail artisan migrate:fresh --database=pgsql_migrations --seed   # rebuild DB with demo data
 ./vendor/bin/sail npm run dev           # Vite: no page uses it now; styling is AdminLTE + public/css/school-theme.css
@@ -123,6 +123,8 @@ The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
 
 **Never keep password fields in the session.** Failed forms send their input back through the session, which is stored in the `sessions` table. Laravel already leaves out `password`, `password_confirmation` and `current_password`. Add any other password-type field (e.g. `parent_password`) to `$exceptions->dontFlash()` in `bootstrap/app.php`. Never call a bare `back()->withInput()`; pass `$request->except([...password fields])` instead (see `StudentController::PASSWORD_FIELDS`). Tests: `expectSessionWithoutPasswords()` in `StudentManagementTest`.
 
+**Never let personal data reach the logs (SEC-04).** PostgreSQL error messages repeat the rejected row (`Failing row contains (…)`, `Key (…)=(…)`), and Laravel's `QueryException` repeats the SQL with every value filled in. Every log channel in `config/logging.php` taps `App\Logging\RedactPersonalData`, which wraps the channel's formatter in `RedactingFormatter` and masks those, email addresses and password-reset tokens before a line is written. Give any new channel the same `tap`; `LogRedactionTest` fails otherwise. Logs are daily files kept `LOG_DAILY_DAYS` (14). `db:provision-roles` sets `log_error_verbosity = terse` on each database so the server log leaves out row values too. Local email goes to Mailpit (http://localhost:8025); never use the `log` mailer outside local development.
+
 ### Seeding and demo logins
 `DatabaseSeeder` uses model factories in `database/factories` (for example `Login::factory()->admin()`). It creates a single active `2025-2026` academic year, then classes and divisions, teachers, parents and students. It then calls `LoginSeeder`, which creates demo accounts with full profiles. Their password is `password`: `admin@example.com`, `teacher@example.com`, `student@example.com` (enrolled), and `parent@example.com` (the demo student's parent).
 
@@ -144,7 +146,7 @@ The app never connects as a superuser. There are three logins:
 - **`DB_MIGRATION_USERNAME` (`school_owner`)** owns the database and every table and runs migrations: always pass `--database=pgsql_migrations` to `migrate`/`migrate:fresh`/`migrate:rollback`. A plain `migrate` runs as the app role and fails with a permission error. `tests/TestCase.php` rebuilds the test schema through this connection.
 - **`DB_ADMIN_USERNAME` (Sail's `sail` superuser)** is used only by `php artisan db:provision-roles [databases…]`. The command creates or updates both roles, hands every existing object to the owner, grants the app row access (plus default privileges for future tables) and then signs in as each role to check it. `compose.yaml` creates the superuser from `DB_ADMIN_*`, never from `DB_USERNAME`.
 
-After a fresh clone or a new database volume: `sail up -d`, then `sail artisan db:provision-roles school testing`, then migrate as above. In production, give the app only `DB_USERNAME`/`DB_PASSWORD`; the migration and admin credentials belong to the deploy step.
+After a fresh clone or a new database volume: `sail up -d`, then `sail artisan db:provision-roles school_erp testing`, then migrate as above. In production, give the app only `DB_USERNAME`/`DB_PASSWORD`; the migration and admin credentials belong to the deploy step.
 
 ## PostgreSQL notes
 Differences from MySQL that cause real bugs here:
