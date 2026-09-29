@@ -1,5 +1,6 @@
 <?php
 
+use App\Logging\RedactPersonalData;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -48,18 +49,22 @@ return [
     | Available drivers: "single", "daily", "slack", "syslog",
     |                    "errorlog", "monolog", "custom", "stack"
     |
+    | Every channel that writes somewhere taps RedactPersonalData, which masks
+    | personal data (database rows, emails, reset links) before it is written.
+    |
     */
 
     'channels' => [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'channels' => explode(',', (string) env('LOG_STACK', 'daily')),
             'ignore_exceptions' => false,
         ],
 
         'single' => [
             'driver' => 'single',
+            'tap' => [RedactPersonalData::class],
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
@@ -67,6 +72,7 @@ return [
 
         'daily' => [
             'driver' => 'daily',
+            'tap' => [RedactPersonalData::class],
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => env('LOG_DAILY_DAYS', 14),
@@ -75,6 +81,7 @@ return [
 
         'slack' => [
             'driver' => 'slack',
+            'tap' => [RedactPersonalData::class],
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
             'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
@@ -84,6 +91,7 @@ return [
 
         'papertrail' => [
             'driver' => 'monolog',
+            'tap' => [RedactPersonalData::class],
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
             'handler_with' => [
@@ -96,6 +104,7 @@ return [
 
         'stderr' => [
             'driver' => 'monolog',
+            'tap' => [RedactPersonalData::class],
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => StreamHandler::class,
             'handler_with' => [
@@ -107,6 +116,7 @@ return [
 
         'syslog' => [
             'driver' => 'syslog',
+            'tap' => [RedactPersonalData::class],
             'level' => env('LOG_LEVEL', 'debug'),
             'facility' => env('LOG_SYSLOG_FACILITY', LOG_USER),
             'replace_placeholders' => true,
@@ -114,6 +124,7 @@ return [
 
         'errorlog' => [
             'driver' => 'errorlog',
+            'tap' => [RedactPersonalData::class],
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],

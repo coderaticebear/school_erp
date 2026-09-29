@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
+
 test('provisioning sets up both roles and passes its own privilege check', function () {
     $database = config('database.connections.pgsql.database');
 
@@ -7,6 +9,20 @@ test('provisioning sets up both roles and passes its own privilege check', funct
         ->expectsOutputToContain('The app role can only read and write rows')
         ->doesntExpectOutputToContain('WRONG')
         ->assertSuccessful();
+});
+
+test('provisioning keeps row values out of the database server log', function () {
+    $database = config('database.connections.pgsql.database');
+    DB::connection('pgsql_admin')->statement("ALTER DATABASE \"{$database}\" RESET log_error_verbosity");
+
+    $this->artisan('db:provision-roles', ['databases' => [$database]])->assertSuccessful();
+
+    // Database settings apply from the next sign-in, so ask through a fresh connection.
+    config(['database.connections.probe' => config('database.connections.pgsql')]);
+    $verbosity = DB::connection('probe')->selectOne("select current_setting('log_error_verbosity') as value")->value;
+    DB::purge('probe');
+
+    expect($verbosity)->toBe('terse');
 });
 
 test('provisioning can run again without changing the outcome', function () {

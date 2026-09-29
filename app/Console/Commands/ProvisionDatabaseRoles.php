@@ -133,6 +133,9 @@ class ProvisionDatabaseRoles extends Command
         $connection->statement("REVOKE ALL ON DATABASE {$db} FROM PUBLIC");
         $connection->statement("GRANT CONNECT ON DATABASE {$db} TO {$a}");
 
+        // Keep row values out of the server log: the DETAIL of a constraint error repeats the whole row.
+        $connection->statement("ALTER DATABASE {$db} SET log_error_verbosity = 'terse'");
+
         // Sequences created by serial or identity columns follow their table, so they are skipped here.
         $relations = $connection->select(<<<'SQL'
             select c.relname as name, c.relkind as kind
@@ -189,7 +192,8 @@ class ProvisionDatabaseRoles extends Command
             foreach (['pgsql' => false, 'pgsql_migrations' => true] as $connectionName => $mayChangeSchema) {
                 $role = $this->connectionTo($connectionName, $database)->selectOne(<<<'SQL'
                     select current_user as name, r.rolsuper, r.rolcreaterole, r.rolcreatedb, r.rolbypassrls,
-                           has_schema_privilege('public', 'CREATE') as can_change_schema
+                           has_schema_privilege('public', 'CREATE') as can_change_schema,
+                           current_setting('log_error_verbosity') as log_error_verbosity
                     from pg_roles r
                     where r.rolname = current_user
                     SQL);
@@ -197,7 +201,8 @@ class ProvisionDatabaseRoles extends Command
                 DB::purge('provision_target');
 
                 $ok = ! $role->rolsuper && ! $role->rolcreaterole && ! $role->rolcreatedb && ! $role->rolbypassrls
-                    && $role->can_change_schema === $mayChangeSchema;
+                    && $role->can_change_schema === $mayChangeSchema
+                    && $role->log_error_verbosity === 'terse';
                 $passed = $passed && $ok;
 
                 $rows[] = [
@@ -207,15 +212,16 @@ class ProvisionDatabaseRoles extends Command
                     $role->rolcreaterole || $role->rolcreatedb ? 'yes' : 'no',
                     $role->rolbypassrls ? 'yes' : 'no',
                     $role->can_change_schema ? 'yes' : 'no',
+                    $role->log_error_verbosity,
                     $ok ? 'OK' : 'WRONG',
                 ];
             }
         }
 
-        $this->table(['Database', 'Role', 'Superuser', 'Create roles/DBs', 'Bypass RLS', 'Change schema', 'Check'], $rows);
+        $this->table(['Database', 'Role', 'Superuser', 'Create roles/DBs', 'Bypass RLS', 'Change schema', 'Error log detail', 'Check'], $rows);
 
         $passed
-            ? $this->components->info('The app role can only read and write rows; only the owner role can change the schema.')
+            ? $this->components->info('The app role can only read and write rows; only the owner role can change the schema; the server log leaves out row values.')
             : $this->components->error('A role has more (or fewer) privileges than it should. See the table above.');
 
         return $passed;
