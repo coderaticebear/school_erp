@@ -111,6 +111,7 @@ The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
 - **Small checkboxes/radios** in tables go inside `<label class="hit-target">` (32px click target).
 - The AdminLTE preloader is off (`config/adminlte.php`).
 - **Identity (Step D):** `SCHOOL_NAME` (and optional `SCHOOL_INITIALS`) in `.env` feeds `config('school.name')`, `App\Services\SchoolIdentity`, the `<x-crest>` shield, the serif wordmark and page titles. The serif (Source Serif 4) is used **only** for the school's name; everything else is Source Sans 3.
+- **No outside servers (SEC-05):** a page must never make the browser contact another server, because every request hands a third party the visitor's (often a child's) IP address. The fonts are self-hosted in `public/vendor/fonts` (`fonts.css`, OFL licences) and DataTables 3 in `public/vendor/datatables`. DataTables is off by default; a page that needs it adds `@section('plugins.Datatables', true)` (only the Students and Teachers lists do). Never add a CDN, Google Fonts or any other outside URL: download the files into `public/vendor` instead. `SelfHostedAssetsTest` and `smoke.cjs` fail otherwise. DataTables' dark colours follow our tokens through the `--dt-*` variables in `school-theme.css`.
 - **Tokens:** `public/css/school-theme.css` defines them as CSS variables (`--erp-ink` #1f3b73 for primary actions and the current page, `--erp-page`, `--erp-line`, `--erp-good/attention/problem` with tints). Status colours are for status only, as tinted badges (`badge-success/warning/danger/secondary`). Never use solid green, yellow or red action buttons. The sidebar is AdminLTE's `sidebar-light-primary`.
 - **Dashboards** use `.stat-card` (`.stat-label`, `.stat-value`, `.stat-context`), not AdminLTE small-boxes or info-boxes.
 - **Subjects** always appear in their colour: `<x-subject-chip :subject="$s" />` (or `plain` for dot plus name in tables). `TimetableGrid::colorFor()` / `dotFor()` give the classes, keyed by subject id.
@@ -134,7 +135,7 @@ Pest feature tests use `RefreshDatabase` against the `testing` Postgres database
 ### Browser tests (tests/e2e)
 Playwright scripts that drive the running app through Sail at `http://localhost` (set `TARGET_URL` to change it). They run through the playwright-skill runner (`./install-skills.sh` restores it) and are `.cjs` because `package.json` is `"type": "module"`:
 ```bash
-node .agents/skills/playwright-skill/run.js tests/e2e/smoke.cjs          # read-only: every page per role, 403s across roles, CSV exports
+node .agents/skills/playwright-skill/run.js tests/e2e/smoke.cjs          # read-only: every page per role (and no outside servers), 403s across roles, CSV exports
 node .agents/skills/playwright-skill/run.js tests/e2e/browser-suite.cjs  # JS interactions, phone layouts; changes some demo data
 node .agents/skills/playwright-skill/run.js tests/e2e/functional.cjs     # full school lifecycle through the UI; writes QA records, run once per database
 ```

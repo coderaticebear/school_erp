@@ -262,7 +262,7 @@ async function flash(page) {
 
     await step('FT-08 the student profile and list show the new student', admin, async () => {
         await admin.goto(`${BASE}/students`);
-        await admin.fill('#studentList_filter input', Q.studentFirst);
+        await admin.fill('input[type=search][aria-controls=studentList]', Q.studentFirst);
         expect((await admin.locator('#studentList tbody').innerText()).includes(Q.studentLast), 'not found with the list search (apostrophe name)');
         await admin.goto(`${BASE}/admin/view/student/${Q.studentId}`);
         const text = await admin.textContent('main');

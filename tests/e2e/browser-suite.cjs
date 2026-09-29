@@ -156,7 +156,7 @@ const alertText = page => page.locator('.alert').first().innerText().catch(() =>
 
     await check('Teachers: table search filters rows', async () => {
         await page.goto(`${BASE}/teachers`);
-        const search = page.locator('#teacherList_filter input');
+        const search = page.locator('input[type=search][aria-controls=teacherList]');
         await search.waitFor();
         const before = await page.locator('#teacherList tbody tr').count();
         await search.fill('Demo');
