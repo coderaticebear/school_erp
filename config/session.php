@@ -45,9 +45,13 @@ return [
     | should be encrypted before it's stored. All encryption is performed
     | automatically by Laravel and you may use the session like normal.
     |
+    | On by default (SEC-09): the payload holds refilled form input, such as
+    | a child's name and address, and must not be readable from a database
+    | copy. Expired sessions are deleted hourly by `sessions:prune`.
+    |
     */
 
-    'encrypt' => env('SESSION_ENCRYPT', false),
+    'encrypt' => env('SESSION_ENCRYPT', true),
 
     /*
     |--------------------------------------------------------------------------
