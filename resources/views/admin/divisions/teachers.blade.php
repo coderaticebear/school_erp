@@ -67,7 +67,7 @@
 @stop
 
 @section('js')
-    <script>
+    <script nonce="{{ Vite::cspNonce() }}">
         $(function () {
             // A class teacher must also teach the division.
             $('.class-teacher').on('change', function () {

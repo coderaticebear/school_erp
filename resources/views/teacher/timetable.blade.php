@@ -4,7 +4,7 @@
 @section('content_header')
     <x-page-header title="My Timetable">
         @if ($grid)
-            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
+            <button type="button" class="btn btn-outline-secondary" data-print><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
         @endif
     </x-page-header>
 @stop

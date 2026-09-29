@@ -24,7 +24,7 @@
 
 @once
     @push('js')
-        <script>
+        <script nonce="{{ Vite::cspNonce() }}">
             (function () {
                 let pending = null;
 

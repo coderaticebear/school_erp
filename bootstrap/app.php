@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
         ]);
+
+        // Security headers and the CSP nonce on every response, error pages included (SEC-10).
+        $middleware->append(SecurityHeaders::class);
 
         // Check the role before route-model binding, so other roles get 403 (not 404) on admin URLs.
         $middleware->prependToPriorityList(

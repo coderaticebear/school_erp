@@ -49,7 +49,7 @@
 
 @once
     @push('js')
-        <script>
+        <script nonce="{{ Vite::cspNonce() }}">
             // Day picker: switch panels, with arrow-key support between tabs.
             document.addEventListener('click', function (event) {
                 const tab = event.target.closest('.timetable-day-tab');

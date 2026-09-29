@@ -75,6 +75,8 @@ php artisan create-admin principal@your-school.org
 
 It prints a generated password once. Pass it to the admin securely.
 
+Serve the app over HTTPS only: in production the session cookie is marked secure and the app sends `Strict-Transport-Security`, so sign-in won't work over plain HTTP. Set `expose_php = Off` in `php.ini` as well.
+
 The server also needs Laravel's scheduler, which deletes expired sessions every hour:
 
 ```bash

@@ -5,7 +5,7 @@
     <x-page-header title="Exam Report">
         @if ($exam)
             <a href="{{ route('admin.reports.exams', ['exam' => $exam->id, 'format' => 'csv']) }}" class="btn btn-outline-secondary"><i class="fas fa-file-export mr-1" aria-hidden="true"></i> Export</a>
-            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
+            <button type="button" class="btn btn-outline-secondary" data-print><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
         @endif
     </x-page-header>
 @stop
@@ -16,7 +16,7 @@
     @else
         <form method="get" class="form-inline mb-3 no-print">
             <label class="mr-2" for="exam">Exam</label>
-            <select name="exam" id="exam" class="custom-select" onchange="this.form.submit()">
+            <select name="exam" id="exam" class="custom-select" data-auto-submit>
                 @foreach ($exams as $option)
                     <option value="{{ $option->id }}" @selected($option->id === $exam->id)>{{ $option->name }}{{ $option->isPublished() ? '' : ' (draft)' }}</option>
                 @endforeach

@@ -33,7 +33,7 @@
             <div class="card-header">
                 <form method="get" class="form-inline">
                     <label class="mr-2" for="month">Month</label>
-                    <select name="month" id="month" class="custom-select custom-select-sm" onchange="this.form.submit()">
+                    <select name="month" id="month" class="custom-select custom-select-sm" data-auto-submit>
                         <option value="">All of {{ $academicYear->year }}</option>
                         @foreach ($months as $value)
                             <option value="{{ $value }}" @selected($month === $value)>{{ $monthLabel($value) }}</option>

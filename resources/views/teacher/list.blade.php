@@ -80,7 +80,7 @@
 @stop
 
 @section('js')
-    <script>
+    <script nonce="{{ Vite::cspNonce() }}">
         $(function () {
             $('#teacherList').DataTable({ columnDefs: [{ targets: -1, orderable: false }] });
 

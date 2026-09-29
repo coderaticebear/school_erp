@@ -15,7 +15,7 @@
     @else
         <form method="get" action="{{ route('marks.index') }}" class="form-inline mb-3">
             <label class="mr-2" for="exam">Exam</label>
-            <select name="exam" id="exam" class="custom-select" onchange="this.form.submit()">
+            <select name="exam" id="exam" class="custom-select" data-auto-submit>
                 @foreach ($exams as $option)
                     <option value="{{ $option->id }}" @selected($option->id === $exam->id)>{{ $option->name }}</option>
                 @endforeach
