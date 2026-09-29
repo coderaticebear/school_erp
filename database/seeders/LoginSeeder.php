@@ -10,14 +10,13 @@ use App\Models\StudentClass;
 use App\Models\Students;
 use App\Models\Subjects;
 use App\Models\Teachers;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 /**
  * Demo accounts with known credentials (password: "password") for local testing.
  * Each non-admin account has a matching profile so its portal pages work.
  */
-class LoginSeeder extends Seeder
+class LoginSeeder extends DemoSeeder
 {
     public function run(): void
     {

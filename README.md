@@ -67,6 +67,14 @@ The seeder creates demo data (classes, teachers, students, a published timetable
 | Student | student@example.com |
 | Parent | parent@example.com (parent of the demo student) |
 
+These accounts are for local development only. The seeders refuse to run when `APP_ENV=production`. On a real server, create the first admin with:
+
+```bash
+php artisan create-admin principal@your-school.org
+```
+
+It prints a generated password once. Pass it to the admin securely.
+
 ### School settings
 
 Set these in `.env` (defaults in `config/school.php`):

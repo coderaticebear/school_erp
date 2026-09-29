@@ -129,6 +129,8 @@ The app passes the axe WCAG 2.2 AA checks on every page. Keep it that way:
 ### Seeding and demo logins
 `DatabaseSeeder` uses model factories in `database/factories` (for example `Login::factory()->admin()`). It creates a single active `2025-2026` academic year, then classes and divisions, teachers, parents and students. It then calls `LoginSeeder`, which creates demo accounts with full profiles. Their password is `password`: `admin@example.com`, `teacher@example.com`, `student@example.com` (enrolled), and `parent@example.com` (the demo student's parent).
 
+**Demo seeders never run in production (SEC-07).** `DatabaseSeeder`, `LoginSeeder` and `DemoActivitySeeder` extend `Database\Seeders\DemoSeeder`, which throws when `APP_ENV=production` however the seeder is started (`db:seed`, `migrate --seed`, `--force`), so a deploy that seeds by mistake fails instead of creating known-password accounts. Any new seeder that creates demo data or accounts must extend `DemoSeeder` too. On a real server, create admins with `php artisan create-admin {email}`, which prints a generated password once.
+
 ### Tests
 Pest feature tests use `RefreshDatabase` against the `testing` Postgres database. `actingAsRole(Login::ROLE_X)` in `tests/Pest.php` creates and logs in a user with that role, including their teacher, student or parent profile. Tests that depend on "today" pin the clock with `Carbon::setTestNow()`.
 
