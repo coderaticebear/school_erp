@@ -11,9 +11,8 @@ use App\Models\StudentClass;
 use App\Models\Students;
 use App\Models\Subjects;
 use App\Models\Teachers;
-use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class DatabaseSeeder extends DemoSeeder
 {
     /**
      * @var list<string>

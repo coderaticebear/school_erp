@@ -10,10 +10,9 @@ use App\Models\Login;
 use App\Models\Mark;
 use App\Models\StudentClass;
 use App\Services\TimetableGenerator;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
-class DemoActivitySeeder extends Seeder
+class DemoActivitySeeder extends DemoSeeder
 {
     public function run(TimetableGenerator $generator): void
     {
