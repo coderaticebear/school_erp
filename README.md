@@ -75,6 +75,12 @@ php artisan create-admin principal@your-school.org
 
 It prints a generated password once. Pass it to the admin securely.
 
+The server also needs Laravel's scheduler, which deletes expired sessions every hour:
+
+```bash
+* * * * * cd /path/to/school_erp && php artisan schedule:run >> /dev/null 2>&1
+```
+
 ### School settings
 
 Set these in `.env` (defaults in `config/school.php`):
