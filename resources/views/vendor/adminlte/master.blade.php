@@ -124,6 +124,9 @@
     {{-- Extra Configured Plugins Scripts --}}
     @include('adminlte::plugins', ['type' => 'js'])
 
+    {{-- Shared behaviour for data-print, data-auto-submit and data-submit-form (inline handlers are blocked by the CSP) --}}
+    <script src="{{ asset('js/school.js') }}?v={{ @filemtime(public_path('js/school.js')) }}"></script>
+
     {{-- Livewire Script --}}
     @if(config('adminlte.livewire'))
         @if(intval(app()->version()) >= 7)

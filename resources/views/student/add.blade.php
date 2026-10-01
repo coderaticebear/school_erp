@@ -210,7 +210,7 @@
 @stop
 
 @section('js')
-    <script>
+    <script nonce="{{ Vite::cspNonce() }}">
         $(function () {
             const $status = $('#parent-lookup-status');
             const escape = (text) => $('<div>').text(text ?? '').html();

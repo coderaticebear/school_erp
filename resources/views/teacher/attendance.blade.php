@@ -19,13 +19,13 @@
                     <div class="card-header">
                         <form method="get" action="{{ route('teacher.attendance') }}" class="form-inline">
                             <label class="mr-2" for="division">Division</label>
-                            <select name="division" id="division" class="custom-select mr-3" onchange="this.form.submit()">
+                            <select name="division" id="division" class="custom-select mr-3" data-auto-submit>
                                 @foreach ($divisions as $option)
                                     <option value="{{ $option->id }}" @selected($option->id === $division->id)>{{ $option->label }}</option>
                                 @endforeach
                             </select>
                             <label class="mr-2" for="date">Date</label>
-                            <input type="date" name="date" id="date" class="form-control" value="{{ $date->toDateString() }}" max="{{ now()->toDateString() }}" onchange="this.form.submit()">
+                            <input type="date" name="date" id="date" class="form-control" value="{{ $date->toDateString() }}" max="{{ now()->toDateString() }}" data-auto-submit>
                         </form>
                     </div>
 
@@ -105,7 +105,7 @@
 @stop
 
 @section('js')
-    <script>
+    <script nonce="{{ Vite::cspNonce() }}">
         $(function () {
             const labels = { present: 'present', late: 'late', absent: 'absent', excused: 'excused' };
 

@@ -4,7 +4,7 @@
 @section('content_header')
     <x-page-header title="Attendance Report">
         <a href="{{ request()->fullUrlWithQuery(['format' => 'csv']) }}" class="btn btn-outline-secondary"><i class="fas fa-file-export mr-1" aria-hidden="true"></i> Export Students</a>
-        <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
+        <button type="button" class="btn btn-outline-secondary" data-print><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
     </x-page-header>
 @stop
 

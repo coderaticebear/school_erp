@@ -29,7 +29,7 @@
                     <i class="fas fa-file-export mr-1" aria-hidden="true"></i> Export
                 </a>
             @endif
-            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
+            <button type="button" class="btn btn-outline-secondary" data-print><i class="fas fa-print mr-1" aria-hidden="true"></i> Print</button>
         @endif
     </x-page-header>
 @stop
@@ -77,7 +77,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="division-select">Division</label>
-                                    <select class="custom-select" id="division-select" name="division" onchange="this.form.teacher.value=''; this.form.submit()">
+                                    <select class="custom-select" id="division-select" name="division" data-auto-submit data-clears="teacher">
                                         @foreach ($divisions as $option)
                                             <option value="{{ $option->id }}" @selected($division?->id === $option->id)>{{ $option->label }}</option>
                                         @endforeach
@@ -87,7 +87,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="teacher-select">Teacher</label>
-                                    <select class="custom-select" id="teacher-select" name="teacher" onchange="this.form.division.disabled = this.value !== ''; this.form.submit()">
+                                    <select class="custom-select" id="teacher-select" name="teacher" data-auto-submit data-disables-when-chosen="division">
                                         <option value="">— Show a division —</option>
                                         @foreach ($teachers as $option)
                                             <option value="{{ $option->id }}" @selected($teacher?->id === $option->id)>{{ $option->full_name }}</option>
@@ -237,7 +237,7 @@
 
 @if ($division && $editOptions)
     @section('js')
-        <script>
+        <script nonce="{{ Vite::cspNonce() }}">
             $(function () {
                 const options = @json($editOptions);
                 const bySubject = Object.fromEntries(options.subjects.map(s => [s.id, s.teachers]));
