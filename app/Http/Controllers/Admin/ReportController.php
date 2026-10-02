@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\Divisions;
 use App\Models\Exam;
+use App\Services\CsvExport;
 use App\Services\SchoolReports;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -30,7 +31,7 @@ class ReportController extends Controller
         $byStudent = $academicYear ? $this->reports->attendanceByStudent($academicYear, $from, $to, $division) : collect();
 
         if ($request->query('format') === 'csv') {
-            return $this->csv('attendance-'.$from->toDateString().'-to-'.$to->toDateString().'.csv',
+            return CsvExport::download('attendance-'.$from->toDateString().'-to-'.$to->toDateString().'.csv',
                 ['Student', 'Division', 'Present', 'Late', 'Absent', 'Excused', 'Days', 'Percent'],
                 $byStudent->map(fn ($row) => [
                     $row['student']->first_name.' '.$row['student']->last_name, $row['division']?->label,
@@ -56,7 +57,7 @@ class ReportController extends Controller
         $bySubject = $exam ? $this->reports->examBySubject($exam) : collect();
 
         if ($exam && $request->query('format') === 'csv') {
-            return $this->csv('exam-report-'.str($exam->name)->slug().'.csv',
+            return CsvExport::download('exam-report-'.str($exam->name)->slug().'.csv',
                 ['Division', 'Students', 'Complete', 'Passed', 'Pass rate', 'Average %', 'Top student'],
                 $byDivision->map(fn ($row) => [
                     $row['division']->label, $row['students'], $row['complete'], $row['passed'], $row['pass_rate'], $row['average'],
@@ -84,21 +85,5 @@ class ReportController extends Controller
         $to = $parse($request->query('to'), now()->startOfDay());
 
         return $from->greaterThan($to) ? [$to, $from] : [$from, $to];
-    }
-
-    /**
-     * @param  list<string>  $header
-     * @param  iterable<int, list<mixed>>  $rows
-     */
-    protected function csv(string $filename, array $header, iterable $rows): StreamedResponse
-    {
-        return response()->streamDownload(function () use ($header, $rows) {
-            $out = fopen('php://output', 'w');
-            fputcsv($out, $header);
-            foreach ($rows as $row) {
-                fputcsv($out, $row);
-            }
-            fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
     }
 }

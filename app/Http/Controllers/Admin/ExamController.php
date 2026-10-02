@@ -10,6 +10,7 @@ use App\Models\Exam;
 use App\Models\Mark;
 use App\Models\StudentClass;
 use App\Models\Students;
+use App\Services\CsvExport;
 use App\Services\ExamResults;
 use App\Services\TimetableGenerator;
 use Illuminate\Http\RedirectResponse;
@@ -135,22 +136,19 @@ class ExamController extends Controller
     {
         $filename = 'results-'.str($exam->name)->slug().'-'.str($division->label)->slug().'.csv';
 
-        return response()->streamDownload(function () use ($results) {
-            $out = fopen('php://output', 'w');
-            fputcsv($out, ['Student', ...$results['subjects']->pluck('subject_name'), 'Total', 'Percent', 'Grade', 'Result', 'Rank']);
+        $rows = $results['rows']->map(function (array $row) use ($results) {
+            $cells = [$row['student']->first_name.' '.$row['student']->last_name];
 
-            foreach ($results['rows'] as $row) {
-                $cells = [$row['student']->first_name.' '.$row['student']->last_name];
-
-                foreach ($results['subjects'] as $subject) {
-                    $mark = $row['marks'][$subject->id] ?? null;
-                    $cells[] = $mark ? ($mark->is_absent ? 'AB' : $mark->marks) : '';
-                }
-
-                fputcsv($out, [...$cells, $row['total'], $row['percent'] ?? '', $row['grade'], $row['result'], $row['rank'] ?? '']);
+            foreach ($results['subjects'] as $subject) {
+                $mark = $row['marks'][$subject->id] ?? null;
+                $cells[] = $mark ? ($mark->is_absent ? 'AB' : $mark->marks) : '';
             }
 
-            fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
+            return [...$cells, $row['total'], $row['percent'] ?? '', $row['grade'], $row['result'], $row['rank'] ?? ''];
+        });
+
+        return CsvExport::download($filename,
+            ['Student', ...$results['subjects']->pluck('subject_name'), 'Total', 'Percent', 'Grade', 'Result', 'Rank'],
+            $rows);
     }
 }

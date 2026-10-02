@@ -92,6 +92,7 @@ Controllers for setup data are in `app/Http/Controllers/Admin` (academic years, 
 
 ### Reports and hardening (Phase 6)
 - `App\Services\SchoolReports` powers the admin dashboard and `Admin\ReportController` (attendance by division or student with a `school.low_attendance_percent` flag, exam results by division or subject, CSV export).
+- **Every CSV download goes through `App\Services\CsvExport::download()` (SEC-12).** It puts a `'` in front of text starting with `=`, `+`, `-`, `@`, tab or carriage return, so a name like `=HYPERLINK(…)` can't run as a formula in Excel or Sheets. Never call `fputcsv` directly.
 - `Model::preventLazyLoading()` is on outside production, so an N+1 query throws in dev and tests. Eager-load relations (including `class` whenever you use `Divisions::$label`).
 - Logout is POST only (AdminLTE's user menu). `Login` uses `Notifiable` so password-reset emails send. `Login::$name` feeds the navbar.
 - `tests/Feature/Auth/RouteProtectionTest.php` fails if a new route lacks `auth` plus a `role:` middleware. Add public routes to its list on purpose, never by accident.

