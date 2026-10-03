@@ -28,6 +28,8 @@ The app runs inside Sail containers (`compose.yaml`: `laravel.test`, `pgsql` on 
 
 Tests run against a separate `testing` Postgres database (set in `phpunit.xml`; Sail creates it through the init SQL mounted in `compose.yaml`).
 
+**Dependency audit (SEC-15):** `.github/workflows/audit.yml` runs `composer audit --locked` and `npm audit` on every pull request, on pushes to `main` and every Monday, and fails on any published advisory. Run both through Sail (`sail composer audit`, `sail npm audit`) before opening a PR that changes `composer.lock` or `package-lock.json`.
+
 ## Architecture
 
 ### Auth and roles
