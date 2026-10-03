@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class UpdateStudentRequest extends AdminFormRequest
 {
@@ -27,7 +28,7 @@ class UpdateStudentRequest extends AdminFormRequest
             'country' => ['required', 'string', 'max:255'],
             'postal' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('login', 'email')->ignore($student?->login_id)],
-            'password' => ['nullable', 'string', 'min:8', 'max:255'],
+            'password' => ['nullable', 'string', Password::defaults(), 'max:255'],
         ];
     }
 

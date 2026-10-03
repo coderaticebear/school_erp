@@ -93,7 +93,7 @@
                         <div class="form-group mb-0">
                             <label for="password">Password @include('partials.required')</label>
                             <input type="password" id="password" name="password" @class($field('password')) aria-required="true" autocomplete="new-password" aria-describedby="password-hint">
-                            <small id="password-hint" class="form-text text-muted">At least 8 characters.</small>
+                            <small id="password-hint" class="form-text text-muted">At least 12 characters.</small>
                             @include('partials.field-error', ['name' => 'password'])
                         </div>
                     </div>
@@ -153,7 +153,7 @@
                             <div class="form-group mb-0">
                                 <label for="parent-password">Parent Password @include('partials.required')</label>
                                 <input type="password" id="parent-password" name="parent_password" @class($field('parent_password')) aria-required="true" autocomplete="new-password">
-                                <small class="form-text text-muted">At least 8 characters. The parent uses this to sign in.</small>
+                                <small class="form-text text-muted">At least 12 characters. The parent uses this to sign in.</small>
                                 @include('partials.field-error', ['name' => 'parent_password'])
                             </div>
                         </div>

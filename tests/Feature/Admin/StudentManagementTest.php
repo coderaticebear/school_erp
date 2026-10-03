@@ -36,7 +36,7 @@ function studentPayload(array $overrides = []): array
         'parent_last_name' => 'Varghese',
         'parent_area_code' => '416',
         'parent_phone' => '5551234',
-        'parent_password' => 'parent-pass',
+        'parent_password' => 'parent-pass-1',
         ...$overrides,
     ];
 }
@@ -111,6 +111,8 @@ test('validation errors are returned per field and input is kept', function (arr
     'no division' => [['class_division_id' => ''], 'class_division_id'],
     'unknown division' => [['class_division_id' => 999999], 'class_division_id'],
     'short password' => [['password' => 'short'], 'password'],
+    '11-character password' => [['password' => 'elevenchars'], 'password'],
+    '11-character parent password' => [['parent_password' => 'elevenchars'], 'parent_password'],
     'new parent without name' => [['parent_first_name' => ''], 'parent_first_name'],
     'same email for parent and student' => [['p_email' => 'asha@example.test'], 'p_email'],
     'unknown parent id' => [['parent_id' => 999999], 'parent_id'],
@@ -287,6 +289,7 @@ test('student edit validation', function (array $overrides, string $field) {
 })->with([
     'email of another account' => [['email' => 'taken@example.test'], 'email'],
     'short new password' => [['password' => 'short'], 'password'],
+    '11-character new password' => [['password' => 'elevenchars'], 'password'],
     'missing division' => [['class_division_id' => ''], 'class_division_id'],
     'bad gender' => [['gender' => 'robot'], 'gender'],
 ]);
