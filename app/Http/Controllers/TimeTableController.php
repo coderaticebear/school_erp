@@ -7,9 +7,11 @@ use App\Http\Requests\GenerateTimetableRequest;
 use App\Http\Requests\TimetableEntryRequest;
 use App\Models\AcademicYear;
 use App\Models\Divisions;
+use App\Models\Period;
 use App\Models\Subjects;
 use App\Models\Teachers;
 use App\Models\TimetableEntry;
+use App\Services\CsvExport;
 use App\Services\TimetableGenerator;
 use App\Services\TimetableGrid;
 use Illuminate\Http\RedirectResponse;
@@ -165,23 +167,18 @@ class TimeTableController extends Controller
 
         $filename = 'timetable-'.str($name)->slug().'-'.$academicYear->year.'.csv';
 
-        return response()->streamDownload(function () use ($grid, $describe) {
-            $out = fopen('php://output', 'w');
-            fputcsv($out, ['Period', 'Time', ...array_values($grid['days'])]);
+        $rows = $grid['periods']->map(function (Period $period) use ($grid, $describe) {
+            $row = [$period->label, $period->time_range];
 
-            foreach ($grid['periods'] as $period) {
-                $row = [$period->label, $period->time_range];
-
-                foreach (array_keys($grid['days']) as $day) {
-                    $entry = $grid['cells'][$day][$period->id] ?? null;
-                    $row[] = $period->is_break ? $period->label : ($entry ? $describe($entry) : '');
-                }
-
-                fputcsv($out, $row);
+            foreach (array_keys($grid['days']) as $day) {
+                $entry = $grid['cells'][$day][$period->id] ?? null;
+                $row[] = $period->is_break ? $period->label : ($entry ? $describe($entry) : '');
             }
 
-            fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
+            return $row;
+        });
+
+        return CsvExport::download($filename, ['Period', 'Time', ...array_values($grid['days'])], $rows);
     }
 
     /**

