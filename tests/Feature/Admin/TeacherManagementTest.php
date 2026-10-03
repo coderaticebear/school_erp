@@ -83,6 +83,7 @@ test('teacher validation', function (array $overrides, string $field) {
     'no subjects' => [['subject_ids' => []], 'subject_ids'],
     'unknown subject' => [['subject_ids' => [999999]], 'subject_ids.0'],
     'no password' => [['password' => ''], 'password'],
+    '11-character password' => [['password' => 'elevenchars'], 'password'],
     'bad email' => [['email' => 'not-an-email'], 'email'],
     'no first name' => [['first_name' => ''], 'first_name'],
 ]);

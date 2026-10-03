@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rules\Password;
+
 class StoreStudentRequest extends AdminFormRequest
 {
     protected function prepareForValidation(): void
@@ -35,7 +37,7 @@ class StoreStudentRequest extends AdminFormRequest
             'postal' => ['required', 'string', 'max:255'],
 
             'email' => ['required', 'email', 'max:255', 'unique:login,email'],
-            'password' => ['required', 'string', 'min:8', 'max:255'],
+            'password' => ['required', 'string', Password::defaults(), 'max:255'],
 
             'parent_id' => ['nullable', 'integer', 'exists:parents,id'],
             'parent_first_name' => ['exclude_with:parent_id', 'required', 'string', 'max:255'],
@@ -43,7 +45,7 @@ class StoreStudentRequest extends AdminFormRequest
             'parent_area_code' => ['exclude_with:parent_id', 'required', 'string', 'max:10'],
             'parent_phone' => ['exclude_with:parent_id', 'required', 'string', 'max:10'],
             'p_email' => ['exclude_with:parent_id', 'required', 'email', 'max:255', 'unique:login,email', 'different:email'],
-            'parent_password' => ['exclude_with:parent_id', 'required', 'string', 'min:8', 'max:255'],
+            'parent_password' => ['exclude_with:parent_id', 'required', 'string', Password::defaults(), 'max:255'],
         ];
     }
 

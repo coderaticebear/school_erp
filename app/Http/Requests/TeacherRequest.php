@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class TeacherRequest extends AdminFormRequest
 {
@@ -24,7 +25,7 @@ class TeacherRequest extends AdminFormRequest
             'postal' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('login', 'email')->ignore($teacher?->login_id)],
             // Required when creating; optional when editing (blank keeps the current password).
-            'password' => [$teacher ? 'nullable' : 'required', 'string', 'min:8', 'max:255'],
+            'password' => [$teacher ? 'nullable' : 'required', 'string', Password::defaults(), 'max:255'],
             'subject_ids' => ['required', 'array', 'min:1'],
             'subject_ids.*' => ['integer', 'distinct', 'exists:subjects,id'],
         ];
