@@ -1,0 +1,30 @@
+# Security SEC-15: fail when a PHP or npm dependency has a published vulnerability.
+# Runs on every pull request and push to main, and weekly, because new advisories
+# appear without any change here. It reads only the lock files: no install, no database.
+name: Dependency audit
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1' # Mondays, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Composer audit
+        run: composer audit --locked
+
+      - name: npm audit
+        run: npm audit
