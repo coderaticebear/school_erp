@@ -33,6 +33,17 @@ class ResetPasswordController extends Controller
     protected $redirectTo = '/dashboard';
 
     /**
+     * Security SEC-20: a deactivated account can't use a reset link, even one sent before it was deactivated. It is
+     * treated like an unknown email and gets the wrong-token reply.
+     *
+     * @return array<string, mixed>
+     */
+    protected function credentials(Request $request): array
+    {
+        return [...$request->only('email', 'password', 'password_confirmation', 'token'), 'is_active' => true];
+    }
+
+    /**
      * Security SEC-11: an email with no account gets the same reply as a wrong or expired token, so this form
      * can't be used to check which emails have accounts.
      */

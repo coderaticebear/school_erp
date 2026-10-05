@@ -33,6 +33,17 @@ class ForgotPasswordController extends Controller
     }
 
     /**
+     * Security SEC-20: only active accounts get a reset email. A deactivated one is treated like an unknown email, so
+     * it gets the same reply (SEC-11).
+     *
+     * @return array<string, mixed>
+     */
+    protected function credentials(Request $request): array
+    {
+        return [...$request->only('email'), 'is_active' => true];
+    }
+
+    /**
      * Security SEC-11: an email with no account, or a repeat request inside the throttle window, gets the same
      * reply as a sent link, so this form can't be used to check which emails have accounts.
      */
