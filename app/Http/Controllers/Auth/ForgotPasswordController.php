@@ -25,6 +25,14 @@ class ForgotPasswordController extends Controller
     use SendsPasswordResetEmails;
 
     /**
+     * Security SEC-19: reset-link requests go through the "password-reset" limiter (see AppServiceProvider).
+     */
+    public function __construct()
+    {
+        $this->middleware('throttle:password-reset')->only('sendResetLinkEmail');
+    }
+
+    /**
      * Security SEC-11: an email with no account, or a repeat request inside the throttle window, gets the same
      * reply as a sent link, so this form can't be used to check which emails have accounts.
      */
