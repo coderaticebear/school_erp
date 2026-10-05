@@ -71,7 +71,5 @@ networks:
     sail:
         driver: bridge
 volumes:
-    sail-mysql:
-        driver: local
     sail-pgsql:
         driver: local
