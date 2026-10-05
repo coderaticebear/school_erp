@@ -33,7 +33,7 @@ Tests run against a separate `testing` Postgres database (set in `phpunit.xml`; 
 ## Architecture
 
 ### Auth and roles
-- The authenticatable model is **`App\Models\Login`** (table `login`), not `User`. `config/auth.php` defaults `AUTH_MODEL` to it. `User`/`users` is leftover Laravel scaffolding.
+- The authenticatable model is **`App\Models\Login`** (table `login`), not `User`. `config/auth.php` defaults `AUTH_MODEL` to it. There is no `User` model or `users` table: SEC-24 dropped Laravel's unused scaffolding (model, factory, `RegisterController`, register views). The auth provider and password broker are still *named* `users` in `config/auth.php`; that's only a name.
 - `login.role` is an integer: **1 = admin, 2 = teacher, 3 = student, 4 = parent**. Use the `Login::ROLE_*` constants, not bare numbers. `Login` has `hasOne` relations to `Students`, `Teachers` and `Parents` through `login_id`. Only `is_active` accounts can log in, and public registration is disabled (admins create accounts).
 - `routes/web.php` has one route group per role, guarded by `['auth', 'role:N']`. The `role` alias (`App\Http\Middleware\RoleMiddleware`) is registered in `bootstrap/app.php`. `/dashboard` redirects to the right role dashboard.
 - `RoleMiddleware` returns 403 for a wrong role. Admin actions must live in the `role:1` group, even when they handle another entity (e.g. `POST /admin/students`).
