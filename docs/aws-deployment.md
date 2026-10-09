@@ -13,9 +13,15 @@ Plan agreed 2026-10-09. This is a **demo/showcase** deployment on one EC2 instan
 | Environment | `APP_ENV=production`, **no demo seeding** (SEC-07). First admin comes from `php artisan create-admin` |
 | Deploy flow | Manual: SSH in, run `scripts/deploy.sh` |
 | Email | None. `MAIL_MAILER=array` discards mail, so password resets don't arrive and an admin sets passwords |
-| Instance | `t3.small` (2 GB), Ubuntu 24.04 LTS, nearest region. Check free-plan eligibility in the console; if not eligible use `t3.micro` plus 2 GB swap |
+| Instance | `t3.small` (2 GB), Ubuntu 24.04 LTS, region **us-east-2 (Ohio)**. Check free-plan eligibility in the console; if not eligible use `t3.micro` plus 2 GB swap |
 
-Still to fill in when the server exists: region, instance ID, Elastic IP, DuckDNS name, S3 bucket name.
+## Progress log (update as we go)
+
+- 2026-10-09: plan agreed; repo files merged/PR'd (#32). Repo is **public**, so the server clones over HTTPS and no deploy key is needed. Region is **us-east-2**. Budget alert is **$10**.
+- AWS account activation takes ~24 h, so the AWS steps resume on **2026-10-10**.
+- Next action: "One-time AWS setup" step 1 (root MFA, IAM admin user, $10 budget), then step 2 onward. PR #32 must be merged first so the server can clone `main`.
+- Open question: the user pasted instructions to set up the "Agent Toolkit for AWS" (https://raw.githubusercontent.com/aws/agent-toolkit-for-aws/refs/heads/main/setup-instructions/setup.md). Not done yet; ask the user whether they want it before running anything.
+- Still to fill in when the server exists: instance ID, Elastic IP, DuckDNS name, S3 bucket name.
 
 ## Architecture
 
@@ -33,7 +39,7 @@ Internet -> :80/:443 web (Caddy, TLS)  -> static files from public/
 ## One-time AWS setup
 
 1. **Account safety.** Turn on MFA for the root user, create an IAM admin user for daily work, and create a **$10 budget alert** (Billing > Budgets) before launching anything.
-2. **Region + key pair.** Pick the nearest region. Create an EC2 key pair (store the `.pem` in `~/.ssh`, `chmod 400`).
+2. **Region + key pair.** Use **us-east-2 (Ohio)**; check the console's region dropdown before creating anything. Create an EC2 key pair (store the `.pem` in `~/.ssh`, `chmod 400`).
 3. **Security group.** Inbound: SSH 22 from *my IP only*, HTTP 80 and HTTPS 443 from anywhere. Nothing else.
 4. **S3 backup bucket.** Block all public access, default encryption on, lifecycle rule to expire objects after ~30 days.
 5. **IAM role for the instance.** Policy allowing only `s3:PutObject` (and `s3:ListBucket` if wanted) on that bucket. Attach as the instance profile.
@@ -59,10 +65,10 @@ curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv
 unzip -q awscliv2.zip && sudo ./aws/install
 ```
 
-If the repo is private, create a read-only **deploy key** (`ssh-keygen -t ed25519`), add the public key in GitHub (repo Settings > Deploy keys), then clone over SSH.
+The repo is public, so clone over HTTPS (no key needed). If it is ever made private, use a read-only deploy key (`ssh-keygen -t ed25519`, GitHub repo Settings > Deploy keys) and clone over SSH.
 
 ```bash
-git clone git@github.com:coderaticebear/school_erp.git && cd school_erp
+git clone https://github.com/coderaticebear/school_erp.git && cd school_erp
 cp .env.production.example .env
 cp .env.deploy.example .env.deploy && chmod 600 .env .env.deploy
 ```
@@ -127,7 +133,7 @@ Create the scratch database first (`createdb`), and never restore over the live 
 
 ## Costs and cleanup
 
-Expected well under $100 over 6 months (instance, 30 GB EBS, one Elastic IP while attached, a few cents of S3). When the demo is finished, **terminate the instance, release the Elastic IP, delete leftover EBS volumes/snapshots and the S3 bucket**; unattached IPs and volumes keep billing.
+At full price (no free tier or credits) about **$21/month** in us-east-2: `t3.small` ~$15.20, 30 GB gp3 ~$2.40, public IPv4 ~$3.65, S3 under $1 (`t3.micro` would be ~$14). Six months is ~$130, so the $100 credits last about 5 months; the $10 budget alert is the early warning. A stopped instance still costs ~$6/month for disk and IP. When the demo is finished, **terminate the instance, release the Elastic IP, delete leftover EBS volumes/snapshots and the S3 bucket**; unattached IPs and volumes keep billing.
 
 ## Gotchas specific to this repo
 
