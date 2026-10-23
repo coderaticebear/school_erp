@@ -168,6 +168,9 @@ Differences from MySQL that cause real bugs here:
 - DDL is transactional, so a failed migration rolls back completely.
 - Use Boost `database-schema` / `database-query` to check real columns and foreign keys before writing queries or migrations.
 
+## AWS demo deployment
+`docs/aws-deployment.md` is the runbook and progress log for the EC2 demo (production Docker stack in `compose.prod.yaml`, `docker/prod/`, `scripts/deploy.sh`). Read its progress log before any deployment work and update it as steps finish. Never put real student data on the demo until the SEC items are done.
+
 ## Agent skills
 `SKILLS.md` lists the project's skills, where each comes from, and what's intentionally excluded. `./install-skills.sh` restores them after a clone. When a skill is added or removed, update `SKILLS.md`.
 

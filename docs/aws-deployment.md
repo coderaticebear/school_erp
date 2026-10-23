@@ -21,6 +21,7 @@ Plan agreed 2026-10-09. This is a **demo/showcase** deployment on one EC2 instan
 - AWS account activation takes ~24 h, so the AWS steps resume on **2026-10-10**.
 - Next action: "One-time AWS setup" step 1 (root MFA, IAM admin user, $10 budget), then step 2 onward. PR #32 must be merged first so the server can clone `main`.
 - Open question: the user pasted instructions to set up the "Agent Toolkit for AWS" (https://raw.githubusercontent.com/aws/agent-toolkit-for-aws/refs/heads/main/setup-instructions/setup.md). Not done yet; ask the user whether they want it before running anything.
+- 2026-10-23: npm audit advisories fixed (lockfile only) and the PR's audit check passes. No AWS resources exist yet; next is "One-time AWS setup" step 1.
 - Still to fill in when the server exists: instance ID, Elastic IP, DuckDNS name, S3 bucket name.
 
 ## Architecture
