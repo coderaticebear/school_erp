@@ -96,6 +96,10 @@ All items have Status: Built. Paths are relative to the project root.
 | FR-AUTH-09 | An admin activates or deactivates a student or teacher account on the Edit page. | `app/Http/Controllers/StudentController.php`, `app/Http/Controllers/TeacherController.php` (`toggleActive`), `resources/views/partials/account-status.blade.php` |
 | FR-AUTH-10 | A command creates an admin with a generated password. The password shows once. | `app/Console/Commands/CreateAdmin.php` |
 | FR-AUTH-11 | Logout works only with POST. | `config/adminlte.php`, `CLAUDE.md` |
+| FR-AUTH-12 | After a correct password, every user must enter a 6-digit authenticator code or a one-time recovery code. The secret is encrypted and the recovery codes are hashed. A user with no 2FA can open only the set-up page. | `app/Http/Middleware/EnsureTwoFactor.php`, `app/Http/Controllers/TwoFactorController.php`, `app/Services/TwoFactorAuth.php`, `config/two-factor.php` (SEC-06) |
+| FR-AUTH-13 | A user can see 2FA status and make new recovery codes on the Security page. The dashboard warns when fewer than 3 codes are left. | `app/Http/Controllers/TwoFactorController.php`, `resources/views/two-factor/`, `resources/views/partials/dashboard-notices.blade.php` |
+| FR-AUTH-14 | An admin resets the 2FA of a student, parent or teacher, and a command does it by email. A reset ends all sessions of that account. | `app/Http/Controllers/Admin/TwoFactorResetController.php`, `app/Console/Commands/ResetTwoFactor.php` |
+| FR-AUTH-15 | An admin must enter the password again (valid 15 minutes) before account deactivation, CSV export and setting a password for another person. | `routes/web.php`, `app/Http/Middleware/ConfirmPasswordForCsv.php`, `app/Http/Requests/UpdateStudentRequest.php`, `app/Http/Requests/TeacherRequest.php` |
 
 ### 4.2 Students, parents and teachers
 
@@ -285,6 +289,7 @@ The legacy `users` table was dropped (`2026_10_05_162918_drop_legacy_users_table
 | NFR-SEC-04 | Logs do not hold personal data. A formatter masks database row values, emails and reset tokens. | `app/Logging/RedactPersonalData.php`, `RedactingFormatter.php`, `config/logging.php` |
 | NFR-SEC-05 | No page makes the browser contact another server. Fonts and DataTables are self-hosted. | `public/vendor`, `tests/Feature/Security/SelfHostedAssetsTest.php` |
 | NFR-SEC-07 | Demo seeders throw in production. | `database/seeders/DemoSeeder.php` |
+| NFR-SEC-06 | Two-factor sign-in and password confirmation for sensitive admin actions (see FR-AUTH-12 to FR-AUTH-15). The switch `TWO_FACTOR_REQUIRED` is ignored in production. | `config/two-factor.php`, `tests/Feature/Auth/TwoFactorEdgeCasesTest.php` |
 | NFR-SEC-09 | Sessions are encrypted. The system deletes old sessions every hour. | `config/session.php`, `app/Console/Commands/PruneSessions.php`, `routes/console.php` |
 | NFR-SEC-10 | A strict Content-Security-Policy and other security headers are sent on all responses. Inline scripts need a nonce. | `app/Http/Middleware/SecurityHeaders.php` |
 | NFR-SEC-11 | Password-reset pages do not show whether an email has an account. | `ForgotPasswordController`, `ResetPasswordController` |
@@ -296,7 +301,7 @@ The legacy `users` table was dropped (`2026_10_05_162918_drop_legacy_users_table
 | NFR-SEC-24 | Unused scaffolding (the `User` model, `users` table and register pages) is removed. | `tests/Feature/Security/LegacyUsersTableTest.php` |
 | NFR-RTE-01 | A test fails when a route lacks `auth` and a `role:` middleware. | `tests/Feature/Auth/RouteProtectionTest.php` |
 
-The security audit also has SEC items that are not done yet (for example SEC-01 and SEC-06). The owner tracks them outside this repository.
+The security audit also has SEC items that are not done yet (for example SEC-01). The owner tracks them outside this repository.
 
 ### 7.2 Database roles and logging (Built)
 
@@ -384,6 +389,7 @@ Source: `docs/aws-deployment.md`, `compose.prod.yaml`, `docker/prod/`, `scripts/
 | Date | Change |
 |---|---|
 | 2026-10-23 | First version (reverse PRD) |
+| 2026-10-25 | SEC-06 two-factor sign-in moved to Built (FR-AUTH-12 to FR-AUTH-15, NFR-SEC-06). Design in `docs/prd/two-factor-sign-in.md` |
 
 ## How to use this PRD
 
