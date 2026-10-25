@@ -622,6 +622,16 @@ label:not(.form-check-label):not(.custom-file-label):not(.btn) {
 .alert-info { background: var(--erp-info-tint); border-color: var(--erp-info-line); color: var(--erp-info-strong); }
 .alert-light { background: var(--erp-card); border-color: var(--erp-line); color: var(--erp-text); }
 
+/* A link inside a status alert takes the alert's text colour (the link colour fails contrast on the tints) and stays underlined. */
+.alert-success a, .alert-danger a, .alert-warning a, .alert-info a {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* Field errors: Bootstrap's #dc3545 fails contrast on dark cards. */
+.invalid-feedback { color: var(--erp-problem); }
+
 .alert .close {
     color: inherit;
     opacity: .7;

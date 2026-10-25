@@ -19,6 +19,7 @@ Restart Claude Code afterwards so it loads the skills.
 | `laravel-best-practices` | Laravel Boost | Yes, `.claude/skills/` | Writing and reviewing Laravel code: Eloquent, validation, security, routes |
 | `testing-best-practices` | Laravel Boost | Yes, `.claude/skills/` | Designing and reviewing Pest tests |
 | `infer-conventions` | Laravel Boost | Yes, `.claude/skills/` | Recording this app's own conventions |
+| `implement-prd` | Written by the user | Yes, `.claude/skills/` | **Mandatory** workflow for all new feature work: PRD → clarify → technical design → task breakdown → TDD code → QA. Each phase waits for the user's approval |
 | `playwright-skill` | [`lackeyjb/playwright-skill`](https://github.com/lackeyjb/playwright-skill) via `npx skills` | No, restored by `install-skills.sh` | Browser testing: clicking through pages, JavaScript checks, screenshots, phone layouts |
 | `apple-design` | [`dickwu/apple-design-skill`](https://github.com/dickwu/apple-design-skill) via `npx skills -a claude-code` | No, restored by `install-skills.sh` | Design and UX reviews: layout, hierarchy, accessibility, dark mode, forms, "make this look less generic" |
 

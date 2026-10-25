@@ -29,6 +29,8 @@ class UpdateStudentRequest extends AdminFormRequest
             'postal' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('login', 'email')->ignore($student?->login_id)],
             'password' => ['nullable', 'string', Password::defaults(), 'max:255'],
+            // A new password for another person needs the admin's own password (SEC-06).
+            'current_password' => [Rule::excludeIf(blank($this->input('password'))), 'required', 'string', 'current_password'],
         ];
     }
 
@@ -37,6 +39,6 @@ class UpdateStudentRequest extends AdminFormRequest
      */
     public function attributes(): array
     {
-        return ['dob' => 'date of birth', 'class_division_id' => 'class / division'];
+        return ['dob' => 'date of birth', 'class_division_id' => 'class / division', 'current_password' => 'your password'];
     }
 }

@@ -124,7 +124,7 @@ test('editing a teacher updates profile, email and subjects but keeps the passwo
 test('editing a teacher can change the password', function () {
     $teacher = Teachers::factory()->create();
 
-    $this->put("/admin/teachers/{$teacher->id}", teacherPayload(['email' => $teacher->login->email, 'password' => 'brand-new-pass']));
+    $this->put("/admin/teachers/{$teacher->id}", teacherPayload(['email' => $teacher->login->email, 'password' => 'brand-new-pass', 'current_password' => 'password']));
 
     expect(Hash::check('brand-new-pass', $teacher->fresh()->login->password))->toBeTrue();
 });
@@ -140,6 +140,7 @@ test('a teacher can be deactivated, which blocks login, and reactivated', functi
     $teacher = Teachers::factory()->create();
     $teacher->login->update(['password' => bcrypt('teacher-pass')]);
 
+    confirmPassword();
     $this->post("/admin/teachers/{$teacher->id}/toggle-active")->assertSessionHas('success');
     expect($teacher->login->fresh()->is_active)->toBeFalse();
 

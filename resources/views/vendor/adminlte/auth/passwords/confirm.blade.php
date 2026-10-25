@@ -1,89 +1,32 @@
-@extends('adminlte::master')
+{{-- Confirm Password (SEC-06): CSV exports, deactivation and two-factor resets ask for the password again.
+     It uses the auth-card layout like the two-factor pages, because AdminLTE's lockscreen has no heading, an image
+     with no alt text, an icon button with no name and low contrast in dark mode. --}}
+@extends('adminlte::auth.auth-page', ['authType' => 'login'])
 
-@section('adminlte_css')
-    @yield('css')
+@php($field = fn (string $name) => ['form-control', 'is-invalid' => $errors->has($name)])
+
+@section('auth_header', 'Confirm Your Password')
+
+@section('auth_body')
+    <p>For your security, enter your password again to continue.</p>
+
+    <form action="{{ route('password.confirm') }}" method="post">
+        @csrf
+
+        <div class="form-group">
+            <label for="password">Your Password @include('partials.required')</label>
+            <input id="password" type="password" name="password" @class($field('password'))
+                autocomplete="current-password" required autofocus
+                @error('password') aria-invalid="true" aria-describedby="password-error" @enderror>
+            @include('partials.field-error', ['name' => 'password'])
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Confirm Password</button>
+    </form>
 @stop
 
-@section('classes_body', 'lockscreen')
-
-@php
-    $passResetUrl = View::getSection('password_reset_url') ?? config('adminlte.password_reset_url', 'password/reset');
-    $dashboardUrl = View::getSection('dashboard_url') ?? config('adminlte.dashboard_url', 'home');
-
-    if (config('adminlte.use_route_url', false)) {
-        $passResetUrl = $passResetUrl ? route($passResetUrl) : '';
-        $dashboardUrl = $dashboardUrl ? route($dashboardUrl) : '';
-    } else {
-        $passResetUrl = $passResetUrl ? url($passResetUrl) : '';
-        $dashboardUrl = $dashboardUrl ? url($dashboardUrl) : '';
-    }
-@endphp
-
-@section('body')
-    <div class="lockscreen-wrapper">
-
-        {{-- Lockscreen logo --}}
-        <div class="lockscreen-logo">
-            <a href="{{ $dashboardUrl }}">
-                <img src="{{ asset(config('adminlte.logo_img')) }}" height="50">
-                {!! config('adminlte.logo', '<b>Admin</b>LTE') !!}
-            </a>
-        </div>
-
-        {{-- Lockscreen user name --}}
-        <div class="lockscreen-name">
-            {{ isset(Auth::user()->name) ? Auth::user()->name : Auth::user()->email }}
-        </div>
-
-        {{-- Lockscreen item --}}
-        <div class="lockscreen-item">
-            @if(config('adminlte.usermenu_image'))
-                <div class="lockscreen-image">
-                    <img src="{{ Auth::user()->adminlte_image() }}" alt="{{ Auth::user()->name }}">
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('password.confirm') }}"
-                class="lockscreen-credentials @if(! config('adminlte.usermenu_image')) ml-0 @endif">
-                @csrf
-
-                <div class="input-group">
-                    <input id="password" type="password" name="password"
-                        class="form-control @error('password') is-invalid @enderror"
-                        placeholder="{{ __('adminlte::adminlte.password') }}" required autofocus>
-
-                    <div class="input-group-append">
-                        <button type="submit" class="btn">
-                            <i class="fas fa-arrow-right text-muted"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        {{-- Password error alert --}}
-        @error('password')
-            <div class="lockscreen-subitem text-center" role="alert">
-                <b class="text-danger">{{ $message }}</b>
-            </div>
-        @enderror
-
-        {{-- Help block --}}
-        <div class="help-block text-center">
-            {{ __('adminlte::adminlte.confirm_password_message') }}
-        </div>
-
-        {{-- Additional links --}}
-        <div class="text-center">
-            <a href="{{ $passResetUrl }}">
-                {{ __('adminlte::adminlte.i_forgot_my_password') }}
-            </a>
-        </div>
-
-    </div>
-@stop
-
-@section('adminlte_js')
-    @stack('js')
-    @yield('js')
+@section('auth_footer')
+    <p class="text-center mb-0">
+        <a href="{{ route('password.request') }}">Forgot Your Password?</a>
+    </p>
 @stop

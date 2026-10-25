@@ -44,4 +44,17 @@ class LoginFactory extends Factory
     {
         return $this->state(fn () => ['is_active' => false]);
     }
+
+    /**
+     * A login that has finished two-factor set-up.
+     * The default secret is a valid 32-character base32 string.
+     */
+    public function withTwoFactor(?string $secret = null): static
+    {
+        return $this->state(fn () => [
+            'two_factor_secret' => $secret ?? 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP',
+            'two_factor_confirmed_at' => now(),
+            'two_factor_recovery_codes' => [],
+        ]);
+    }
 }

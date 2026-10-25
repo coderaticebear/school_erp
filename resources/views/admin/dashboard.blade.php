@@ -9,6 +9,8 @@
 @php($unmarked = $todayByDivision->filter(fn ($row) => $row['students'] > 0 && $row['marked'] === 0)->count())
 
 @section('content')
+    @include('partials.dashboard-notices')
+
     @unless ($academicYear)
         <div class="alert alert-warning">There is no active academic year. <a href="{{ route('admin.academic-years.index') }}">Set one up</a> to get started.</div>
     @endunless

@@ -1,10 +1,11 @@
 // SMOKE TEST: every page loads for its role without contacting another server, guests and other roles are kept out, exports download.
-// Read-only: it signs in as the demo accounts and never changes data. Run it against the seeded demo database:
+// Read-only: it signs in as the demo accounts and never changes data. Run it against the seeded demo database,
+// with TWO_FACTOR_REQUIRED=false in .env (the demo accounts have no authenticator app):
 //   node .agents/skills/playwright-skill/run.js tests/e2e/smoke.cjs
 const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
-const { BASE, outputDir, tinker } = require('./support.cjs');
+const { BASE, outputDir, tinker, confirmPassword, assertNoTwoFactorGate } = require('./support.cjs');
 
 const OUT = outputDir('smoke');
 const ids = JSON.parse(tinker(`
@@ -39,12 +40,12 @@ const PAGES = {
         `/admin/divisions/${ids.divisionId}/teachers`, '/admin/academic-years', '/admin/timetable', `/admin/timetable?division=${ids.divisionId}`,
         `/admin/timetable?teacher=${ids.teacherId}`, '/admin/periods', '/admin/exams', `/admin/exams/${ids.examId}`,
         `/admin/exams/${ids.examId}/divisions/${ids.divisionId}`, `/admin/exams/${ids.examId}/students/${ids.studentId}`, '/marks',
-        `/marks/${ids.examId}/${ids.divisionId}/${ids.subjectId}`, '/admin/reports/attendance', '/admin/reports/exams'],
+        `/marks/${ids.examId}/${ids.divisionId}/${ids.subjectId}`, '/admin/reports/attendance', '/admin/reports/exams', '/security'],
     teacher: ['/teacher/dashboard', '/teacher/timetable', '/teacher/classes', `/teacher/classes/${ids.tDivId}`, '/teacher/attendance', '/marks',
-        `/marks/${ids.examId}/${ids.tDivId}/${ids.tSubId}`],
-    student: ['/student/dashboard', '/student/timetable', '/student/attendance', '/student/results', `/student/results/${ids.pubExamId}`],
+        `/marks/${ids.examId}/${ids.tDivId}/${ids.tSubId}`, '/security'],
+    student: ['/student/dashboard', '/student/timetable', '/student/attendance', '/student/results', `/student/results/${ids.pubExamId}`, '/security'],
     parent: ['/parent/dashboard', `/parent/children/${ids.childId}`, `/parent/children/${ids.childId}/timetable`, `/parent/children/${ids.childId}/attendance`,
-        `/parent/children/${ids.childId}/results`, `/parent/children/${ids.childId}/results/${ids.pubExamId}`],
+        `/parent/children/${ids.childId}/results`, `/parent/children/${ids.childId}/results/${ids.pubExamId}`, '/security'],
 };
 const DASHBOARD = { admin: '/admin/dashboard', teacher: '/teacher/dashboard', student: '/student/dashboard', parent: '/parent/dashboard' };
 
@@ -55,6 +56,7 @@ async function signIn(browser, role) {
     await page.fill('input[name=email]', `${role}@example.com`);
     await page.fill('input[name=password]', 'password');
     await Promise.all([page.waitForURL(u => !u.pathname.startsWith('/login')), page.click('button[type=submit]')]);
+    assertNoTwoFactorGate(page);
     return { context, page };
 }
 
@@ -149,6 +151,8 @@ async function signIn(browser, role) {
             await expectStatus("another division's marks sheet is refused", `/marks/${ids.examId}/${ids.otherDivId}/${ids.tSubId}`, 403);
         }
         if (role === 'admin') {
+            // SEC-06: CSV exports need a password from the last 15 minutes. The sign-in counts, but confirm again so a slow run still passes.
+            await confirmPassword(page);
             for (const [label, url] of [
                 ['timetable CSV (division)', `/admin/timetable/export?division=${ids.divisionId}`],
                 ['timetable CSV (teacher)', `/admin/timetable/export?teacher=${ids.teacherId}`],

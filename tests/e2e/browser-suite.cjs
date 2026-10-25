@@ -4,7 +4,7 @@
 const path = require('node:path');
 const fs = require('node:fs');
 const { chromium } = require('playwright');
-const { BASE, outputDir, lastSchoolDay } = require('./support.cjs');
+const { BASE, outputDir, lastSchoolDay, assertNoTwoFactorGate } = require('./support.cjs');
 
 const SCHOOL_DAY = lastSchoolDay();
 
@@ -36,6 +36,7 @@ async function newSession(browser, email, viewport) {
     await page.locator('input[name=email]').fill(email);
     await page.locator('input[name=password]').fill('password');
     await Promise.all([page.waitForURL(u => !u.pathname.startsWith('/login')), page.locator('button[type=submit]').click()]);
+    assertNoTwoFactorGate(page);
     return { context, page };
 }
 

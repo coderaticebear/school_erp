@@ -10,6 +10,11 @@ use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
 
 class EventServiceProvider extends ServiceProvider
 {
+    /**
+     * The Security page (two-factor sign-in and recovery codes, SEC-06). Every role has it.
+     */
+    private const SECURITY_ITEM = ['text' => 'Security', 'url' => 'security', 'icon' => 'fas fa-shield-alt'];
+
     public function register(): void
     {
         //
@@ -42,6 +47,8 @@ class EventServiceProvider extends ServiceProvider
                 ['header' => 'Reports'],
                 ['text' => 'Attendance Report', 'url' => 'admin/reports/attendance', 'icon' => 'fas fa-chart-bar'],
                 ['text' => 'Exam Report', 'url' => 'admin/reports/exams', 'icon' => 'fas fa-chart-line'],
+                ['header' => 'Account'],
+                self::SECURITY_ITEM,
             ],
             Login::ROLE_TEACHER => [
                 ['text' => 'Dashboard', 'url' => 'teacher/dashboard', 'icon' => 'fas fa-tachometer-alt'],
@@ -49,15 +56,18 @@ class EventServiceProvider extends ServiceProvider
                 ['text' => 'My Classes', 'url' => 'teacher/classes', 'icon' => 'fas fa-chalkboard'],
                 ['text' => 'Attendance', 'url' => 'teacher/attendance', 'icon' => 'fas fa-clipboard-check'],
                 ['text' => 'Marks Entry', 'url' => 'marks', 'icon' => 'fas fa-pen'],
+                self::SECURITY_ITEM,
             ],
             Login::ROLE_STUDENT => [
                 ['text' => 'Dashboard', 'url' => 'student/dashboard', 'icon' => 'fas fa-tachometer-alt'],
                 ['text' => 'My Timetable', 'url' => 'student/timetable', 'icon' => 'fas fa-calendar-alt'],
                 ['text' => 'My Attendance', 'url' => 'student/attendance', 'icon' => 'fas fa-clipboard-check'],
                 ['text' => 'My Results', 'url' => 'student/results', 'icon' => 'fas fa-poll'],
+                self::SECURITY_ITEM,
             ],
             Login::ROLE_PARENT => [
                 ['text' => 'My Children', 'url' => 'parent/dashboard', 'icon' => 'fas fa-users'],
+                self::SECURITY_ITEM,
             ],
             default => [],
         };
