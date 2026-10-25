@@ -6,7 +6,7 @@
 @stop
 
 @section('content')
-    @include('partials.alerts')
+    @include('partials.dashboard-notices')
 
     <div class="row">
         <div class="col-sm-6 col-xl-3 mb-3">

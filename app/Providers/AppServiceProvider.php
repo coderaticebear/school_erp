@@ -44,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
         Password::defaults(fn () => Password::min(12)->uncompromised());
 
         $this->limitResetLinkRequests();
+        $this->limitTwoFactorAttempts();
 
         // Admins can manage any division; teachers only the divisions they are assigned to.
         Gate::define('teach-division', function (Login $user, Divisions $division): bool {
@@ -97,5 +98,26 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(5)->by('minute:'.$request->ip())->response($tooManyRequests),
             Limit::perHour(20)->by('hour:'.$request->ip())->response($tooManyRequests),
         ]);
+    }
+
+    /**
+     * Security SEC-06 (FR-2FA-08): the "two-factor" limiter allows 5 code attempts a minute for each login and IP
+     * address, on the challenge and the set-up form. The reply is the same for a right or a wrong code, so it does
+     * not say whether the code or the account was wrong.
+     */
+    private function limitTwoFactorAttempts(): void
+    {
+        $tooManyAttempts = function (Request $request, array $headers): Response {
+            $message = 'Too many attempts. Please wait a minute and try again.';
+            $field = ! $request->filled('code') && $request->filled('recovery_code') ? 'recovery_code' : 'code';
+
+            return $request->expectsJson()
+                ? response()->json(['message' => $message], Response::HTTP_TOO_MANY_REQUESTS, $headers)
+                : back()->withErrors([$field => $message])->withHeaders($headers);
+        };
+
+        RateLimiter::for('two-factor', fn (Request $request) => Limit::perMinute(5)
+            ->by('minute:'.($request->user()?->id ?? 'guest').'|'.$request->ip())
+            ->response($tooManyAttempts));
     }
 }

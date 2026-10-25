@@ -43,10 +43,17 @@ expect()->extend('toBeOne', function () {
 
 /**
  * Create a login with the given role (plus its teacher/student/parent profile) and authenticate as it.
+ * With $withTwoFactor, the login has finished two-factor set-up.
  */
-function actingAsRole(int $role): App\Models\Login
+function actingAsRole(int $role, bool $withTwoFactor = false): App\Models\Login
 {
-    $login = App\Models\Login::factory()->create(['role' => $role]);
+    $factory = App\Models\Login::factory();
+
+    if ($withTwoFactor) {
+        $factory = $factory->withTwoFactor();
+    }
+
+    $login = $factory->create(['role' => $role]);
 
     match ($role) {
         App\Models\Login::ROLE_TEACHER => App\Models\Teachers::factory()->create(['login_id' => $login->id]),
@@ -58,4 +65,57 @@ function actingAsRole(int $role): App\Models\Login
     test()->actingAs($login);
 
     return $login;
+}
+
+/**
+ * The secret that LoginFactory::withTwoFactor() uses by default.
+ */
+const TWO_FACTOR_TEST_SECRET = 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP';
+
+/**
+ * The code an authenticator app shows for a secret, $steps 30-second steps from now.
+ */
+function twoFactorCode(string $secret = TWO_FACTOR_TEST_SECRET, int $steps = 0): string
+{
+    $google2fa = new PragmaRX\Google2FA\Google2FA;
+
+    return $google2fa->oathTotp($secret, $google2fa->getTimestamp() + $steps);
+}
+
+/**
+ * Record that the signed-in user entered the password $secondsAgo seconds ago (the password.confirm page).
+ */
+function confirmPassword(int $secondsAgo = 0): void
+{
+    test()->withSession(['auth.password_confirmed_at' => time() - $secondsAgo]);
+}
+
+/**
+ * Act as an admin who entered the password in the last few minutes.
+ */
+function actingAsConfirmedAdmin(): App\Models\Login
+{
+    $admin = actingAsRole(App\Models\Login::ROLE_ADMIN);
+    confirmPassword();
+
+    return $admin;
+}
+
+/**
+ * Fail when any submitted password reached the session, where failed forms keep their input.
+ *
+ * @param  list<string>  $passwords
+ */
+function expectSessionWithoutPasswords(array $passwords): void
+{
+    $session = serialize(session()->all());
+
+    foreach ($passwords as $password) {
+        expect($session)->not->toContain($password);
+    }
+
+    expect(session()->getOldInput())
+        ->not->toHaveKey('password')
+        ->not->toHaveKey('parent_password')
+        ->not->toHaveKey('current_password');
 }

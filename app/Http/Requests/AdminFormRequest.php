@@ -17,7 +17,7 @@ abstract class AdminFormRequest extends FormRequest
      *
      * @var list<string>
      */
-    protected array $unsanitized = ['password', 'parent_password'];
+    protected array $unsanitized = ['password', 'parent_password', 'current_password'];
 
     public function authorize(): bool
     {

@@ -26,6 +26,8 @@ class TeacherRequest extends AdminFormRequest
             'email' => ['required', 'email', 'max:255', Rule::unique('login', 'email')->ignore($teacher?->login_id)],
             // Required when creating; optional when editing (blank keeps the current password).
             'password' => [$teacher ? 'nullable' : 'required', 'string', Password::defaults(), 'max:255'],
+            // On edit, a new password for another person needs the admin's own password (SEC-06).
+            'current_password' => [Rule::excludeIf(! $teacher || blank($this->input('password'))), 'required', 'string', 'current_password'],
             'subject_ids' => ['required', 'array', 'min:1'],
             'subject_ids.*' => ['integer', 'distinct', 'exists:subjects,id'],
         ];
@@ -44,6 +46,6 @@ class TeacherRequest extends AdminFormRequest
      */
     public function attributes(): array
     {
-        return ['subject_ids' => 'subjects'];
+        return ['subject_ids' => 'subjects', 'current_password' => 'your password'];
     }
 }

@@ -93,7 +93,7 @@
                             <input id="email" type="email" name="email" @class($field('email')) value="{{ old('email', $teacher->login?->email) }}">
                             @include('partials.field-error', ['name' => 'email'])
                         </div>
-                        <div class="form-group mb-0">
+                        <div @class(['form-group', 'mb-0' => ! $editing])>
                             <label for="password">Password @unless ($editing) @include('partials.required') @endunless</label>
                             <input id="password" type="password" name="password" @class($field('password')) autocomplete="new-password">
                             @include('partials.field-error', ['name' => 'password'])
@@ -101,6 +101,14 @@
                                 <small class="form-text text-muted">Leave blank to keep the current password.</small>
                             @endif
                         </div>
+                        @if ($editing)
+                            <div class="form-group mb-0">
+                                <label for="current-password">Your Password</label>
+                                <input id="current-password" type="password" name="current_password" @class($field('current_password')) autocomplete="current-password" aria-describedby="current-password-help">
+                                @include('partials.field-error', ['name' => 'current_password'])
+                                <small id="current-password-help" class="form-text text-muted">Enter your own password when you set a new password above.</small>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -135,6 +143,16 @@
                     'who' => 'teacher',
                 ])
             </div>
+            @if ($teacher->login)
+                <div class="col-lg-6">
+                    @include('partials.two-factor-reset', [
+                        'title' => 'Two-Factor Sign-In',
+                        'name' => $teacher->full_name,
+                        'enabled' => $teacher->login->hasTwoFactorEnabled(),
+                        'action' => route('admin.teachers.two-factor.reset', $teacher),
+                    ])
+                </div>
+            @endif
         </div>
     @endif
 @stop

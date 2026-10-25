@@ -5,7 +5,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
-const { BASE, outputDir, tinker, lastSchoolDay, appToday } = require('./support.cjs');
+const { BASE, outputDir, tinker, lastSchoolDay, appToday, confirmPassword, assertNoTwoFactorGate } = require('./support.cjs');
 
 const OUT = outputDir('functional');
 // Attendance can only be taken on a school day, so the lifecycle uses the most recent one.
@@ -55,6 +55,7 @@ async function newSession(browser, email, password, { expectFail = false } = {})
     await Promise.all([page.waitForLoadState('load'), page.click('button[type=submit]')]);
     await page.waitForLoadState('load');
     if (!expectFail && new URL(page.url()).pathname.startsWith('/login')) throw new Error(`login failed for ${email}`);
+    assertNoTwoFactorGate(page);
     return { context, page };
 }
 
@@ -83,6 +84,8 @@ async function flash(page) {
     });
 
     const { context: adminCtx, page: admin } = await newSession(browser, 'admin@example.com', 'password');
+    // SEC-06: deactivation and CSV exports need the password again; one confirmation lasts 15 minutes.
+    await confirmPassword(admin);
 
     await step('FT-01 admin signs in and lands on the dashboard', admin, async () => {
         expect(new URL(admin.url()).pathname === '/admin/dashboard', `landed on ${admin.url()}`);
@@ -307,6 +310,7 @@ async function flash(page) {
     });
 
     await step('FT-10 timetable CSV export includes the new lessons', admin, async () => {
+        await confirmPassword(admin);
         const r = await adminCtx.request.get(`${BASE}/admin/timetable/export?division=${Q.divisionId}`);
         const body = await r.text();
         expect(r.status() === 200 && body.includes(Q.subjectRenamed), 'export missing subject');
@@ -414,6 +418,7 @@ async function flash(page) {
 
     // ---------- Reports ----------
     await step('FT-17 reports and CSV exports include the new data', admin, async () => {
+        await confirmPassword(admin);
         await admin.goto(`${BASE}/admin/reports/attendance?division=${Q.divisionId}&from=${TODAY}&to=${TODAY}`);
         expect((await admin.textContent('main')).includes(Q.studentLast), 'attendance report missing student');
         const csv = await (await adminCtx.request.get(`${BASE}/admin/reports/attendance?division=${Q.divisionId}&from=${TODAY}&to=${TODAY}&format=csv`)).text();

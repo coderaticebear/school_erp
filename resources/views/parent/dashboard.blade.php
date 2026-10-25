@@ -6,6 +6,8 @@
 @stop
 
 @section('content')
+    @include('partials.dashboard-notices')
+
     <div class="row">
         @forelse ($children as $child)
             @php($student = $child['student'])

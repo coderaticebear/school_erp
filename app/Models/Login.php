@@ -29,14 +29,50 @@ class Login extends Authenticable
         'is_active',
     ];
 
-    protected $hidden = ['password', 'remember_token'];
+    /**
+     * The two-factor fields are hidden and not fillable: only the two-factor code may set them.
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'two_factor_secret',
+        'two_factor_confirmed_at',
+        'two_factor_recovery_codes',
+        'two_factor_last_timestep',
+    ];
 
     protected function casts(): array
     {
         return [
             'role' => 'integer',
             'is_active' => 'boolean',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_confirmed_at' => 'datetime',
+            'two_factor_last_timestep' => 'integer',
         ];
+    }
+
+    /**
+     * The name of the role's own dashboard route. Null for an unknown role.
+     */
+    public function dashboardRouteName(): ?string
+    {
+        return match ($this->role) {
+            self::ROLE_ADMIN => 'admin.dashboard',
+            self::ROLE_TEACHER => 'teacher.dashboard',
+            self::ROLE_STUDENT => 'student.dashboard',
+            self::ROLE_PARENT => 'parent.dashboard',
+            default => null,
+        };
+    }
+
+    /**
+     * True when the user has finished two-factor set-up.
+     */
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_confirmed_at !== null && $this->two_factor_secret !== null;
     }
 
     /**

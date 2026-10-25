@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DivisionTeacherController;
 use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\PeriodController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\TwoFactorResetController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MarksController;
 use App\Http\Controllers\Portal\ParentPortalController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Teacher\AttendanceController as TeacherAttendanceContro
 use App\Http\Controllers\Teacher\PortalController as TeacherPortalController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TimeTableController;
+use App\Http\Controllers\TwoFactorController;
 use App\Models\Login;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -31,16 +33,29 @@ Route::get('/', function () {
 
 // Fallback dashboard route that redirects based on role
 Route::get('/dashboard', function () {
-    $user = auth()->user();
+    $routeName = auth()->user()->dashboardRouteName();
+    abort_if($routeName === null, 403);
 
-    return match ((int) $user->role) {
-        Login::ROLE_ADMIN => redirect()->route('admin.dashboard'),
-        Login::ROLE_TEACHER => redirect()->route('teacher.dashboard'),
-        Login::ROLE_STUDENT => redirect()->route('student.dashboard'),
-        Login::ROLE_PARENT => redirect()->route('parent.dashboard'),
-        default => abort(403),
-    };
+    return redirect()->route($routeName);
 })->middleware(['auth', 'role'])->name('dashboard');
+
+// Two-factor sign-in (SEC-06): every role. EnsureTwoFactor lets these routes through before verification.
+Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN.','.Login::ROLE_TEACHER.','.Login::ROLE_STUDENT.','.Login::ROLE_PARENT])
+    ->prefix('two-factor')->name('two-factor.')->group(function () {
+        Route::get('/setup', [TwoFactorController::class, 'setup'])->name('setup');
+        Route::post('/setup', [TwoFactorController::class, 'enable'])->middleware('throttle:two-factor')->name('enable');
+        Route::get('/codes', [TwoFactorController::class, 'codes'])->name('codes');
+        Route::get('/challenge', [TwoFactorController::class, 'challenge'])->name('challenge');
+        Route::post('/challenge', [TwoFactorController::class, 'verify'])->middleware('throttle:two-factor')->name('verify');
+    });
+
+// Security page (SEC-06): every role. These routes are not two-factor.*, so EnsureTwoFactor guards them.
+Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN.','.Login::ROLE_TEACHER.','.Login::ROLE_STUDENT.','.Login::ROLE_PARENT])
+    ->prefix('security')->name('security.')->group(function () {
+        Route::get('/', [TwoFactorController::class, 'manage'])->name('index');
+        Route::post('/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])
+            ->middleware('password.confirm')->name('recovery-codes');
+    });
 
 // Admin routes
 Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {
@@ -53,8 +68,15 @@ Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {
     Route::get('/admin/view/student/{id}', [AdminController::class, 'viewStudent'])->name('admin.students.show');
     Route::get('/admin/students/{student}/edit', [StudentController::class, 'edit'])->name('admin.students.edit');
     Route::put('/admin/students/{student}', [StudentController::class, 'update'])->name('admin.students.update');
-    Route::post('/admin/students/{student}/toggle-active', [StudentController::class, 'toggleActive'])->name('admin.students.toggle-active');
+    Route::post('/admin/students/{student}/toggle-active', [StudentController::class, 'toggleActive'])->middleware('password.confirm')->name('admin.students.toggle-active');
     Route::post('/admin/getParentByEmail', [AdminController::class, 'getParentByEmail']);
+
+    // Two-factor reset for a lost device (SEC-06): needs a recent admin password; never resets an admin account.
+    Route::middleware('password.confirm')->name('admin.')->group(function () {
+        Route::post('/admin/students/{student}/two-factor/reset', [TwoFactorResetController::class, 'student'])->name('students.two-factor.reset');
+        Route::post('/admin/students/{student}/parent/two-factor/reset', [TwoFactorResetController::class, 'parent'])->name('students.parent-two-factor.reset');
+        Route::post('/admin/teachers/{teacher}/two-factor/reset', [TwoFactorResetController::class, 'teacher'])->name('teachers.two-factor.reset');
+    });
 
     // Teachers
     Route::get('/teachers', [TeacherController::class, 'getTeacher'])->name('admin.teachers.index');
@@ -63,7 +85,7 @@ Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {
     Route::post('/admin/teachers', [TeacherController::class, 'store'])->name('admin.teachers.store');
     Route::get('/admin/teachers/{teacher}/edit', [TeacherController::class, 'edit'])->name('admin.teachers.edit');
     Route::put('/admin/teachers/{teacher}', [TeacherController::class, 'update'])->name('admin.teachers.update');
-    Route::post('/admin/teachers/{teacher}/toggle-active', [TeacherController::class, 'toggleActive'])->name('admin.teachers.toggle-active');
+    Route::post('/admin/teachers/{teacher}/toggle-active', [TeacherController::class, 'toggleActive'])->middleware('password.confirm')->name('admin.teachers.toggle-active');
 
     // Subjects
     Route::get('/subjects', [SubjectController::class, 'index'])->name('admin.subjects.index');
@@ -95,7 +117,7 @@ Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {
     Route::put('/admin/timetable/entries', [TimeTableController::class, 'saveEntry'])->name('admin.timetable.entries.save');
     Route::delete('/admin/timetable/entries', [TimeTableController::class, 'clearEntry'])->name('admin.timetable.entries.clear');
     Route::post('/admin/timetable/publish', [TimeTableController::class, 'publish'])->name('admin.timetable.publish');
-    Route::get('/admin/timetable/export', [TimeTableController::class, 'export'])->name('admin.timetable.export');
+    Route::get('/admin/timetable/export', [TimeTableController::class, 'export'])->middleware('password.confirm')->name('admin.timetable.export');
 
     // Exams and results
     Route::get('/admin/exams', [ExamController::class, 'index'])->name('admin.exams.index');
@@ -104,12 +126,12 @@ Route::middleware(['auth', 'role:'.Login::ROLE_ADMIN])->group(function () {
     Route::put('/admin/exams/{exam}', [ExamController::class, 'update'])->name('admin.exams.update');
     Route::delete('/admin/exams/{exam}', [ExamController::class, 'destroy'])->name('admin.exams.destroy');
     Route::post('/admin/exams/{exam}/publish', [ExamController::class, 'togglePublish'])->name('admin.exams.publish');
-    Route::get('/admin/exams/{exam}/divisions/{division}', [ExamController::class, 'results'])->name('admin.exams.results');
+    Route::get('/admin/exams/{exam}/divisions/{division}', [ExamController::class, 'results'])->middleware('confirm-csv')->name('admin.exams.results');
     Route::get('/admin/exams/{exam}/students/{student}', [ExamController::class, 'reportCard'])->name('admin.exams.report-card');
 
-    // Reports
-    Route::get('/admin/reports/attendance', [ReportController::class, 'attendance'])->name('admin.reports.attendance');
-    Route::get('/admin/reports/exams', [ReportController::class, 'exams'])->name('admin.reports.exams');
+    // Reports (a CSV download needs a recent admin password, SEC-06)
+    Route::get('/admin/reports/attendance', [ReportController::class, 'attendance'])->middleware('confirm-csv')->name('admin.reports.attendance');
+    Route::get('/admin/reports/exams', [ReportController::class, 'exams'])->middleware('confirm-csv')->name('admin.reports.exams');
 
     // Bell schedule
     Route::get('/admin/periods', [PeriodController::class, 'index'])->name('admin.periods.index');

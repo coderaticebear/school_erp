@@ -205,6 +205,7 @@ test('a student is deactivated from the edit page', function () {
     $student = Students::factory()->create();
 
     $this->get("/admin/students/{$student->id}/edit")->assertSee('Deactivate Student');
+    confirmPassword();
     $this->from("/admin/students/{$student->id}/edit")->post("/admin/students/{$student->id}/toggle-active")
         ->assertRedirect("/admin/students/{$student->id}/edit");
     $this->get("/admin/students/{$student->id}/edit")->assertSee('Reactivate Student');
@@ -273,7 +274,7 @@ test('editing a student without a class enrols them for the active year', functi
 test('editing a student can change login email and password', function () {
     $student = Students::factory()->create();
 
-    $this->put("/admin/students/{$student->id}", studentUpdatePayload($student, ['email' => 'new@example.test', 'password' => 'new-password']))
+    $this->put("/admin/students/{$student->id}", studentUpdatePayload($student, ['email' => 'new@example.test', 'password' => 'new-password', 'current_password' => 'password']))
         ->assertSessionHasNoErrors();
 
     $login = $student->fresh()->login;
@@ -296,6 +297,7 @@ test('student edit validation', function (array $overrides, string $field) {
 
 test('a student can be deactivated and reactivated', function () {
     $student = Students::factory()->create();
+    confirmPassword();
 
     $this->post("/admin/students/{$student->id}/toggle-active")->assertSessionHas('success');
     expect($student->login->fresh()->is_active)->toBeFalse();
@@ -333,24 +335,6 @@ test('the student profile shows real class, attendance and contact details', fun
         ->assertDontSee('No teacher has been assigned yet')
         ->assertDontSee('No data found');
 });
-
-/**
- * Fail when any submitted password reached the session, where failed forms keep their input.
- *
- * @param  list<string>  $passwords
- */
-function expectSessionWithoutPasswords(array $passwords): void
-{
-    $session = serialize(session()->all());
-
-    foreach ($passwords as $password) {
-        expect($session)->not->toContain($password);
-    }
-
-    expect(session()->getOldInput())
-        ->not->toHaveKey('password')
-        ->not->toHaveKey('parent_password');
-}
 
 test('a failed add student form keeps its input but never the passwords', function () {
     $this->from('/admin/addStudent')
@@ -406,7 +390,7 @@ test('editing a student with no active year keeps the input but never the new pa
     $this->academicYear->update(['is_active' => false]);
 
     $this->from("/admin/students/{$student->id}/edit")
-        ->put("/admin/students/{$student->id}", studentUpdatePayload($student, ['password' => 'Student-Secret-7733']))
+        ->put("/admin/students/{$student->id}", studentUpdatePayload($student, ['password' => 'Student-Secret-7733', 'current_password' => 'password']))
         ->assertRedirect("/admin/students/{$student->id}/edit")
         ->assertSessionHas('error')
         ->assertSessionHasInput('first_name', 'Renamed');

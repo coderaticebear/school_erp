@@ -89,11 +89,17 @@
                             <input id="email" type="email" name="email" @class($field('email')) value="{{ old('email', $student->login?->email) }}">
                             @include('partials.field-error', ['name' => 'email'])
                         </div>
-                        <div class="form-group mb-0">
+                        <div class="form-group">
                             <label for="password">Password</label>
                             <input id="password" type="password" name="password" @class($field('password')) autocomplete="new-password">
                             @include('partials.field-error', ['name' => 'password'])
                             <small class="form-text text-muted">Leave blank to keep the current password.</small>
+                        </div>
+                        <div class="form-group mb-0">
+                            <label for="current-password">Your Password</label>
+                            <input id="current-password" type="password" name="current_password" @class($field('current_password')) autocomplete="current-password" aria-describedby="current-password-help">
+                            @include('partials.field-error', ['name' => 'current_password'])
+                            <small id="current-password-help" class="form-text text-muted">Enter your own password when you set a new password above.</small>
                         </div>
                     </div>
                 </div>
@@ -155,5 +161,26 @@
                 'who' => 'student',
             ])
         </div>
+        @if ($student->login)
+            <div class="col-lg-6">
+                @include('partials.two-factor-reset', [
+                    'title' => 'Two-Factor Sign-In',
+                    'name' => $student->first_name.' '.$student->last_name,
+                    'enabled' => $student->login->hasTwoFactorEnabled(),
+                    'action' => route('admin.students.two-factor.reset', $student),
+                ])
+            </div>
+        @endif
+        @if ($student->parent?->login)
+            <div class="col-lg-6">
+                @include('partials.two-factor-reset', [
+                    'title' => 'Parent Two-Factor Sign-In',
+                    'intro' => 'Parent: '.$student->parent->first_name.' '.$student->parent->last_name.' ('.$student->parent->login->email.')',
+                    'name' => $student->parent->first_name.' '.$student->parent->last_name,
+                    'enabled' => $student->parent->login->hasTwoFactorEnabled(),
+                    'action' => route('admin.students.parent-two-factor.reset', $student),
+                ])
+            </div>
+        @endif
     </div>
 @stop

@@ -22,7 +22,7 @@ class StudentController extends Controller
      *
      * @var list<string>
      */
-    protected const PASSWORD_FIELDS = ['password', 'parent_password'];
+    protected const PASSWORD_FIELDS = ['password', 'parent_password', 'current_password'];
 
     /**
      * Create the student's login and profile, attach (or create) the parent,
@@ -125,7 +125,7 @@ class StudentController extends Controller
     public function edit(Students $student): View
     {
         $academicYear = AcademicYear::current();
-        $student->load('login');
+        $student->load(['login', 'parent.login']);
 
         $currentDivisionId = $academicYear
             ? StudentClass::query()
