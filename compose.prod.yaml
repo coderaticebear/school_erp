@@ -1,0 +1,93 @@
+# Production stack for the AWS demo. See docs/aws-deployment.md.
+#   docker compose -f compose.prod.yaml up -d --build
+#
+# Two env files, on purpose:
+#   .env         app settings; the only file the long-running app, scheduler and web containers see.
+#   .env.deploy  Postgres superuser and schema-owner passwords; only the pgsql service and the
+#                one-off `tools` service (migrations, db:provision-roles, create-admin) read it.
+# Compose also reads .env to fill in ${SITE_ADDRESS}.
+
+x-app: &app
+    image: school-erp-app
+    build:
+        context: .
+        dockerfile: docker/prod/Dockerfile
+        target: app
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+        - storage:/var/www/html/storage
+    networks:
+        - internal
+
+services:
+    app:
+        <<: *app
+        command: sh -c "php artisan config:cache && php artisan event:cache && php artisan view:cache && exec php-fpm"
+        depends_on:
+            pgsql:
+                condition: service_healthy
+
+    scheduler:
+        <<: *app
+        # sessions:prune runs hourly from routes/console.php (SEC-09).
+        command: sh -c "php artisan config:cache && exec php artisan schedule:work"
+        depends_on:
+            pgsql:
+                condition: service_healthy
+
+    web:
+        image: school-erp-web
+        build:
+            context: .
+            dockerfile: docker/prod/Dockerfile
+            target: web
+        restart: unless-stopped
+        environment:
+            SITE_ADDRESS: ${SITE_ADDRESS:?set SITE_ADDRESS in .env}
+        ports:
+            - '80:80'
+            - '443:443'
+        volumes:
+            - caddy-data:/data
+            - caddy-config:/config
+        depends_on:
+            - app
+        networks:
+            - internal
+
+    pgsql:
+        image: 'postgres:18-alpine'
+        restart: unless-stopped
+        # Not published to the host: only the other containers can reach it.
+        env_file: .env.deploy
+        volumes:
+            - pgsql-data:/var/lib/postgresql
+        networks:
+            - internal
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -q -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
+    # One-off commands: docker compose -f compose.prod.yaml run --rm tools php artisan ...
+    tools:
+        <<: *app
+        restart: 'no'
+        profiles: [tools]
+        env_file:
+            - .env
+            - .env.deploy
+        depends_on:
+            pgsql:
+                condition: service_healthy
+
+networks:
+    internal:
+
+volumes:
+    pgsql-data:
+    storage:
+    caddy-data:
+    caddy-config:

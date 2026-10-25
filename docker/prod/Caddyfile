@@ -1,0 +1,13 @@
+# SITE_ADDRESS is the DuckDNS host name (e.g. myschool.duckdns.org). Caddy gets and renews the
+# Let's Encrypt certificate for it by itself, so ports 80 and 443 must be reachable.
+{$SITE_ADDRESS} {
+	root * /var/www/html/public
+	encode zstd gzip
+
+	# Security headers for PHP pages come from App\Http\Middleware\SecurityHeaders (SEC-10).
+	header X-Content-Type-Options nosniff
+	header -Server
+
+	php_fastcgi app:9000
+	file_server
+}
